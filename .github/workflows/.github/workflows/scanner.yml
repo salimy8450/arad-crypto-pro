@@ -1,0 +1,48 @@
+
+name: ARAD CRYPTO PRO Scanner
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: arad-crypto-scanner
+  cancel-in-progress: false
+
+jobs:
+  scanner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepare signal history
+        run: |
+          if [ ! -f signal_state.json ]; then
+            echo '{}' > signal_state.json
+          fi
+
+      - name: Restore signal history
+        uses: actions/cache@v4
+        with:
+          path: signal_state.json
+          key: signal-state-${{ github.ref }}-${{ github.run_id }}
+          restore-keys: |
+            signal-state-${{ github.ref }}-
+
+      - name: Run ARAD Scanner
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python bot.py
