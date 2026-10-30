@@ -8,15 +8,15 @@ import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================
-# ARAD CRYPTO PRO V2
-# Bybit USDT Perpetual Market Scanner
+# ARAD CRYPTO PRO V3
+# MEXC USDT Perpetual Market Scanner
 # Signals only - No automatic trading
 # ==========================================
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 CHAT_ID = os.getenv("CHAT_ID", "")
 
-BASE_URL = "https://api.bybit.com"
+BASE_URL = "https://api.mexc.com"
 
 MAX_COINS = 100
 MIN_SCORE = 75
@@ -25,10 +25,17 @@ STATE_FILE = "signal_state.json"
 COOLDOWN_HOURS = 4
 
 MEME_COINS = {
-    "DOGEUSDT", "SHIBUSDT", "PEPEUSDT",
-    "BONKUSDT", "WIFUSDT", "FLOKIUSDT",
-    "BOMEUSDT", "MEMEUSDT", "TURBOUSDT",
-    "1000SATSUSDT", "1000CHEEMSUSDT"
+    "DOGE_USDT",
+    "SHIB_USDT",
+    "PEPE_USDT",
+    "BONK_USDT",
+    "WIF_USDT",
+    "FLOKI_USDT",
+    "BOME_USDT",
+    "MEME_USDT",
+    "TURBO_USDT",
+    "1000SATS_USDT",
+    "1000CHEEMS_USDT"
 }
 
 
@@ -45,27 +52,38 @@ def api_get(path, params=None):
         try:
             req = urllib.request.Request(
                 url,
-                headers={"User-Agent": "ARAD-CRYPTO-PRO/2.0"}
+                headers={
+                    "User-Agent": "ARAD-CRYPTO-PRO/3.0",
+                    "Accept": "application/json"
+                }
             )
 
             with urllib.request.urlopen(req, timeout=25) as response:
                 result = json.loads(response.read().decode())
 
-            if result.get("retCode", 0) != 0:
+            if result.get("success") is False:
                 raise RuntimeError(
-                    "Bybit API error: " + str(result)
+                    "MEXC API error: " + str(result)
+                )
+
+            if result.get("code", 0) != 0:
+                raise RuntimeError(
+                    "MEXC API error: " + str(result)
                 )
 
             return result
 
         except urllib.error.HTTPError as exc:
-            # Do not retry permanent access restrictions
+            print(
+                "MEXC HTTP error:",
+                exc.code,
+                exc.reason
+            )
+
             if exc.code in (403, 451):
                 raise RuntimeError(
-                    f"Bybit access restricted: HTTP {exc.code}"
+                    f"MEXC access restricted: HTTP {exc.code}"
                 ) from exc
-
-            print("API attempt", attempt + 1, "failed:", exc)
 
             if attempt == 2:
                 raise
@@ -73,7 +91,12 @@ def api_get(path, params=None):
             time.sleep(2 * (attempt + 1))
 
         except Exception as exc:
-            print("API attempt", attempt + 1, "failed:", exc)
+            print(
+                "API attempt",
+                attempt + 1,
+                "failed:",
+                exc
+            )
 
             if attempt == 2:
                 raise
@@ -89,8 +112,9 @@ def telegram_send(message):
         return False
 
     url = (
-        f"https://api.telegram.org/bot"
-        f"{BOT_TOKEN}/sendMessage"
+        "https://api.telegram.org/bot"
+        + BOT_TOKEN
+        + "/sendMessage"
     )
 
     data = urllib.parse.urlencode({
@@ -162,36 +186,73 @@ def rsi(values, period=14):
 
 def get_market_data(symbol, interval):
     interval_map = {
-        "15m": "15",
-        "1h": "60"
+        "15m": ("Min15", 900),
+        "1h": ("Min60", 3600)
     }
 
+    mexc_interval, seconds = interval_map[interval]
+
+    now = int(time.time())
+
+    # Request enough history for EMA and volume analysis
+    start = now - (125 * seconds)
+
     result = api_get(
-        "/v5/market/kline",
+        "/api/v1/contract/kline/" + symbol,
         {
-            "category": "linear",
-            "symbol": symbol,
-            "interval": interval_map[interval],
-            "limit": 120
+            "interval": mexc_interval,
+            "start": start,
+            "end": now
         }
     )
 
-    candles = result["result"]["list"]
+    data = result.get("data")
 
-    # Bybit returns newest candles first
-    candles = sorted(candles, key=lambda c: int(c[0]))
+    if not isinstance(data, dict):
+        return None
 
-    # Ignore unfinished candle
-    candles = candles[:-1]
+    times = data.get("time", [])
+    closes = data.get("close", [])
+    highs = data.get("high", [])
+    lows = data.get("low", [])
+    volumes = data.get("vol", [])
+
+    count = min(
+        len(times),
+        len(closes),
+        len(highs),
+        len(lows),
+        len(volumes)
+    )
+
+    candles = []
+
+    for i in range(count):
+        candle_time = int(times[i])
+
+        # Ignore unfinished candle
+        if candle_time + seconds > now:
+            continue
+
+        candles.append({
+            "time": candle_time,
+            "close": float(closes[i]),
+            "high": float(highs[i]),
+            "low": float(lows[i]),
+            "volume": float(volumes[i])
+        })
+
+    candles.sort(key=lambda item: item["time"])
 
     if len(candles) < 60:
+        print("Not enough candles:", symbol, interval)
         return None
 
     return {
-        "close": [float(c[4]) for c in candles],
-        "high": [float(c[2]) for c in candles],
-        "low": [float(c[3]) for c in candles],
-        "volume": [float(c[5]) for c in candles]
+        "close": [c["close"] for c in candles],
+        "high": [c["high"] for c in candles],
+        "low": [c["low"] for c in candles],
+        "volume": [c["volume"] for c in candles]
     }
 
 
@@ -364,8 +425,8 @@ def format_signal(signal):
     )
 
     return (
-        "🚀 ARAD CRYPTO PRO V2\n\n"
-        f"صرافی داده: Bybit Futures\n"
+        "🚀 ARAD CRYPTO PRO V3\n\n"
+        "صرافی داده: MEXC Futures\n"
         f"ارز: {signal['symbol']}\n"
         f"جهت: {direction}\n"
         f"ورود: {signal['entry']:.8g}\n"
@@ -377,71 +438,85 @@ def format_signal(signal):
         "تأیید روند: 15m + 1h\n"
         f"زمان: {datetime.now(timezone.utc).strftime('%H:%M UTC')}\n\n"
         "⚠️ امتیاز، احتمال موفقیت نیست. "
-        "قبل از معامله بررسی شود."
+        "قیمت و امکان معامله را در اوربیت بررسی کن."
     )
 
 
 # ---------- SYMBOL DISCOVERY ----------
 
 def get_symbols():
-    active = set()
-    cursor = None
+    contracts_result = api_get(
+        "/api/v1/contract/detail"
+    )
 
-    # Read all pages of USDT perpetual contracts
-    while True:
-        params = {
-            "category": "linear",
-            "limit": 1000
-        }
+    contracts = contracts_result.get("data", [])
 
-        if cursor:
-            params["cursor"] = cursor
-
-        result = api_get(
-            "/v5/market/instruments-info",
-            params
+    if not isinstance(contracts, list):
+        raise RuntimeError(
+            "Unexpected MEXC contract list format."
         )
 
-        for item in result["result"]["list"]:
-            if (
-                item.get("status") == "Trading"
-                and item.get("quoteCoin") == "USDT"
-                and item.get("contractType") == "LinearPerpetual"
-            ):
-                active.add(item["symbol"])
+    active = set()
 
-        cursor = result["result"].get("nextPageCursor")
+    for item in contracts:
+        if (
+            item.get("quoteCoin") == "USDT"
+            and item.get("settleCoin") == "USDT"
+            and item.get("futureType") == 1
+        ):
+            active.add(item["symbol"])
 
-        if not cursor:
-            break
+    if not active:
+        raise RuntimeError(
+            "No USDT perpetual contracts found."
+        )
 
-    # Meme coins that are actually listed
+    # Keep only meme coins that actually exist
     memes = [
         symbol for symbol in MEME_COINS
         if symbol in active
     ]
 
     tickers_result = api_get(
-        "/v5/market/tickers",
-        {"category": "linear"}
+        "/api/v1/contract/ticker"
     )
 
-    tickers = [
-        item for item in tickers_result["result"]["list"]
-        if item["symbol"] in active
+    tickers = tickers_result.get("data", [])
+
+    # Some API responses may return one ticker object
+    if isinstance(tickers, dict):
+        tickers = [tickers]
+
+    if not isinstance(tickers, list):
+        raise RuntimeError(
+            "Unexpected MEXC ticker format."
+        )
+
+    valid_tickers = [
+        item for item in tickers
+        if (
+            item.get("symbol") in active
+            and float(item.get("amount24") or 0) > 0
+        )
     ]
 
-    tickers.sort(
-        key=lambda x: float(x.get("turnover24h", 0)),
+    valid_tickers.sort(
+        key=lambda x: float(x.get("amount24") or 0),
         reverse=True
     )
 
     top_symbols = [
         item["symbol"]
-        for item in tickers[:MAX_COINS]
+        for item in valid_tickers[:MAX_COINS]
     ]
 
-    return list(dict.fromkeys(memes + top_symbols))
+    selected = list(dict.fromkeys(memes + top_symbols))
+
+    print("Active USDT perpetual contracts:", len(active))
+    print("Meme coins included:", len(memes))
+    print("Top liquid coins selected:", len(top_symbols))
+
+    return selected
 
 
 # ---------- SIGNAL HISTORY ----------
@@ -472,7 +547,8 @@ def can_send(signal, state):
 # ---------- MAIN ----------
 
 def main():
-    print("ARAD CRYPTO PRO V2 started.")
+    print("ARAD CRYPTO PRO V3 started.")
+    print("Data source: MEXC Futures")
     print("UTC:", datetime.now(timezone.utc).isoformat())
 
     if not BOT_TOKEN or not CHAT_ID:
@@ -487,8 +563,8 @@ def main():
 
     except Exception as exc:
         error_message = (
-            "⚠️ ARAD CRYPTO PRO V2\n"
-            "دریافت اطلاعات بازار Bybit ناموفق بود.\n"
+            "⚠️ ARAD CRYPTO PRO V3\n"
+            "دریافت اطلاعات بازار MEXC ناموفق بود.\n"
             f"خطا: {str(exc)[:300]}"
         )
 
@@ -501,7 +577,10 @@ def main():
     sent_count = 0
 
     for index, symbol in enumerate(symbols, start=1):
-        print(f"[{index}/{len(symbols)}] Scanning {symbol}")
+        print(
+            f"[{index}/{len(symbols)}] "
+            f"Scanning {symbol}"
+        )
 
         signal = make_signal(symbol)
 
