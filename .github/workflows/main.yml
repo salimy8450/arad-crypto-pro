@@ -1,10 +1,11 @@
+
 name: ARAD CRYPTO PRO Scanner
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - "test_mexc.py"
+      - "bot.py"
       - ".github/workflows/main.yml"
 
 permissions:
@@ -13,7 +14,7 @@ permissions:
 jobs:
   scanner:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
@@ -24,8 +25,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install requests
-        run: python -m pip install requests
-
-      - name: Test MEXC connection
-        run: python test_mexc.py
+      - name: Run ARAD CRYPTO PRO
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: python bot.py
