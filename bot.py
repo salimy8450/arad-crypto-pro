@@ -8,14 +8,15 @@ import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================
-# ARAD CRYPTO PRO V1
-# Binance USDT-M Futures Signal Scanner
+# ARAD CRYPTO PRO V2
+# Bybit USDT Perpetual Market Scanner
+# Signals only - No automatic trading
 # ==========================================
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 CHAT_ID = os.getenv("CHAT_ID", "")
 
-BASE_URL = "https://fapi.binance.com"
+BASE_URL = "https://api.bybit.com"
 
 MAX_COINS = 100
 MIN_SCORE = 75
@@ -34,25 +35,49 @@ MEME_COINS = {
 # ---------- HTTP REQUEST ----------
 
 def api_get(path, params=None):
+    query = urllib.parse.urlencode(params or {})
     url = BASE_URL + path
 
-    if params:
-        url += "?" + urllib.parse.urlencode(params)
+    if query:
+        url += "?" + query
 
     for attempt in range(3):
         try:
             req = urllib.request.Request(
                 url,
-                headers={"User-Agent": "ARAD-CRYPTO-PRO"}
+                headers={"User-Agent": "ARAD-CRYPTO-PRO/2.0"}
             )
 
             with urllib.request.urlopen(req, timeout=25) as response:
-                return json.loads(response.read().decode())
+                result = json.loads(response.read().decode())
+
+            if result.get("retCode", 0) != 0:
+                raise RuntimeError(
+                    "Bybit API error: " + str(result)
+                )
+
+            return result
+
+        except urllib.error.HTTPError as exc:
+            # Do not retry permanent access restrictions
+            if exc.code in (403, 451):
+                raise RuntimeError(
+                    f"Bybit access restricted: HTTP {exc.code}"
+                ) from exc
+
+            print("API attempt", attempt + 1, "failed:", exc)
+
+            if attempt == 2:
+                raise
+
+            time.sleep(2 * (attempt + 1))
 
         except Exception as exc:
             print("API attempt", attempt + 1, "failed:", exc)
+
             if attempt == 2:
                 raise
+
             time.sleep(2 * (attempt + 1))
 
 
@@ -60,7 +85,8 @@ def api_get(path, params=None):
 
 def telegram_send(message):
     if not BOT_TOKEN or not CHAT_ID:
-        raise RuntimeError("Missing Telegram secrets")
+        print("Telegram secrets are missing.")
+        return False
 
     url = (
         f"https://api.telegram.org/bot"
@@ -135,16 +161,27 @@ def rsi(values, period=14):
 # ---------- MARKET DATA ----------
 
 def get_market_data(symbol, interval):
-    candles = api_get(
-        "/fapi/v1/klines",
+    interval_map = {
+        "15m": "15",
+        "1h": "60"
+    }
+
+    result = api_get(
+        "/v5/market/kline",
         {
+            "category": "linear",
             "symbol": symbol,
-            "interval": interval,
+            "interval": interval_map[interval],
             "limit": 120
         }
     )
 
-    # Ignore the unfinished candle
+    candles = result["result"]["list"]
+
+    # Bybit returns newest candles first
+    candles = sorted(candles, key=lambda c: int(c[0]))
+
+    # Ignore unfinished candle
     candles = candles[:-1]
 
     if len(candles) < 60:
@@ -275,7 +312,6 @@ def make_signal(symbol):
         risk = atr * 1.5
 
         if direction == "LONG":
-
             sl = entry - risk
 
             targets = [
@@ -287,7 +323,6 @@ def make_signal(symbol):
             ]
 
         else:
-
             sl = entry + risk
 
             targets = [
@@ -329,62 +364,87 @@ def format_signal(signal):
     )
 
     return (
-        "🚀 ARAD CRYPTO PRO V1\n\n"
+        "🚀 ARAD CRYPTO PRO V2\n\n"
+        f"صرافی داده: Bybit Futures\n"
         f"ارز: {signal['symbol']}\n"
         f"جهت: {direction}\n"
         f"ورود: {signal['entry']:.8g}\n"
         f"حد ضرر: {signal['sl']:.8g}\n\n"
         f"{targets}\n\n"
-        f"قدرت سیگنال: {signal['score']}%\n"
+        f"امتیاز الگوریتم: {signal['score']}\n"
         f"RSI 15m: {signal['rsi']:.1f}\n"
         f"نسبت حجم: {signal['volume']:.2f}x\n"
         "تأیید روند: 15m + 1h\n"
         f"زمان: {datetime.now(timezone.utc).strftime('%H:%M UTC')}\n\n"
-        "⚠️ سیگنال تحلیلی است؛ قبل از ورود بررسی شود."
+        "⚠️ امتیاز، احتمال موفقیت نیست. "
+        "قبل از معامله بررسی شود."
     )
 
 
 # ---------- SYMBOL DISCOVERY ----------
 
 def get_symbols():
-    exchange = api_get("/fapi/v1/exchangeInfo")
-    tickers = api_get("/fapi/v1/ticker/24hr")
+    active = set()
+    cursor = None
 
-    active = {
-        item["symbol"]
-        for item in exchange["symbols"]
-        if (
-            item["status"] == "TRADING"
-            and item["quoteAsset"] == "USDT"
-            and item["contractType"] == "PERPETUAL"
+    # Read all pages of USDT perpetual contracts
+    while True:
+        params = {
+            "category": "linear",
+            "limit": 1000
+        }
+
+        if cursor:
+            params["cursor"] = cursor
+
+        result = api_get(
+            "/v5/market/instruments-info",
+            params
         )
-    }
 
-    # Only include meme coins actually listed
+        for item in result["result"]["list"]:
+            if (
+                item.get("status") == "Trading"
+                and item.get("quoteCoin") == "USDT"
+                and item.get("contractType") == "LinearPerpetual"
+            ):
+                active.add(item["symbol"])
+
+        cursor = result["result"].get("nextPageCursor")
+
+        if not cursor:
+            break
+
+    # Meme coins that are actually listed
     memes = [
         symbol for symbol in MEME_COINS
         if symbol in active
     ]
 
-    ranked = [
-        item for item in tickers
+    tickers_result = api_get(
+        "/v5/market/tickers",
+        {"category": "linear"}
+    )
+
+    tickers = [
+        item for item in tickers_result["result"]["list"]
         if item["symbol"] in active
     ]
 
-    ranked.sort(
-        key=lambda x: float(x.get("quoteVolume", 0)),
+    tickers.sort(
+        key=lambda x: float(x.get("turnover24h", 0)),
         reverse=True
     )
 
     top_symbols = [
         item["symbol"]
-        for item in ranked[:MAX_COINS]
+        for item in tickers[:MAX_COINS]
     ]
 
     return list(dict.fromkeys(memes + top_symbols))
 
 
-# ---------- PERSISTENT SIGNAL HISTORY ----------
+# ---------- SIGNAL HISTORY ----------
 
 def load_state():
     try:
@@ -401,32 +461,46 @@ def save_state(state):
 
 def can_send(signal, state):
     key = signal["symbol"] + "_" + signal["direction"]
-
     last_sent = state.get(key, 0)
-    now = time.time()
 
-    return now - last_sent >= COOLDOWN_HOURS * 3600
+    return (
+        time.time() - last_sent
+        >= COOLDOWN_HOURS * 3600
+    )
 
 
-# ---------- MAIN: ONE SCAN PER RUN ----------
+# ---------- MAIN ----------
 
 def main():
-    print("ARAD CRYPTO PRO V1 started.")
+    print("ARAD CRYPTO PRO V2 started.")
     print("UTC:", datetime.now(timezone.utc).isoformat())
 
     if not BOT_TOKEN or not CHAT_ID:
-        raise RuntimeError("BOT_TOKEN or CHAT_ID is missing.")
+        raise RuntimeError(
+            "BOT_TOKEN or CHAT_ID is missing."
+        )
 
     state = load_state()
 
-    symbols = get_symbols()
+    try:
+        symbols = get_symbols()
+
+    except Exception as exc:
+        error_message = (
+            "⚠️ ARAD CRYPTO PRO V2\n"
+            "دریافت اطلاعات بازار Bybit ناموفق بود.\n"
+            f"خطا: {str(exc)[:300]}"
+        )
+
+        print(error_message)
+        telegram_send(error_message)
+        raise
 
     print("Symbols to scan:", len(symbols))
 
     sent_count = 0
 
     for index, symbol in enumerate(symbols, start=1):
-
         print(f"[{index}/{len(symbols)}] Scanning {symbol}")
 
         signal = make_signal(symbol)
@@ -440,21 +514,12 @@ def main():
             time.sleep(REQUEST_DELAY)
             continue
 
-        message = format_signal(signal)
-
-        if telegram_send(message):
-
-            key = (
-                signal["symbol"]
-                + "_"
-                + signal["direction"]
-            )
-
+        if telegram_send(format_signal(signal)):
+            key = signal["symbol"] + "_" + signal["direction"]
             state[key] = time.time()
             save_state(state)
 
             sent_count += 1
-
             print("Signal sent:", symbol)
 
         time.sleep(REQUEST_DELAY)
