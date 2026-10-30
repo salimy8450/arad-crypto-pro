@@ -7,18 +7,21 @@ import urllib.parse
 import urllib.error
 from datetime import datetime, timezone
 
-# =====================================
+# ==========================================
 # ARAD CRYPTO PRO V1
 # Binance USDT-M Futures Signal Scanner
-# =====================================
+# ==========================================
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 CHAT_ID = os.getenv("CHAT_ID", "")
 
 BASE_URL = "https://fapi.binance.com"
-SCAN_INTERVAL = 300
+
 MAX_COINS = 100
 MIN_SCORE = 75
+REQUEST_DELAY = 0.20
+STATE_FILE = "signal_state.json"
+COOLDOWN_HOURS = 4
 
 MEME_COINS = {
     "DOGEUSDT", "SHIBUSDT", "PEPEUSDT",
@@ -27,28 +30,42 @@ MEME_COINS = {
     "1000SATSUSDT", "1000CHEEMSUSDT"
 }
 
-sent_signals = {}
 
+# ---------- HTTP REQUEST ----------
 
 def api_get(path, params=None):
     url = BASE_URL + path
+
     if params:
         url += "?" + urllib.parse.urlencode(params)
 
-    req = urllib.request.Request(
-        url, headers={"User-Agent": "ARAD-CRYPTO-PRO"}
-    )
+    for attempt in range(3):
+        try:
+            req = urllib.request.Request(
+                url,
+                headers={"User-Agent": "ARAD-CRYPTO-PRO"}
+            )
 
-    with urllib.request.urlopen(req, timeout=20) as response:
-        return json.loads(response.read().decode())
+            with urllib.request.urlopen(req, timeout=25) as response:
+                return json.loads(response.read().decode())
 
+        except Exception as exc:
+            print("API attempt", attempt + 1, "failed:", exc)
+            if attempt == 2:
+                raise
+            time.sleep(2 * (attempt + 1))
+
+
+# ---------- TELEGRAM ----------
 
 def telegram_send(message):
     if not BOT_TOKEN or not CHAT_ID:
-        print("Telegram secrets are missing.")
-        return False
+        raise RuntimeError("Missing Telegram secrets")
 
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    url = (
+        f"https://api.telegram.org/bot"
+        f"{BOT_TOKEN}/sendMessage"
+    )
 
     data = urllib.parse.urlencode({
         "chat_id": CHAT_ID,
@@ -58,13 +75,21 @@ def telegram_send(message):
     req = urllib.request.Request(url, data=data)
 
     try:
-        with urllib.request.urlopen(req, timeout=20) as response:
+        with urllib.request.urlopen(req, timeout=25) as response:
             result = json.loads(response.read().decode())
-            return result.get("ok", False)
+
+        if not result.get("ok"):
+            print("Telegram rejected message:", result)
+            return False
+
+        return True
+
     except Exception as exc:
         print("Telegram error:", exc)
         return False
 
+
+# ---------- INDICATORS ----------
 
 def ema(values, period):
     if len(values) < period:
@@ -74,8 +99,9 @@ def ema(values, period):
     result = sum(values[:period]) / period
 
     for value in values[period:]:
-        result = (value * multiplier) + (
-            result * (1 - multiplier)
+        result = (
+            value * multiplier
+            + result * (1 - multiplier)
         )
 
     return result
@@ -87,11 +113,11 @@ def rsi(values, period=14):
         for i in range(1, len(values))
     ]
 
+    if len(changes) < period:
+        return 50
+
     gains = [max(x, 0) for x in changes]
     losses = [max(-x, 0) for x in changes]
-
-    if len(gains) < period:
-        return 50
 
     avg_gain = sum(gains[-period:]) / period
     avg_loss = sum(losses[-period:]) / period
@@ -99,18 +125,30 @@ def rsi(values, period=14):
     if avg_loss == 0:
         return 100
 
+    if avg_gain == 0:
+        return 0
+
     rs = avg_gain / avg_loss
     return 100 - (100 / (1 + rs))
 
 
+# ---------- MARKET DATA ----------
+
 def get_market_data(symbol, interval):
     candles = api_get(
         "/fapi/v1/klines",
-        {"symbol": symbol, "interval": interval, "limit": 120}
+        {
+            "symbol": symbol,
+            "interval": interval,
+            "limit": 120
+        }
     )
 
-    # Ignore the currently forming candle
+    # Ignore the unfinished candle
     candles = candles[:-1]
+
+    if len(candles) < 60:
+        return None
 
     return {
         "close": [float(c[4]) for c in candles],
@@ -120,7 +158,12 @@ def get_market_data(symbol, interval):
     }
 
 
+# ---------- ANALYSIS ----------
+
 def analyze(data):
+    if not data:
+        return None
+
     close = data["close"]
     high = data["high"]
     low = data["low"]
@@ -132,9 +175,11 @@ def analyze(data):
     e9 = ema(close, 9)
     e21 = ema(close, 21)
     e50 = ema(close, 50)
+
     current_rsi = rsi(close)
 
     true_ranges = []
+
     for i in range(1, len(close)):
         tr = max(
             high[i] - low[i],
@@ -146,14 +191,14 @@ def analyze(data):
     atr = sum(true_ranges[-14:]) / 14
 
     avg_volume = sum(volume[-21:-1]) / 20
+
     volume_ratio = (
-        volume[-1] / avg_volume if avg_volume else 0
+        volume[-1] / avg_volume
+        if avg_volume > 0 else 0
     )
 
-    price = close[-1]
-
     return {
-        "price": price,
+        "price": close[-1],
         "ema9": e9,
         "ema21": e21,
         "ema50": e50,
@@ -162,6 +207,8 @@ def analyze(data):
         "volume_ratio": volume_ratio
     }
 
+
+# ---------- SIGNAL GENERATOR ----------
 
 def make_signal(symbol):
     try:
@@ -174,6 +221,7 @@ def make_signal(symbol):
         directions = []
 
         for item in (m15, h1):
+
             if (
                 item["ema9"] > item["ema21"] > item["ema50"]
                 and item["price"] > item["ema21"]
@@ -193,13 +241,16 @@ def make_signal(symbol):
             return None
 
         direction = directions[0]
-        r = m15["rsi"]
+        current_rsi = m15["rsi"]
+
         score = 65
 
-        if direction == "LONG" and 50 <= r <= 70:
+        if direction == "LONG" and 50 <= current_rsi <= 70:
             score += 10
-        elif direction == "SHORT" and 30 <= r <= 50:
+
+        elif direction == "SHORT" and 30 <= current_rsi <= 50:
             score += 10
+
         else:
             return None
 
@@ -224,7 +275,9 @@ def make_signal(symbol):
         risk = atr * 1.5
 
         if direction == "LONG":
+
             sl = entry - risk
+
             targets = [
                 entry + risk * 1.0,
                 entry + risk * 1.5,
@@ -232,8 +285,11 @@ def make_signal(symbol):
                 entry + risk * 2.5,
                 entry + risk * 3.0
             ]
+
         else:
+
             sl = entry + risk
+
             targets = [
                 entry - risk * 1.0,
                 entry - risk * 1.5,
@@ -249,7 +305,7 @@ def make_signal(symbol):
             "sl": sl,
             "targets": targets,
             "score": score,
-            "rsi": r,
+            "rsi": current_rsi,
             "volume": m15["volume_ratio"]
         }
 
@@ -258,30 +314,37 @@ def make_signal(symbol):
         return None
 
 
+# ---------- SIGNAL MESSAGE ----------
+
 def format_signal(signal):
-    s = signal
-    direction = "🟢 LONG" if s["direction"] == "LONG" else "🔴 SHORT"
+    direction = (
+        "🟢 LONG"
+        if signal["direction"] == "LONG"
+        else "🔴 SHORT"
+    )
 
     targets = "\n".join(
-        f"TP{i+1}: {value:.8g}"
-        for i, value in enumerate(s["targets"])
+        f"TP{i + 1}: {value:.8g}"
+        for i, value in enumerate(signal["targets"])
     )
 
     return (
         "🚀 ARAD CRYPTO PRO V1\n\n"
-        f"ارز: {s['symbol']}\n"
+        f"ارز: {signal['symbol']}\n"
         f"جهت: {direction}\n"
-        f"ورود: {s['entry']:.8g}\n"
-        f"حد ضرر: {s['sl']:.8g}\n\n"
+        f"ورود: {signal['entry']:.8g}\n"
+        f"حد ضرر: {signal['sl']:.8g}\n\n"
         f"{targets}\n\n"
-        f"قدرت سیگنال: {s['score']}%\n"
-        f"RSI 15m: {s['rsi']:.1f}\n"
-        f"حجم: {s['volume']:.2f}x\n"
+        f"قدرت سیگنال: {signal['score']}%\n"
+        f"RSI 15m: {signal['rsi']:.1f}\n"
+        f"نسبت حجم: {signal['volume']:.2f}x\n"
         "تأیید روند: 15m + 1h\n"
         f"زمان: {datetime.now(timezone.utc).strftime('%H:%M UTC')}\n\n"
         "⚠️ سیگنال تحلیلی است؛ قبل از ورود بررسی شود."
     )
 
+
+# ---------- SYMBOL DISCOVERY ----------
 
 def get_symbols():
     exchange = api_get("/fapi/v1/exchangeInfo")
@@ -290,10 +353,18 @@ def get_symbols():
     active = {
         item["symbol"]
         for item in exchange["symbols"]
-        if item["status"] == "TRADING"
-        and item["quoteAsset"] == "USDT"
-        and item["contractType"] == "PERPETUAL"
+        if (
+            item["status"] == "TRADING"
+            and item["quoteAsset"] == "USDT"
+            and item["contractType"] == "PERPETUAL"
+        )
     }
+
+    # Only include meme coins actually listed
+    memes = [
+        symbol for symbol in MEME_COINS
+        if symbol in active
+    ]
 
     ranked = [
         item for item in tickers
@@ -306,55 +377,90 @@ def get_symbols():
     )
 
     top_symbols = [
-        item["symbol"] for item in ranked[:MAX_COINS]
+        item["symbol"]
+        for item in ranked[:MAX_COINS]
     ]
 
-    # Give priority to meme coins
-    return list(dict.fromkeys(
-        list(MEME_COINS) + top_symbols
-    ))
+    return list(dict.fromkeys(memes + top_symbols))
 
+
+# ---------- PERSISTENT SIGNAL HISTORY ----------
+
+def load_state():
+    try:
+        with open(STATE_FILE, "r", encoding="utf-8") as file:
+            return json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return {}
+
+
+def save_state(state):
+    with open(STATE_FILE, "w", encoding="utf-8") as file:
+        json.dump(state, file, indent=2)
+
+
+def can_send(signal, state):
+    key = signal["symbol"] + "_" + signal["direction"]
+
+    last_sent = state.get(key, 0)
+    now = time.time()
+
+    return now - last_sent >= COOLDOWN_HOURS * 3600
+
+
+# ---------- MAIN: ONE SCAN PER RUN ----------
 
 def main():
     print("ARAD CRYPTO PRO V1 started.")
+    print("UTC:", datetime.now(timezone.utc).isoformat())
 
     if not BOT_TOKEN or not CHAT_ID:
         raise RuntimeError("BOT_TOKEN or CHAT_ID is missing.")
 
-    while True:
-        try:
-            symbols = get_symbols()
-            print("Scanning", len(symbols), "symbols")
+    state = load_state()
 
-            for symbol in symbols:
-                signal = make_signal(symbol)
+    symbols = get_symbols()
 
-                if not signal:
-                    continue
+    print("Symbols to scan:", len(symbols))
 
-                key = (
-                    symbol,
-                    signal["direction"]
-                )
+    sent_count = 0
 
-                # Avoid repeating the same direction
-                if key in sent_signals:
-                    continue
+    for index, symbol in enumerate(symbols, start=1):
 
-                message = format_signal(signal)
+        print(f"[{index}/{len(symbols)}] Scanning {symbol}")
 
-                if telegram_send(message):
-                    sent_signals[key] = time.time()
-                    print("Signal sent:", symbol, key[1])
+        signal = make_signal(symbol)
 
-                time.sleep(0.25)
+        if signal is None:
+            time.sleep(REQUEST_DELAY)
+            continue
 
-            print("Scan completed.")
+        if not can_send(signal, state):
+            print("Cooldown active:", symbol)
+            time.sleep(REQUEST_DELAY)
+            continue
 
-        except Exception as exc:
-            print("Scanner error:", exc)
+        message = format_signal(signal)
 
-        time.sleep(SCAN_INTERVAL)
+        if telegram_send(message):
+
+            key = (
+                signal["symbol"]
+                + "_"
+                + signal["direction"]
+            )
+
+            state[key] = time.time()
+            save_state(state)
+
+            sent_count += 1
+
+            print("Signal sent:", symbol)
+
+        time.sleep(REQUEST_DELAY)
+
+    print("Scan completed.")
+    print("Signals sent:", sent_count)
 
 
 if __name__ == "__main__":
