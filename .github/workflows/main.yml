@@ -3,6 +3,8 @@ name: ARAD CRYPTO PRO Scanner
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
   push:
     paths:
       - "bot.py"
