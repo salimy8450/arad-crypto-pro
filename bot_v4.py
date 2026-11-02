@@ -1,23 +1,30 @@
+
 import os
 import time
 import json
+import html
 import urllib.request
 import urllib.parse
 import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================================
-# ARAD CRYPTO PRO V4.1 TEST
-# MEXC USDT PERPETUAL - DRY RUN ONLY
-# NO ORDERS - NO TELEGRAM
+# ARAD CRYPTO PRO V4.2
+# MEXC USDT PERPETUAL SCANNER
+# SIGNALS ONLY - NO AUTOMATIC ORDERS
+# TELEGRAM ENABLED
 # ==========================================================
 
 BASE_URL = "https://contract.mexc.com"
-MAX_COINS = 8
-MIN_SCORE = 75
-REQUEST_DELAY = 0.25
-OI_FILE = "oi_test_state.json"
-REPORT_FILE = "arad_v41_test_report.txt"
+TELEGRAM_URL = "https://api.telegram.org"
+
+MAX_TOP_COINS = 30
+MIN_SCORE = 80
+REQUEST_DELAY = 0.20
+COOLDOWN_HOURS = 4
+
+STATE_FILE = "signal_state.json"
+REPORT_FILE = "arad_v42_report.txt"
 
 MEME_COINS = {
     "DOGE_USDT", "SHIB_USDT", "PEPE_USDT",
@@ -31,28 +38,73 @@ MEME_COINS = {
 def api_get(path, params=None):
     query = urllib.parse.urlencode(params or {})
     url = BASE_URL + path
+
     if query:
         url += "?" + query
 
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": "ARAD-CRYPTO-PRO-V4.1-TEST"}
+        headers={"User-Agent": "ARAD-CRYPTO-PRO-V4.2"}
     )
 
     try:
         with urllib.request.urlopen(request, timeout=20) as response:
             result = json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
-        raise RuntimeError(f"API request failed ({path}): {exc}") from exc
+    except Exception as exc:
+        raise RuntimeError(
+            f"API failed ({path}): {exc}"
+        ) from exc
 
     if isinstance(result, dict):
         if result.get("success") is False:
-            raise RuntimeError(f"MEXC API error ({path}): {result}")
+            raise RuntimeError(f"MEXC error: {result}")
+
         code = result.get("code")
         if code not in (None, 0, "0"):
-            raise RuntimeError(f"MEXC API error ({path}): {result}")
+            raise RuntimeError(f"MEXC error: {result}")
 
     return result
+
+
+# -------------------- TELEGRAM --------------------
+
+def send_telegram(message):
+    token = os.getenv("BOT_TOKEN")
+    chat_id = os.getenv("CHAT_ID")
+
+    if not token or not chat_id:
+        raise RuntimeError(
+            "BOT_TOKEN or CHAT_ID is missing in GitHub Secrets"
+        )
+
+    url = f"{TELEGRAM_URL}/bot{token}/sendMessage"
+
+    payload = {
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True
+    }
+
+    request = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            result = json.loads(response.read().decode("utf-8"))
+    except Exception as exc:
+        raise RuntimeError(
+            f"Telegram delivery failed: {exc}"
+        ) from exc
+
+    if not result.get("ok"):
+        raise RuntimeError(f"Telegram rejected message: {result}")
+
+    return True
 
 
 # -------------------- INDICATORS --------------------
@@ -60,10 +112,13 @@ def api_get(path, params=None):
 def ema(values, period):
     if len(values) < period:
         return None
+
     alpha = 2.0 / (period + 1)
     value = sum(values[:period]) / period
+
     for item in values[period:]:
-        value = alpha * item + (1.0 - alpha) * value
+        value = alpha * item + (1 - alpha) * value
+
     return value
 
 
@@ -71,50 +126,60 @@ def rsi(values, period=14):
     if len(values) <= period:
         return 50.0
 
-    changes = [values[i] - values[i - 1] for i in range(1, len(values))]
-    gains = [max(change, 0.0) for change in changes]
-    losses = [max(-change, 0.0) for change in changes]
+    changes = [
+        values[i] - values[i - 1]
+        for i in range(1, len(values))
+    ]
+
+    gains = [max(x, 0) for x in changes]
+    losses = [max(-x, 0) for x in changes]
 
     avg_gain = sum(gains[:period]) / period
     avg_loss = sum(losses[:period]) / period
 
     for i in range(period, len(changes)):
-        avg_gain = (avg_gain * (period - 1) + gains[i]) / period
-        avg_loss = (avg_loss * (period - 1) + losses[i]) / period
+        avg_gain = (
+            avg_gain * (period - 1) + gains[i]
+        ) / period
+
+        avg_loss = (
+            avg_loss * (period - 1) + losses[i]
+        ) / period
 
     if avg_loss == 0:
         return 100.0
+
     if avg_gain == 0:
         return 0.0
 
     rs = avg_gain / avg_loss
-    return 100.0 - (100.0 / (1.0 + rs))
+    return 100 - (100 / (1 + rs))
 
 
 def atr(high, low, close, period=14):
     if len(close) < period + 1:
         return 0.0
 
-    true_ranges = []
+    ranges = []
+
     for i in range(1, len(close)):
-        true_ranges.append(max(
+        ranges.append(max(
             high[i] - low[i],
             abs(high[i] - close[i - 1]),
             abs(low[i] - close[i - 1])
         ))
 
-    return sum(true_ranges[-period:]) / period
+    return sum(ranges[-period:]) / period
 
 
-# -------------------- CANDLE DATA --------------------
+# -------------------- CANDLES --------------------
 
 def get_candles(symbol, timeframe):
+
     intervals = {
         "15m": ("Min15", 900),
         "1h": ("Min60", 3600)
     }
-    if timeframe not in intervals:
-        raise ValueError(f"Unsupported timeframe: {timeframe}")
 
     interval, seconds = intervals[timeframe]
     now = int(time.time())
@@ -129,6 +194,7 @@ def get_candles(symbol, timeframe):
     )
 
     data = result.get("data", {})
+
     if not isinstance(data, dict):
         return None
 
@@ -140,56 +206,55 @@ def get_candles(symbol, timeframe):
         data.get("vol", [])
     ]
 
-    if not all(isinstance(field, list) for field in fields):
+    if not all(isinstance(x, list) for x in fields):
         return None
 
-    count = min(len(field) for field in fields)
+    count = min(len(x) for x in fields)
     candles = []
 
     for i in range(count):
         try:
             timestamp = int(fields[0][i])
-            # Exclude the currently forming candle.
+
+            # Ignore unfinished candles.
             if timestamp + seconds > now:
                 continue
 
-            close_price = float(fields[1][i])
-            high_price = float(fields[2][i])
-            low_price = float(fields[3][i])
+            close = float(fields[1][i])
+            high = float(fields[2][i])
+            low = float(fields[3][i])
             volume = float(fields[4][i])
 
-            if close_price <= 0 or high_price <= 0 or low_price <= 0:
+            if min(close, high, low) <= 0:
                 continue
 
-            candles.append((
-                timestamp, close_price, high_price, low_price, volume
-            ))
-        except (TypeError, ValueError, IndexError):
+            candles.append(
+                (timestamp, close, high, low, volume)
+            )
+
+        except (ValueError, TypeError, IndexError):
             continue
 
-    # IMPORTANT: sort by candle timestamp, never by price.
-    candles.sort(key=lambda candle: candle[0])
+    candles.sort(key=lambda x: x[0])
 
-    # Remove duplicate timestamps if the API returns any.
-    unique = {}
-    for candle in candles:
-        unique[candle[0]] = candle
-    candles = [unique[key] for key in sorted(unique)]
+    unique = {c[0]: c for c in candles}
+    candles = [unique[k] for k in sorted(unique)]
 
     if len(candles) < 205:
         return None
 
     return {
-        "close": [candle[1] for candle in candles],
-        "high": [candle[2] for candle in candles],
-        "low": [candle[3] for candle in candles],
-        "volume": [candle[4] for candle in candles]
+        "close": [c[1] for c in candles],
+        "high": [c[2] for c in candles],
+        "low": [c[3] for c in candles],
+        "volume": [c[4] for c in candles]
     }
 
 
-# -------------------- TECHNICAL ANALYSIS --------------------
+# -------------------- ANALYSIS --------------------
 
 def analyze(data):
+
     if not data:
         return None
 
@@ -198,7 +263,7 @@ def analyze(data):
     low = data["low"]
     volume = data["volume"]
 
-    if len(close) < 205 or len(high) != len(close) or len(low) != len(close):
+    if len(close) < 205:
         return None
 
     e9 = ema(close, 9)
@@ -210,18 +275,27 @@ def analyze(data):
     current_atr = atr(high, low, close)
 
     macd_history = []
+
     for i in range(35, len(close) + 1):
         part = close[:i]
-        macd_history.append(ema(part, 12) - ema(part, 26))
+        macd_history.append(
+            ema(part, 12) - ema(part, 26)
+        )
 
     macd_line = macd_history[-1]
     macd_signal = ema(macd_history, 9)
+
     if macd_signal is None:
         return None
+
     macd_hist = macd_line - macd_signal
 
     avg_volume = sum(volume[-21:-1]) / 20
-    volume_ratio = volume[-1] / avg_volume if avg_volume > 0 else 0.0
+
+    volume_ratio = (
+        volume[-1] / avg_volume
+        if avg_volume > 0 else 0
+    )
 
     bull = 0
     bear = 0
@@ -268,135 +342,129 @@ def analyze(data):
         "macd": macd_hist,
         "volume_ratio": volume_ratio,
         "sentiment": sentiment,
-        "sentiment_score": round(100 * max(bull, bear) / 6)
+        "sentiment_score": round(
+            100 * max(bull, bear) / 6
+        )
     }
 
 
-# -------------------- MARKET DATA --------------------
+# -------------------- MARKET METRICS --------------------
 
-def get_open_interest(symbol):
+def get_market_metrics(symbol):
+
+    oi = None
+    funding = None
+
     try:
-        result = api_get("/api/v1/contract/open_interest/" + symbol)
-        data = result.get("data", {})
-        if isinstance(data, dict) and data.get("holdVol") is not None:
-            return float(data["holdVol"])
-    except Exception as exc:
-        print("OI unavailable:", symbol, exc)
-    return None
+        result = api_get(
+            "/api/v1/contract/ticker",
+            {"symbol": symbol}
+        )
 
-
-def get_funding_rate(symbol):
-    try:
-        result = api_get("/api/v1/contract/funding_rate/" + symbol)
         data = result.get("data", {})
-        if isinstance(data, dict) and data.get("fundingRate") is not None:
-            return float(data["fundingRate"])
+
+        if isinstance(data, list) and data:
+            data = data[0]
+
+        if isinstance(data, dict):
+            if data.get("holdVol") is not None:
+                oi = float(data["holdVol"])
+
+            if data.get("fundingRate") is not None:
+                funding = float(data["fundingRate"])
+
     except Exception as exc:
-        print("Funding unavailable:", symbol, exc)
-    return None
+        print("Market metrics unavailable:", symbol, exc)
+
+    return oi, funding
 
 
 def get_buy_sell_pressure(symbol):
+
     try:
         result = api_get(
             "/api/v1/contract/deals/" + symbol,
             {"limit": 100}
         )
+
         deals = result.get("data", [])
+
         if not isinstance(deals, list) or not deals:
             return None
 
-        buy_volume = 0.0
-        sell_volume = 0.0
+        buy = 0.0
+        sell = 0.0
 
         for trade in deals:
-            volume = float(trade.get("v", 0) or 0)
-            side = trade.get("T")
             try:
-                side = int(side)
-            except (TypeError, ValueError):
+                volume = float(trade.get("v", 0))
+                side = int(trade.get("T", 0))
+            except (ValueError, TypeError):
                 continue
 
             if side == 1:
-                buy_volume += volume
+                buy += volume
             elif side == 2:
-                sell_volume += volume
+                sell += volume
 
-        total = buy_volume + sell_volume
+        total = buy + sell
+
         if total <= 0:
             return None
 
         return {
-            "buy": buy_volume,
-            "sell": sell_volume,
-            "buy_percent": 100.0 * buy_volume / total,
-            "sell_percent": 100.0 * sell_volume / total
+            "buy_percent": 100 * buy / total,
+            "sell_percent": 100 * sell / total
         }
+
     except Exception as exc:
-        print("Buy/Sell unavailable:", symbol, exc)
-        return None
-
-
-def get_oi_change(symbol):
-    """Change since the previous successful scan, not a fixed 15m change."""
-    try:
-        state = {}
-        if os.path.exists(OI_FILE):
-            with open(OI_FILE, "r", encoding="utf-8") as file:
-                loaded = json.load(file)
-                if isinstance(loaded, dict):
-                    state = loaded
-
-        current = get_open_interest(symbol)
-        if current is None or current <= 0:
-            return None
-
-        previous = state.get(symbol)
-        state[symbol] = current
-
-        with open(OI_FILE, "w", encoding="utf-8") as file:
-            json.dump(state, file, indent=2)
-
-        if previous is None or float(previous) <= 0:
-            return None
-
-        return ((current - float(previous)) / float(previous)) * 100.0
-    except Exception as exc:
-        print("OI change error:", symbol, exc)
+        print("Pressure unavailable:", symbol, exc)
         return None
 
 
 # -------------------- SIGNAL GENERATOR --------------------
 
 def make_signal(symbol):
+
     try:
         data15 = get_candles(symbol, "15m")
         time.sleep(REQUEST_DELAY)
+
         data1h = get_candles(symbol, "1h")
 
         m15 = analyze(data15)
         h1 = analyze(data1h)
+
         if not m15 or not h1:
             return None
 
         def trend(item):
+
             if (
                 item["ema9"] > item["ema21"] > item["ema50"]
                 and item["price"] > item["ema21"]
             ):
                 return "LONG"
+
             if (
                 item["ema9"] < item["ema21"] < item["ema50"]
                 and item["price"] < item["ema21"]
             ):
                 return "SHORT"
+
             return None
 
         direction = trend(m15)
+
+        # Both timeframes must agree.
         if not direction or trend(h1) != direction:
             return None
 
-        expected = "BULLISH" if direction == "LONG" else "BEARISH"
+        expected = (
+            "BULLISH" if direction == "LONG"
+            else "BEARISH"
+        )
+
         if (
             m15["sentiment"] != expected
             or h1["sentiment"] != expected
@@ -405,36 +473,47 @@ def make_signal(symbol):
         ):
             return None
 
-        if direction == "LONG" and not 50 <= m15["rsi"] <= 70:
-            return None
-        if direction == "SHORT" and not 30 <= m15["rsi"] <= 50:
+        if direction == "LONG":
+            if not 50 <= m15["rsi"] <= 68:
+                return None
+        else:
+            if not 32 <= m15["rsi"] <= 50:
+                return None
+
+        # Avoid excessively extended entries.
+        if abs(m15["price"] - m15["ema21"]) > m15["atr"] * 1.5:
             return None
 
-        # Auxiliary market data. OI is sampled once and never double-counted.
-        oi = get_open_interest(symbol)
-        funding = get_funding_rate(symbol)
+        oi, funding = get_market_metrics(symbol)
         pressure = get_buy_sell_pressure(symbol)
-        oi_change = get_oi_change(symbol)
 
         score = 65
 
         if m15["volume_ratio"] >= 1.2:
             score += 5
+
         if h1["volume_ratio"] >= 1.1:
             score += 5
+
         if m15["sentiment_score"] >= 80:
             score += 5
+
         if h1["sentiment_score"] >= 80:
             score += 5
 
         if pressure:
-            if direction == "LONG" and pressure["buy_percent"] > 55:
-                score += 5
-            elif direction == "SHORT" and pressure["sell_percent"] > 55:
+            if (
+                direction == "LONG"
+                and pressure["buy_percent"] > 55
+            ):
                 score += 5
 
-        # OI change is displayed for observation only. Rising OI alone
-        # does not tell whether new positions are long or short.
+            elif (
+                direction == "SHORT"
+                and pressure["sell_percent"] > 55
+            ):
+                score += 5
+
         score = min(score, 100)
 
         if score < MIN_SCORE or m15["atr"] <= 0:
@@ -445,10 +524,16 @@ def make_signal(symbol):
 
         if direction == "LONG":
             sl = entry - risk
-            targets = [entry + risk * multiple for multiple in (1, 1.5, 2, 2.5, 3)]
+            targets = [
+                entry + risk * x
+                for x in (1, 1.5, 2, 2.5, 3)
+            ]
         else:
             sl = entry + risk
-            targets = [entry - risk * multiple for multiple in (1, 1.5, 2, 2.5, 3)]
+            targets = [
+                entry - risk * x
+                for x in (1, 1.5, 2, 2.5, 3)
+            ]
 
         return {
             "symbol": symbol,
@@ -462,7 +547,6 @@ def make_signal(symbol):
             "sentiment15": m15["sentiment_score"],
             "sentiment1h": h1["sentiment_score"],
             "oi": oi,
-            "oi_change": oi_change,
             "funding": funding,
             "pressure": pressure
         }
@@ -475,8 +559,10 @@ def make_signal(symbol):
 # -------------------- SYMBOL DISCOVERY --------------------
 
 def get_symbols():
+
     result = api_get("/api/v1/contract/detail")
     contracts = result.get("data", [])
+
     if not isinstance(contracts, list):
         raise RuntimeError("Invalid contract list")
 
@@ -486,38 +572,100 @@ def get_symbols():
         if item.get("quoteCoin") == "USDT"
         and item.get("settleCoin") == "USDT"
         and item.get("futureType") == 1
+        and item.get("state", 0) == 0
         and item.get("symbol")
     }
 
     tickers_result = api_get("/api/v1/contract/ticker")
     tickers = tickers_result.get("data", [])
+
     if not isinstance(tickers, list):
         raise RuntimeError("Invalid ticker data")
 
     valid = []
+
     for item in tickers:
+
         if item.get("symbol") not in active:
             continue
+
         try:
             amount = float(item.get("amount24") or 0)
         except (TypeError, ValueError):
             continue
+
         if amount > 0:
             valid.append((item["symbol"], amount))
 
-    valid.sort(key=lambda pair: pair[1], reverse=True)
-    memes = [symbol for symbol in sorted(MEME_COINS) if symbol in active]
-    top = [symbol for symbol, _ in valid[:MAX_COINS]]
+    valid.sort(key=lambda x: x[1], reverse=True)
 
-    # Prioritize the selected meme coins, then fill remaining slots by volume.
-    ordered = list(dict.fromkeys(memes + top))
-    return ordered[:MAX_COINS]
+    memes = [
+        symbol for symbol in sorted(MEME_COINS)
+        if symbol in active
+    ]
+
+    top = [
+        symbol for symbol, _ in valid[:MAX_TOP_COINS]
+    ]
+
+    # Meme coins plus top liquid coins.
+    return list(dict.fromkeys(memes + top))
 
 
-# -------------------- REPORT --------------------
+# -------------------- SIGNAL HISTORY --------------------
 
-def format_report(signal):
+def load_state():
+
+    try:
+        with open(STATE_FILE, "r", encoding="utf-8") as file:
+            data = json.load(file)
+
+        return data if isinstance(data, dict) else {}
+
+    except (OSError, ValueError):
+        return {}
+
+
+def save_state(state):
+
+    temp_file = STATE_FILE + ".tmp"
+
+    with open(temp_file, "w", encoding="utf-8") as file:
+        json.dump(state, file, indent=2)
+
+    os.replace(temp_file, STATE_FILE)
+
+
+def is_duplicate(signal, state):
+
+    key = (
+        signal["symbol"] + "|" +
+        signal["direction"]
+    )
+
+    previous = state.get(key)
+
+    if previous is None:
+        return False
+
+    try:
+        elapsed = time.time() - float(previous)
+    except (TypeError, ValueError):
+        return False
+
+    return elapsed < COOLDOWN_HOURS * 3600
+
+
+# -------------------- MESSAGE --------------------
+
+def format_message(signal):
+
+    direction = signal["direction"]
+
+    emoji = "🟢" if direction == "LONG" else "🔴"
+
     pressure = signal["pressure"]
+
     if pressure:
         pressure_text = (
             f"Buy: {pressure['buy_percent']:.1f}% | "
@@ -526,78 +674,124 @@ def format_report(signal):
     else:
         pressure_text = "Unavailable"
 
-    oi_text = f"{signal['oi']:.4f}" if signal["oi"] is not None else "Unavailable"
-    oi_change_text = (
-        f"{signal['oi_change']:+.2f}% since previous scan"
-        if signal["oi_change"] is not None else "Not enough history"
+    oi_text = (
+        f"{signal['oi']:.4f}"
+        if signal["oi"] is not None
+        else "Unavailable"
     )
+
     funding_text = (
         f"{signal['funding']:.6f}"
-        if signal["funding"] is not None else "Unavailable"
+        if signal["funding"] is not None
+        else "Unavailable"
     )
 
     targets = "\n".join(
-        f"TP{i + 1}: {price:.8g}"
+        f"TP{i+1}: <code>{price:.8g}</code>"
         for i, price in enumerate(signal["targets"])
     )
 
     return (
-        "\n================================\n"
-        "ARAD CRYPTO PRO V4.1 TEST\n"
-        "================================\n"
-        f"Symbol: {signal['symbol']}\n"
-        f"Direction: {signal['direction']}\n"
-        f"Entry: {signal['entry']:.8g}\n"
-        f"Stop Loss: {signal['sl']:.8g}\n"
+        f"{emoji} <b>ARAD CRYPTO PRO V4.2</b>\n"
+        f"━━━━━━━━━━━━━━\n"
+        f"Symbol: <b>{html.escape(signal['symbol'])}</b>\n"
+        f"Direction: <b>{direction}</b>\n"
+        f"Score: <b>{signal['score']}/100</b>\n"
+        f"━━━━━━━━━━━━━━\n"
+        f"Entry: <code>{signal['entry']:.8g}</code>\n"
+        f"Stop Loss: <code>{signal['sl']:.8g}</code>\n"
         f"{targets}\n"
-        "--------------------------------\n"
-        f"Score: {signal['score']}/100 (technical filter score, not win probability)\n"
+        f"━━━━━━━━━━━━━━\n"
         f"RSI 15m: {signal['rsi']:.2f}\n"
-        f"Volume ratio: {signal['volume']:.2f}x\n"
-        f"Sentiment 15m: {signal['sentiment15']}\n"
-        f"Sentiment 1h: {signal['sentiment1h']}\n"
+        f"Volume: {signal['volume']:.2f}x\n"
+        f"Trend 15m: {signal['sentiment15']}/100\n"
+        f"Trend 1h: {signal['sentiment1h']}/100\n"
         f"Open Interest: {oi_text}\n"
-        f"OI change: {oi_change_text}\n"
-        f"Funding Rate: {funding_text}\n"
+        f"Funding: {funding_text}\n"
         f"Buy/Sell: {pressure_text}\n"
-        "================================\n"
+        f"━━━━━━━━━━━━━━\n"
+        f"<i>Signals only - No automatic orders</i>\n"
+        f"UTC: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}"
     )
 
 
-# -------------------- MAIN TEST --------------------
+# -------------------- MAIN --------------------
 
 def main():
-    print("\nARAD CRYPTO PRO V4.1 TEST STARTED")
-    print("Mode: TEST ONLY - NO ORDERS - NO TELEGRAM")
+
+    print("ARAD CRYPTO PRO V4.2 STARTED")
+    print("Mode: LIVE SIGNALS - NO ORDERS")
+    print("Telegram: ENABLED")
+    print("Minimum score:", MIN_SCORE)
     print("UTC:", datetime.now(timezone.utc).isoformat())
 
-    symbols = get_symbols()
-    print("Symbols found:", len(symbols), symbols)
+    # Fail early if Telegram configuration is missing.
+    if not os.getenv("BOT_TOKEN") or not os.getenv("CHAT_ID"):
+        raise RuntimeError("Missing BOT_TOKEN or CHAT_ID")
 
-    signals_found = 0
+    symbols = get_symbols()
+
+    print("Symbols to scan:", len(symbols))
+
+    state = load_state()
+
+    sent = 0
+    duplicates = 0
     errors = 0
 
     with open(REPORT_FILE, "w", encoding="utf-8") as report:
+
         for index, symbol in enumerate(symbols, 1):
-            print(f"\n[{index}/{len(symbols)}] Testing {symbol}")
+
+            print(f"[{index}/{len(symbols)}] Scanning {symbol}")
+
             try:
                 signal = make_signal(symbol)
-                if signal:
-                    output = format_report(signal)
-                    print(output)
-                    report.write(output)
-                    report.flush()
-                    signals_found += 1
-                else:
+
+                if not signal:
                     print("No valid signal")
+                    continue
+
+                print(
+                    f"Signal candidate: {symbol} "
+                    f"{signal['direction']} "
+                    f"Score={signal['score']}"
+                )
+
+                if is_duplicate(signal, state):
+                    print("Duplicate skipped:", symbol)
+                    duplicates += 1
+                    continue
+
+                message = format_message(signal)
+
+                # Save only after successful Telegram delivery.
+                send_telegram(message)
+
+                key = (
+                    signal["symbol"] + "|" +
+                    signal["direction"]
+                )
+
+                state[key] = time.time()
+                save_state(state)
+
+                report.write(message + "\n\n")
+                report.flush()
+
+                sent += 1
+                print("Telegram signal sent:", symbol)
+
             except Exception as exc:
                 errors += 1
-                print("TEST ERROR:", symbol, exc)
+                print("SCAN ERROR:", symbol, exc)
 
             time.sleep(REQUEST_DELAY)
 
-    print("\n========== TEST FINISHED ==========")
-    print("Signals found:", signals_found)
+    print("\n========== SCAN FINISHED ==========")
+    print("Symbols scanned:", len(symbols))
+    print("Signals sent:", sent)
+    print("Duplicates skipped:", duplicates)
     print("Errors:", errors)
     print("Report:", REPORT_FILE)
 
