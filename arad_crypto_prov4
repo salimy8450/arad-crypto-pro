@@ -1,92 +1,54 @@
+
 import os
 import time
 import json
 import urllib.request
 import urllib.parse
-import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================
-# ARAD CRYPTO PRO V4
-# MEXC USDT Perpetual Market Scanner
-# LuxAlgo-inspired sentiment filter (not LuxAlgo's proprietary code)
-# Signals only - No automatic trading
+# ARAD CRYPTO PRO V4.1 TEST
+# MEXC USDT PERPETUAL
+# DRY RUN - NO AUTO TRADING - NO TELEGRAM
 # ==========================================
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "")
-CHAT_ID = os.getenv("CHAT_ID", "")
-BASE_URL = "https://api.mexc.com"
-
-MAX_COINS = 100
+BASE_URL = "https://contract.mexc.com"
+MAX_COINS = 8
 MIN_SCORE = 75
-MIN_SENTIMENT = 60       # 0..100; directional sentiment required on BOTH TFs
-REQUEST_DELAY = 0.20
-STATE_FILE = "signal_state.json"
-COOLDOWN_HOURS = 4
+REQUEST_DELAY = 0.15
+OI_FILE = "oi_test_state.json"
 
 MEME_COINS = {
-    "DOGE_USDT", "SHIB_USDT", "PEPE_USDT", "BONK_USDT",
-    "WIF_USDT", "FLOKI_USDT", "BOME_USDT", "MEME_USDT",
-    "TURBO_USDT", "1000SATS_USDT", "1000CHEEMS_USDT"
+    "DOGE_USDT", "SHIB_USDT", "PEPE_USDT",
+    "BONK_USDT", "WIF_USDT", "FLOKI_USDT",
+    "BOME_USDT", "MEME_USDT", "TURBO_USDT"
 }
 
 
-# ---------- HTTP REQUEST ----------
+# ---------- API ----------
 
 def api_get(path, params=None):
     query = urllib.parse.urlencode(params or {})
-    url = BASE_URL + path + (("?" + query) if query else "")
+    url = BASE_URL + path
+    if query:
+        url += "?" + query
 
-    for attempt in range(3):
-        try:
-            req = urllib.request.Request(
-                url,
-                headers={"User-Agent": "ARAD-CRYPTO-PRO/4.0",
-                         "Accept": "application/json"}
-            )
-            with urllib.request.urlopen(req, timeout=25) as response:
-                result = json.loads(response.read().decode())
+    req = urllib.request.Request(
+        url,
+        headers={"User-Agent": "ARAD-PRO-V4.1"}
+    )
 
-            if isinstance(result, dict):
-                if result.get("success") is False or result.get("code", 0) != 0:
-                    raise RuntimeError("MEXC API error: " + str(result))
-            return result
+    with urllib.request.urlopen(req, timeout=25) as response:
+        result = json.loads(response.read().decode())
 
-        except urllib.error.HTTPError as exc:
-            print("MEXC HTTP error:", exc.code, exc.reason)
-            if exc.code in (403, 451):
-                raise RuntimeError(f"MEXC access restricted: HTTP {exc.code}") from exc
-            if attempt == 2:
-                raise
-            time.sleep(2 * (attempt + 1))
-        except Exception as exc:
-            print("API attempt", attempt + 1, "failed:", exc)
-            if attempt == 2:
-                raise
-            time.sleep(2 * (attempt + 1))
+    if isinstance(result, dict):
+        if result.get("success") is False:
+            raise RuntimeError(str(result))
 
+        if result.get("code", 0) != 0:
+            raise RuntimeError(str(result))
 
-# ---------- TELEGRAM ----------
-
-def telegram_send(message):
-    if not BOT_TOKEN or not CHAT_ID:
-        print("Telegram secrets are missing.")
-        return False
-
-    url = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage"
-    data = urllib.parse.urlencode({"chat_id": CHAT_ID, "text": message}).encode()
-    req = urllib.request.Request(url, data=data)
-
-    try:
-        with urllib.request.urlopen(req, timeout=25) as response:
-            result = json.loads(response.read().decode())
-        if not result.get("ok"):
-            print("Telegram rejected message:", result)
-            return False
-        return True
-    except Exception as exc:
-        print("Telegram error:", exc)
-        return False
+    return result
 
 
 # ---------- INDICATORS ----------
@@ -94,302 +56,409 @@ def telegram_send(message):
 def ema(values, period):
     if len(values) < period:
         return None
-    alpha = 2.0 / (period + 1.0)
+
+    alpha = 2.0 / (period + 1)
     value = sum(values[:period]) / period
+
     for x in values[period:]:
-        value = alpha * x + (1.0 - alpha) * value
+        value = alpha * x + (1 - alpha) * value
+
     return value
 
 
-def rsi_wilder(values, period=14):
+def rsi(values, period=14):
     if len(values) <= period:
         return 50.0
-    changes = [values[i] - values[i - 1] for i in range(1, len(values))]
-    gains = [max(x, 0.0) for x in changes]
-    losses = [max(-x, 0.0) for x in changes]
+
+    changes = [
+        values[i] - values[i-1]
+        for i in range(1, len(values))
+    ]
+
+    gains = [max(x, 0) for x in changes]
+    losses = [max(-x, 0) for x in changes]
+
     avg_gain = sum(gains[:period]) / period
     avg_loss = sum(losses[:period]) / period
+
     for i in range(period, len(changes)):
-        avg_gain = (avg_gain * (period - 1) + gains[i]) / period
-        avg_loss = (avg_loss * (period - 1) + losses[i]) / period
+        avg_gain = (
+            avg_gain * (period - 1) + gains[i]
+        ) / period
+
+        avg_loss = (
+            avg_loss * (period - 1) + losses[i]
+        ) / period
+
     if avg_loss == 0:
         return 100.0
+
     rs = avg_gain / avg_loss
-    return 100.0 - 100.0 / (1.0 + rs)
+    return 100 - (100 / (1 + rs))
 
 
-def stochastic_k(high, low, close, period=14):
-    if len(close) < period:
-        return 50.0
-    hh = max(high[-period:])
-    ll = min(low[-period:])
-    if hh == ll:
-        return 50.0
-    return 100.0 * (close[-1] - ll) / (hh - ll)
-
-
-def cci(high, low, close, period=20):
-    if len(close) < period:
-        return 0.0
-    typical = [(high[i] + low[i] + close[i]) / 3.0 for i in range(len(close))]
-    window = typical[-period:]
-    mean = sum(window) / period
-    mean_dev = sum(abs(x - mean) for x in window) / period
-    if mean_dev == 0:
-        return 0.0
-    return (window[-1] - mean) / (0.015 * mean_dev)
-
-
-def macd_histogram(values):
-    if len(values) < 35:
-        return 0.0
-    fast = ema(values, 12)
-    slow = ema(values, 26)
-    macd_line = fast - slow
-    # Approximate signal line using MACD series over history
-    alpha12, alpha26 = 2/13, 2/27
-    ef = sum(values[:12]) / 12
-    es = sum(values[:26]) / 26
-    series = []
-    for i, x in enumerate(values):
-        if i >= 12:
-            ef = alpha12*x + (1-alpha12)*ef
-        if i >= 26:
-            es = alpha26*x + (1-alpha26)*es
-        if i >= 25:
-            series.append(ef-es)
-    sig = ema(series, 9) if len(series) >= 9 else macd_line
-    return macd_line - (sig if sig is not None else macd_line)
-
-
-def adx_value(high, low, close, period=14):
-    if len(close) < period * 2 + 2:
-        return 0.0
-    trs, plus_dm, minus_dm = [], [], []
-    for i in range(1, len(close)):
-        up = high[i] - high[i-1]
-        down = low[i-1] - low[i]
-        plus_dm.append(up if up > down and up > 0 else 0.0)
-        minus_dm.append(down if down > up and down > 0 else 0.0)
-        trs.append(max(high[i]-low[i],
-                       abs(high[i]-close[i-1]),
-                       abs(low[i]-close[i-1])))
-    # Wilder smoothing
-    tr = sum(trs[:period])
-    pdm = sum(plus_dm[:period])
-    mdm = sum(minus_dm[:period])
-    dxs = []
-    for i in range(period, len(trs)):
-        tr = tr - tr/period + trs[i]
-        pdm = pdm - pdm/period + plus_dm[i]
-        mdm = mdm - mdm/period + minus_dm[i]
-        if tr <= 0:
-            dxs.append(0.0)
-        else:
-            pdi = 100.0 * pdm / tr
-            mdi = 100.0 * mdm / tr
-            denom = pdi + mdi
-            dxs.append(100.0 * abs(pdi-mdi)/denom if denom else 0.0)
-    if len(dxs) < period:
-        return sum(dxs)/len(dxs) if dxs else 0.0
-    adx = sum(dxs[:period])/period
-    for dx in dxs[period:]:
-        adx = (adx*(period-1)+dx)/period
-    return adx
-
-
-def supertrend_direction(high, low, close, period=10, multiplier=3.0):
-    if len(close) < period + 2:
-        return 0
+def atr(high, low, close, period=14):
     trs = []
+
     for i in range(1, len(close)):
-        trs.append(max(high[i]-low[i],
-                       abs(high[i]-close[i-1]),
-                       abs(low[i]-close[i-1])))
-    atr = sum(trs[:period])/period
-    upper_prev = lower_prev = None
-    trend = 1
-    for i in range(period, len(close)):
-        if i > period:
-            tr = trs[i-1]
-            atr = (atr*(period-1)+tr)/period
-        mid = (high[i]+low[i])/2.0
-        basic_upper = mid + multiplier*atr
-        basic_lower = mid - multiplier*atr
-        upper = basic_upper if upper_prev is None else (
-            min(basic_upper, upper_prev) if close[i-1] > upper_prev else basic_upper)
-        lower = basic_lower if lower_prev is None else (
-            max(basic_lower, lower_prev) if close[i-1] < lower_prev else basic_lower)
-        if trend == -1 and close[i] > upper_prev:
-            trend = 1
-        elif trend == 1 and close[i] < lower_prev:
-            trend = -1
-        upper_prev, lower_prev = upper, lower
-    return trend
+        tr = max(
+            high[i] - low[i],
+            abs(high[i] - close[i-1]),
+            abs(low[i] - close[i-1])
+        )
+        trs.append(tr)
+
+    if len(trs) < period:
+        return 0.0
+
+    return sum(trs[-period:]) / period
 
 
-# ---------- MARKET DATA ----------
+# ---------- KLINE DATA ----------
 
-def get_market_data(symbol, interval):
-    interval_map = {"15m": ("Min15", 900), "1h": ("Min60", 3600)}
-    mexc_interval, seconds = interval_map[interval]
+def get_candles(symbol, timeframe):
+    intervals = {
+        "15m": ("Min15", 900),
+        "1h": ("Min60", 3600)
+    }
+
+    interval, seconds = intervals[timeframe]
     now = int(time.time())
-    # 300 candles gives adequate history for EMA200.
-    start = now - (310 * seconds)
 
-    result = api_get("/api/v1/contract/kline/" + symbol,
-                     {"interval": mexc_interval, "start": start, "end": now})
-    data = result.get("data") if isinstance(result, dict) else None
+    result = api_get(
+        "/api/v1/contract/kline/" + symbol,
+        {
+            "interval": interval,
+            "start": now - 240 * seconds,
+            "end": now
+        }
+    )
+
+    data = result.get("data", {})
+
     if not isinstance(data, dict):
         return None
 
-    fields = [data.get(k, []) for k in ("time", "close", "high", "low", "vol")]
+    fields = [
+        data.get("time", []),
+        data.get("close", []),
+        data.get("high", []),
+        data.get("low", []),
+        data.get("vol", [])
+    ]
+
     count = min(map(len, fields))
-    times, closes, highs, lows, volumes = fields
     candles = []
+
     for i in range(count):
-        candle_time = int(times[i])
-        if candle_time + seconds > now:
+        t = int(fields[0][i])
+
+        if t + seconds > now:
             continue
-        candles.append({
-            "time": candle_time,
-            "close": float(closes[i]),
-            "high": float(highs[i]),
-            "low": float(lows[i]),
-            "volume": float(volumes[i])
-        })
-    candles.sort(key=lambda x: x["time"])
-    if len(candles) < 220:
-        print("Not enough closed candles for EMA200:", symbol, interval, len(candles))
+
+        candles.append((
+            float(fields[1][i]),
+            float(fields[2][i]),
+            float(fields[3][i]),
+            float(fields[4][i])
+        ))
+
+    candles.sort(key=lambda x: x[0])
+
+    if len(candles) < 205:
         return None
+
     return {
-        "close": [c["close"] for c in candles],
-        "high": [c["high"] for c in candles],
-        "low": [c["low"] for c in candles],
-        "volume": [c["volume"] for c in candles]
+        "close": [x[0] for x in candles],
+        "high": [x[1] for x in candles],
+        "low": [x[2] for x in candles],
+        "volume": [x[3] for x in candles]
     }
 
 
-# ---------- SENTIMENT ANALYSIS ----------
+# ---------- TECHNICAL ANALYSIS ----------
 
 def analyze(data):
     if not data:
         return None
-    close, high, low, volume = (
-        data["close"], data["high"], data["low"], data["volume"]
+
+    close = data["close"]
+    high = data["high"]
+    low = data["low"]
+    volume = data["volume"]
+
+    e9 = ema(close, 9)
+    e21 = ema(close, 21)
+    e50 = ema(close, 50)
+    e200 = ema(close, 200)
+
+    current_rsi = rsi(close)
+    current_atr = atr(high, low, close)
+
+    macd_line = ema(close, 12) - ema(close, 26)
+
+    macd_history = []
+    for i in range(35, len(close) + 1):
+        part = close[:i]
+        macd_history.append(
+            ema(part, 12) - ema(part, 26)
+        )
+
+    macd_signal = ema(macd_history, 9)
+    macd_hist = macd_line - macd_signal
+
+    avg_volume = sum(volume[-21:-1]) / 20
+    volume_ratio = (
+        volume[-1] / avg_volume if avg_volume > 0 else 0
     )
-    if len(close) < 220:
-        return None
 
-    e9, e21, e50, e200 = (
-        ema(close, 9), ema(close, 21), ema(close, 50), ema(close, 200)
+    bull = 0
+    bear = 0
+
+    if e9 > e21:
+        bull += 1
+    elif e9 < e21:
+        bear += 1
+
+    if e21 > e50:
+        bull += 1
+    elif e21 < e50:
+        bear += 1
+
+    if close[-1] > e200:
+        bull += 2
+    elif close[-1] < e200:
+        bear += 2
+
+    if macd_hist > 0:
+        bull += 1
+    elif macd_hist < 0:
+        bear += 1
+
+    if current_rsi >= 52:
+        bull += 1
+    elif current_rsi <= 48:
+        bear += 1
+
+    sentiment = (
+        "BULLISH" if bull > bear
+        else "BEARISH" if bear > bull
+        else "NEUTRAL"
     )
-    current_rsi = rsi_wilder(close, 14)
-    stoch = stochastic_k(high, low, close, 14)
-    current_cci = cci(high, low, close, 20)
-    macd_hist = macd_histogram(close)
-    adx = adx_value(high, low, close, 14)
-    st_dir = supertrend_direction(high, low, close)
-
-    true_ranges = []
-    for i in range(1, len(close)):
-        true_ranges.append(max(
-            high[i]-low[i],
-            abs(high[i]-close[i-1]),
-            abs(low[i]-close[i-1])
-        ))
-    atr = sum(true_ranges[-14:])/14 if len(true_ranges) >= 14 else 0.0
-    avg_volume = sum(volume[-21:-1])/20 if len(volume) >= 21 else 0.0
-    volume_ratio = volume[-1]/avg_volume if avg_volume > 0 else 0.0
-
-    # LuxAlgo-inspired directional vote model; NOT LuxAlgo's proprietary formula.
-    bull = bear = 0
-    if e9 > e21: bull += 1
-    elif e9 < e21: bear += 1
-    if e21 > e50: bull += 1
-    elif e21 < e50: bear += 1
-    if close[-1] > e200: bull += 2
-    elif close[-1] < e200: bear += 2
-    if macd_hist > 0: bull += 1
-    elif macd_hist < 0: bear += 1
-    if current_rsi >= 52: bull += 1
-    elif current_rsi <= 48: bear += 1
-    if stoch >= 55: bull += 1
-    elif stoch <= 45: bear += 1
-    if current_cci > 0: bull += 1
-    elif current_cci < 0: bear += 1
-    if st_dir > 0: bull += 1
-    elif st_dir < 0: bear += 1
-
-    total_votes = 9
-    sentiment_score = round(100.0 * max(bull, bear) / total_votes)
-    sentiment = "BULLISH" if bull > bear else "BEARISH" if bear > bull else "NEUTRAL"
 
     return {
-        "price": close[-1], "ema9": e9, "ema21": e21,
-        "ema50": e50, "ema200": e200, "rsi": current_rsi,
-        "stoch": stoch, "cci": current_cci, "macd_hist": macd_hist,
-        "adx": adx, "supertrend": st_dir, "atr": atr,
-        "volume_ratio": volume_ratio, "sentiment": sentiment,
-        "sentiment_score": sentiment_score, "bull_votes": bull,
-        "bear_votes": bear
+        "price": close[-1],
+        "ema9": e9,
+        "ema21": e21,
+        "ema50": e50,
+        "ema200": e200,
+        "rsi": current_rsi,
+        "atr": current_atr,
+        "macd": macd_hist,
+        "volume_ratio": volume_ratio,
+        "sentiment": sentiment,
+        "sentiment_score": round(
+            100 * max(bull, bear) / 6
+        )
     }
+# ---------- MARKET SENTIMENT DATA ----------
+
+def get_open_interest(symbol):
+    try:
+        result = api_get(
+            "/api/v1/contract/open_interest/" + symbol
+        )
+        data = result.get("data", {})
+        if isinstance(data, dict):
+            return float(data.get("holdVol", 0))
+    except Exception as exc:
+        print("OI unavailable:", symbol, exc)
+
+    return None
+
+
+def get_funding_rate(symbol):
+    try:
+        result = api_get(
+            "/api/v1/contract/funding_rate/" + symbol
+        )
+        data = result.get("data", {})
+        if isinstance(data, dict):
+            value = data.get("fundingRate")
+            if value is not None:
+                return float(value)
+    except Exception as exc:
+        print("Funding unavailable:", symbol, exc)
+
+    return None
+
+
+# ---------- BUY / SELL PRESSURE ----------
+
+def get_buy_sell_pressure(symbol):
+    try:
+        result = api_get(
+            "/api/v1/contract/deals/" + symbol,
+            {"limit": 100}
+        )
+
+        deals = result.get("data", [])
+
+        if not isinstance(deals, list) or not deals:
+            return None
+
+        buy_volume = 0.0
+        sell_volume = 0.0
+
+        for trade in deals:
+            volume = float(trade.get("v", 0))
+            side = trade.get("T")
+
+            # MEXC deal side:
+            # 1 = buy, 2 = sell
+            if side == 1:
+                buy_volume += volume
+            elif side == 2:
+                sell_volume += volume
+
+        total = buy_volume + sell_volume
+
+        if total <= 0:
+            return None
+
+        return {
+            "buy": buy_volume,
+            "sell": sell_volume,
+            "buy_percent": 100 * buy_volume / total,
+            "sell_percent": 100 * sell_volume / total
+        }
+
+    except Exception as exc:
+        print("Buy/Sell unavailable:", symbol, exc)
+        return None
+
+
+# ---------- OPEN INTEREST CHANGE ----------
+
+def get_oi_change(symbol):
+    try:
+        state = {}
+
+        if os.path.exists(OI_FILE):
+            with open(OI_FILE, "r", encoding="utf-8") as f:
+                state = json.load(f)
+
+        current = get_open_interest(symbol)
+
+        if current is None or current <= 0:
+            return None
+
+        previous = state.get(symbol)
+
+        state[symbol] = current
+
+        with open(OI_FILE, "w", encoding="utf-8") as f:
+            json.dump(state, f, indent=2)
+
+        if previous is None or float(previous) <= 0:
+            return None
+
+        change = (
+            (current - float(previous))
+            / float(previous)
+        ) * 100
+
+        return change
+
+    except Exception as exc:
+        print("OI change error:", symbol, exc)
+        return None
 
 
 # ---------- SIGNAL GENERATOR ----------
 
 def make_signal(symbol):
     try:
-        m15 = analyze(get_market_data(symbol, "15m"))
-        h1 = analyze(get_market_data(symbol, "1h"))
+        data15 = get_candles(symbol, "15m")
+        data1h = get_candles(symbol, "1h")
+
+        m15 = analyze(data15)
+        h1 = analyze(data1h)
+
         if not m15 or not h1:
             return None
 
-        # Existing EMA trend structure must agree on both timeframes.
-        def ema_direction(item):
-            if item["ema9"] > item["ema21"] > item["ema50"] and item["price"] > item["ema21"]:
+        def trend(item):
+            if (
+                item["ema9"] > item["ema21"] > item["ema50"]
+                and item["price"] > item["ema21"]
+            ):
                 return "LONG"
-            if item["ema9"] < item["ema21"] < item["ema50"] and item["price"] < item["ema21"]:
+
+            if (
+                item["ema9"] < item["ema21"] < item["ema50"]
+                and item["price"] < item["ema21"]
+            ):
                 return "SHORT"
+
             return None
 
-        d15, d1h = ema_direction(m15), ema_direction(h1)
-        if not d15 or d15 != d1h:
+        direction = trend(m15)
+
+        if not direction or trend(h1) != direction:
             return None
 
-        direction = d15
-        expected = "BULLISH" if direction == "LONG" else "BEARISH"
+        expected = (
+            "BULLISH" if direction == "LONG"
+            else "BEARISH"
+        )
 
-        # Sentiment must agree in BOTH 15m and 1h.
-        if (m15["sentiment"] != expected or h1["sentiment"] != expected
-                or m15["sentiment_score"] < MIN_SENTIMENT
-                or h1["sentiment_score"] < MIN_SENTIMENT):
+        if (
+            m15["sentiment"] != expected
+            or h1["sentiment"] != expected
+            or m15["sentiment_score"] < 65
+            or h1["sentiment_score"] < 65
+        ):
             return None
 
-        current_rsi = m15["rsi"]
-        # Avoid chasing extreme RSI conditions.
-        if direction == "LONG" and not (50 <= current_rsi <= 70):
-            return None
-        if direction == "SHORT" and not (30 <= current_rsi <= 50):
-            return None
+        if direction == "LONG":
+            if not 50 <= m15["rsi"] <= 70:
+                return None
+        else:
+            if not 30 <= m15["rsi"] <= 50:
+                return None
+
+        oi = get_open_interest(symbol)
+        funding = get_funding_rate(symbol)
+        pressure = get_buy_sell_pressure(symbol)
+        oi_change = get_oi_change(symbol)
 
         score = 65
-        if direction == "LONG" and 50 <= current_rsi <= 70:
-            score += 10
-        elif direction == "SHORT" and 30 <= current_rsi <= 50:
-            score += 10
 
         if m15["volume_ratio"] >= 1.2:
-            score += 10
-        if h1["volume_ratio"] >= 1.1:
-            score += 5
-        if symbol in MEME_COINS:
             score += 5
 
-        # Add a modest sentiment bonus, capped to avoid inflated scores.
-        avg_sentiment = (m15["sentiment_score"] + h1["sentiment_score"]) / 2
-        if avg_sentiment >= 80:
+        if h1["volume_ratio"] >= 1.1:
             score += 5
+
+        if m15["sentiment_score"] >= 80:
+            score += 5
+
+        if h1["sentiment_score"] >= 80:
+            score += 5
+
+        if pressure:
+            if direction == "LONG" and pressure["buy_percent"] > 55:
+                score += 5
+            elif direction == "SHORT" and pressure["sell_percent"] > 55:
+                score += 5
+
+        if oi_change is not None:
+            if direction == "LONG" and oi_change > 0:
+                score += 5
+            elif direction == "SHORT" and oi_change > 0:
+                score += 5
+
         score = min(score, 100)
 
         if score < MIN_SCORE or m15["atr"] <= 0:
@@ -397,158 +466,183 @@ def make_signal(symbol):
 
         entry = m15["price"]
         risk = m15["atr"] * 1.5
+
         if direction == "LONG":
             sl = entry - risk
-            targets = [entry + risk*x for x in (1, 1.5, 2, 2.5, 3)]
+            targets = [
+                entry + risk * x
+                for x in (1, 1.5, 2, 2.5, 3)
+            ]
         else:
             sl = entry + risk
-            targets = [entry - risk*x for x in (1, 1.5, 2, 2.5, 3)]
+            targets = [
+                entry - risk * x
+                for x in (1, 1.5, 2, 2.5, 3)
+            ]
 
         return {
-            "symbol": symbol, "direction": direction,
-            "entry": entry, "sl": sl, "targets": targets,
-            "score": score, "rsi": current_rsi,
+            "symbol": symbol,
+            "direction": direction,
+            "entry": entry,
+            "sl": sl,
+            "targets": targets,
+            "score": score,
+            "rsi": m15["rsi"],
             "volume": m15["volume_ratio"],
             "sentiment15": m15["sentiment_score"],
             "sentiment1h": h1["sentiment_score"],
-            "adx15": m15["adx"], "sentiment_label": expected
+            "oi": oi,
+            "oi_change": oi_change,
+            "funding": funding,
+            "pressure": pressure
         }
+
     except Exception as exc:
-        print("Analysis error:", symbol, exc)
+        print("Signal error:", symbol, exc)
         return None
-
-
-# ---------- SIGNAL MESSAGE ----------
-
-def format_signal(signal):
-    direction = "🟢 LONG" if signal["direction"] == "LONG" else "🔴 SHORT"
-    targets = "\n".join(
-        f"TP{i+1}: {value:.8g}" for i, value in enumerate(signal["targets"])
-    )
-    return (
-        "🚀 ARAD CRYPTO PRO V4\n\n"
-        "صرافی داده: MEXC Futures\n"
-        f"ارز: {signal['symbol']}\n"
-        f"جهت: {direction}\n"
-        f"ورود: {signal['entry']:.8g}\n"
-        f"حد ضرر: {signal['sl']:.8g}\n\n"
-        f"{targets}\n\n"
-        f"امتیاز الگوریتم: {signal['score']}/100\n"
-        f"RSI 15m: {signal['rsi']:.1f}\n"
-        f"نسبت حجم 15m: {signal['volume']:.2f}x\n"
-        f"Sentiment 15m: {signal['sentiment15']}/100\n"
-        f"Sentiment 1h: {signal['sentiment1h']}/100\n"
-        f"ADX 15m: {signal['adx15']:.1f}\n"
-        "تأیید روند: EMA + Sentiment در 15m و 1h\n\n"
-        "⚠️ این فیلتر الهام‌گرفته از روش‌های تحلیل احساسات است "
-        "و خروجی رسمی LuxAlgo نیست. امتیاز، احتمال موفقیت نیست. "
-        "قیمت و امکان معامله را در اوربیت بررسی کن."
-    )
-
-
 # ---------- SYMBOL DISCOVERY ----------
 
 def get_symbols():
-    contracts_result = api_get("/api/v1/contract/detail")
-    contracts = contracts_result.get("data", [])
+    result = api_get("/api/v1/contract/detail")
+    contracts = result.get("data", [])
+
     if not isinstance(contracts, list):
-        raise RuntimeError("Unexpected MEXC contract list format.")
+        raise RuntimeError("Invalid contract list")
 
-    active = set()
-    for item in contracts:
-        if (item.get("quoteCoin") == "USDT"
-                and item.get("settleCoin") == "USDT"
-                and item.get("futureType") == 1):
-            active.add(item["symbol"])
-    if not active:
-        raise RuntimeError("No USDT perpetual contracts found.")
+    active = {
+        item["symbol"]
+        for item in contracts
+        if item.get("quoteCoin") == "USDT"
+        and item.get("settleCoin") == "USDT"
+        and item.get("futureType") == 1
+    }
 
-    memes = [s for s in MEME_COINS if s in active]
     tickers_result = api_get("/api/v1/contract/ticker")
     tickers = tickers_result.get("data", [])
-    if isinstance(tickers, dict):
-        tickers = [tickers]
+
     if not isinstance(tickers, list):
-        raise RuntimeError("Unexpected MEXC ticker format.")
+        raise RuntimeError("Invalid ticker data")
 
     valid = [
-        x for x in tickers
-        if x.get("symbol") in active and float(x.get("amount24") or 0) > 0
+        item for item in tickers
+        if item.get("symbol") in active
+        and float(item.get("amount24") or 0) > 0
     ]
-    valid.sort(key=lambda x: float(x.get("amount24") or 0), reverse=True)
+
+    valid.sort(
+        key=lambda x: float(x.get("amount24") or 0),
+        reverse=True
+    )
+
+    memes = [s for s in MEME_COINS if s in active]
     top = [x["symbol"] for x in valid[:MAX_COINS]]
-    selected = list(dict.fromkeys(memes + top))
 
-    print("Active USDT perpetual contracts:", len(active))
-    print("Meme coins included:", len(memes))
-    print("Top liquid coins selected:", len(top))
-    return selected
+    return list(dict.fromkeys(memes + top))[:MAX_COINS]
 
 
-# ---------- SIGNAL HISTORY ----------
+# ---------- REPORT ----------
 
-def load_state():
-    try:
-        with open(STATE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+def format_report(signal):
+    pressure = signal["pressure"]
+
+    if pressure:
+        pressure_text = (
+            f"Buy: {pressure['buy_percent']:.1f}% | "
+            f"Sell: {pressure['sell_percent']:.1f}%"
+        )
+    else:
+        pressure_text = "Unavailable"
+
+    oi_text = (
+        f"{signal['oi']:.4f}"
+        if signal["oi"] is not None else "Unavailable"
+    )
+
+    oi_change_text = (
+        f"{signal['oi_change']:+.2f}%"
+        if signal["oi_change"] is not None else "Not enough history"
+    )
+
+    funding_text = (
+        f"{signal['funding']:.6f}"
+        if signal["funding"] is not None else "Unavailable"
+    )
+
+    targets = "\n".join(
+        f"TP{i+1}: {price:.8g}"
+        for i, price in enumerate(signal["targets"])
+    )
+
+    return (
+        "\n================================\n"
+        "ARAD CRYPTO PRO V4.1 TEST\n"
+        "================================\n"
+        f"Symbol: {signal['symbol']}\n"
+        f"Direction: {signal['direction']}\n"
+        f"Entry: {signal['entry']:.8g}\n"
+        f"Stop Loss: {signal['sl']:.8g}\n"
+        f"{targets}\n"
+        "--------------------------------\n"
+        f"Score: {signal['score']}/100\n"
+        f"RSI 15m: {signal['rsi']:.2f}\n"
+        f"Volume ratio: {signal['volume']:.2f}x\n"
+        f"Sentiment 15m: {signal['sentiment15']}\n"
+        f"Sentiment 1h: {signal['sentiment1h']}\n"
+        f"Open Interest: {oi_text}\n"
+        f"OI change: {oi_change_text}\n"
+        f"Funding Rate: {funding_text}\n"
+        f"Buy/Sell: {pressure_text}\n"
+        "================================\n"
+    )
 
 
-def save_state(state):
-    with open(STATE_FILE, "w", encoding="utf-8") as f:
-        json.dump(state, f, indent=2)
-
-
-def can_send(signal, state):
-    key = signal["symbol"] + "_" + signal["direction"]
-    return time.time() - state.get(key, 0) >= COOLDOWN_HOURS * 3600
-
-
-# ---------- MAIN ----------
+# ---------- MAIN TEST ----------
 
 def main():
-    print("ARAD CRYPTO PRO V4 started.")
-    print("Data source: MEXC Futures")
+    print("\nARAD CRYPTO PRO V4.1 TEST STARTED")
+    print("Mode: TEST ONLY - NO ORDERS")
     print("UTC:", datetime.now(timezone.utc).isoformat())
 
-    if not BOT_TOKEN or not CHAT_ID:
-        raise RuntimeError("BOT_TOKEN or CHAT_ID is missing.")
+    symbols = get_symbols()
+    print("Symbols found:", len(symbols))
 
-    state = load_state()
-    try:
-        symbols = get_symbols()
-    except Exception as exc:
-        message = ("⚠️ ARAD CRYPTO PRO V4\n"
-                   "دریافت اطلاعات بازار MEXC ناموفق بود.\n"
-                   f"خطا: {str(exc)[:300]}")
-        print(message)
-        telegram_send(message)
-        raise
+    sent = 0
+    errors = 0
 
-    print("Symbols to scan:", len(symbols))
-    sent_count = 0
+    with open(
+        "arad_v41_test_report.txt",
+        "w",
+        encoding="utf-8"
+    ) as report:
 
-    for index, symbol in enumerate(symbols, start=1):
-        print(f"[{index}/{len(symbols)}] Scanning {symbol}")
-        signal = make_signal(symbol)
-        if signal is None:
+        for index, symbol in enumerate(symbols, 1):
+            print(
+                f"\n[{index}/{len(symbols)}] "
+                f"Testing {symbol}"
+            )
+
+            try:
+                signal = make_signal(symbol)
+
+                if signal:
+                    output = format_report(signal)
+                    print(output)
+                    report.write(output)
+                    report.flush()
+                    sent += 1
+                else:
+                    print("No valid signal")
+
+            except Exception as exc:
+                errors += 1
+                print("TEST ERROR:", symbol, exc)
+
             time.sleep(REQUEST_DELAY)
-            continue
-        if not can_send(signal, state):
-            print("Cooldown active:", symbol)
-            time.sleep(REQUEST_DELAY)
-            continue
 
-        if telegram_send(format_signal(signal)):
-            key = signal["symbol"] + "_" + signal["direction"]
-            state[key] = time.time()
-            save_state(state)
-            sent_count += 1
-            print("Signal sent:", symbol)
-        time.sleep(REQUEST_DELAY)
-
-    print("Scan completed. Signals sent:", sent_count)
+    print("\n========== TEST FINISHED ==========")
+    print("Signals found:", sent)
+    print("Errors:", errors)
+    print("Report: arad_v41_test_report.txt")
 
 
 if __name__ == "__main__":
