@@ -1,130 +1,222 @@
 
-import os
-import time
 import json
-import html
+import time
 import urllib.request
 import urllib.parse
-import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================================
-# ARAD CRYPTO PRO V4.2
-# MEXC USDT PERPETUAL SCANNER
-# SIGNALS ONLY - NO AUTOMATIC ORDERS
-# TELEGRAM ENABLED
+# ARAD CRYPTO PRO V5.3
+# MULTI-TIMEFRAME + BOS + PULLBACK + RISK MANAGEMENT
+# ANALYSIS ONLY - NO ORDERS - NO TELEGRAM
 # ==========================================================
 
 BASE_URL = "https://contract.mexc.com"
-TELEGRAM_URL = "https://api.telegram.org"
 
-MAX_TOP_COINS = 30
-MIN_SCORE = 80
-REQUEST_DELAY = 0.20
-COOLDOWN_HOURS = 4
+MAX_COINS = 20
+CANDLE_LIMIT = 240
+REQUEST_DELAY = 0.12
 
-STATE_FILE = "signal_state.json"
-REPORT_FILE = "arad_v42_report.txt"
+MIN_VOLUME_RATIO = 0.80
+MIN_RR = 1.30
+MAX_STOP_ATR = 2.0
+MAX_LIVE_DIFF = 0.50
+
+ATR_SL_MULTIPLIER = 1.20
+
+TIMEFRAMES = {
+    "5m": ("Min5", 300),
+    "15m": ("Min15", 900),
+    "1h": ("Min60", 3600),
+    "4h": ("Hour4", 14400),
+}
+
+EXCLUDED_BASES = {
+    "SOXL", "SOXS", "TESLA", "TSLA", "KORU",
+    "MUSTOCK", "SNDKSTOCK", "USOIL", "UKOIL",
+    "GOLD", "SILVER", "SPY", "QQQ", "NVDA",
+    "AAPL", "AMZN", "META", "MSFT", "GOOGL",
+    "COIN", "MSTR", "NFLX", "AMD", "INTC",
+    "NVD", "TQQQ", "SQQQ", "UVXY"
+}
+
+EXCLUDED_WORDS = (
+    "STOCK", "EQUITY", "ETF", "OIL", "GOLD",
+    "SILVER", "INDEX", "NASDAQ", "NYSE", "COMMODITY"
+)
 
 MEME_COINS = {
-    "DOGE_USDT", "SHIB_USDT", "PEPE_USDT",
-    "BONK_USDT", "WIF_USDT", "FLOKI_USDT",
-    "BOME_USDT", "MEME_USDT", "TURBO_USDT"
+    "DOGE", "SHIB", "PEPE", "BONK", "WIF",
+    "FLOKI", "BOME", "MEME", "TURBO"
 }
 
 
-# -------------------- API --------------------
+# ----------------------------------------------------------
+# API
+# ----------------------------------------------------------
 
 def api_get(path, params=None):
-    query = urllib.parse.urlencode(params or {})
     url = BASE_URL + path
 
-    if query:
-        url += "?" + query
+    if params:
+        url += "?" + urllib.parse.urlencode(params)
 
     request = urllib.request.Request(
         url,
-        headers={"User-Agent": "ARAD-CRYPTO-PRO-V4.2"}
+        headers={"User-Agent": "ARAD-CRYPTO-PRO-V5.3"}
     )
 
     try:
-        with urllib.request.urlopen(request, timeout=20) as response:
+        with urllib.request.urlopen(request, timeout=15) as response:
             result = json.loads(response.read().decode("utf-8"))
-    except Exception as exc:
-        raise RuntimeError(
-            f"API failed ({path}): {exc}"
-        ) from exc
 
-    if isinstance(result, dict):
-        if result.get("success") is False:
-            raise RuntimeError(f"MEXC error: {result}")
+        if not isinstance(result, dict):
+            return None
 
-        code = result.get("code")
-        if code not in (None, 0, "0"):
-            raise RuntimeError(f"MEXC error: {result}")
+        if not result.get("success", False):
+            return None
 
-    return result
+        return result.get("data")
+
+    except Exception as error:
+        print("API ERROR:", str(error)[:120])
+        return None
 
 
-# -------------------- TELEGRAM --------------------
+def get_contracts():
+    data = api_get("/api/v1/contract/detail")
 
-def send_telegram(message):
-    token = os.getenv("BOT_TOKEN")
-    chat_id = os.getenv("CHAT_ID")
+    if not isinstance(data, list):
+        return []
 
-    if not token or not chat_id:
-        raise RuntimeError(
-            "BOT_TOKEN or CHAT_ID is missing in GitHub Secrets"
-        )
+    accepted = []
 
-    url = f"{TELEGRAM_URL}/bot{token}/sendMessage"
+    for item in data:
+        symbol = str(item.get("symbol", ""))
+        base = str(item.get("baseCoin", "")).upper()
+        quote = str(item.get("quoteCoin", "")).upper()
+        settle = str(item.get("settleCoin", "")).upper()
 
-    payload = {
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": True
-    }
+        if not symbol.endswith("_USDT"):
+            continue
 
-    request = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST"
+        if quote != "USDT" or settle != "USDT":
+            continue
+
+        if not base or base in EXCLUDED_BASES:
+            continue
+
+        description = (
+            base + " " + str(item.get("displayNameEn", ""))
+        ).upper()
+
+        if any(word in description for word in EXCLUDED_WORDS):
+            continue
+
+        state = item.get("state")
+
+        if state is not None and state != 0:
+            continue
+
+        accepted.append(item)
+
+    return accepted
+
+
+def get_tickers():
+    data = api_get("/api/v1/contract/ticker")
+
+    if isinstance(data, dict):
+        return [data]
+
+    if isinstance(data, list):
+        return data
+
+    return []
+
+
+def get_live_price(ticker):
+    try:
+        return float(ticker.get("lastPrice", 0))
+    except (ValueError, TypeError, AttributeError):
+        return 0.0
+
+
+def get_candles(symbol, interval, seconds):
+    data = api_get(
+        "/api/v1/contract/kline/" + symbol,
+        {"interval": interval}
     )
 
-    try:
-        with urllib.request.urlopen(request, timeout=20) as response:
-            result = json.loads(response.read().decode("utf-8"))
-    except Exception as exc:
-        raise RuntimeError(
-            f"Telegram delivery failed: {exc}"
-        ) from exc
+    if not isinstance(data, dict):
+        return None
 
-    if not result.get("ok"):
-        raise RuntimeError(f"Telegram rejected message: {result}")
+    keys = ("time", "open", "high", "low", "close", "vol")
 
-    return True
+    if not all(key in data for key in keys):
+        return None
+
+    count = min(len(data[key]) for key in keys)
+    now = int(time.time())
+    candles = []
+
+    for i in range(count):
+        try:
+            timestamp = int(data["time"][i])
+
+            # Exclude currently forming candle.
+            if timestamp + seconds > now:
+                continue
+
+            candle = {
+                "time": timestamp,
+                "open": float(data["open"][i]),
+                "high": float(data["high"][i]),
+                "low": float(data["low"][i]),
+                "close": float(data["close"][i]),
+                "volume": float(data["vol"][i])
+            }
+
+            if (
+                candle["close"] <= 0
+                or candle["high"] < candle["low"]
+                or candle["volume"] < 0
+            ):
+                continue
+
+            candles.append(candle)
+
+        except (ValueError, TypeError, IndexError):
+            continue
+
+    candles.sort(key=lambda x: x["time"])
+
+    if len(candles) < 205:
+        return None
+
+    return candles[-CANDLE_LIMIT:]
 
 
-# -------------------- INDICATORS --------------------
+# ----------------------------------------------------------
+# INDICATORS
+# ----------------------------------------------------------
 
 def ema(values, period):
     if len(values) < period:
         return None
 
-    alpha = 2.0 / (period + 1)
-    value = sum(values[:period]) / period
+    result = sum(values[:period]) / period
+    multiplier = 2 / (period + 1)
 
-    for item in values[period:]:
-        value = alpha * item + (1 - alpha) * value
+    for value in values[period:]:
+        result = value * multiplier + result * (1 - multiplier)
 
-    return value
+    return result
 
 
-def rsi(values, period=14):
+def calculate_rsi(values, period=14):
     if len(values) <= period:
-        return 50.0
+        return None
 
     changes = [
         values[i] - values[i - 1]
@@ -137,7 +229,7 @@ def rsi(values, period=14):
     avg_gain = sum(gains[:period]) / period
     avg_loss = sum(losses[:period]) / period
 
-    for i in range(period, len(changes)):
+    for i in range(period, len(gains)):
         avg_gain = (
             avg_gain * (period - 1) + gains[i]
         ) / period
@@ -149,651 +241,605 @@ def rsi(values, period=14):
     if avg_loss == 0:
         return 100.0
 
-    if avg_gain == 0:
-        return 0.0
-
     rs = avg_gain / avg_loss
     return 100 - (100 / (1 + rs))
 
 
-def atr(high, low, close, period=14):
-    if len(close) < period + 1:
-        return 0.0
+def calculate_atr(candles, period=14):
+    if len(candles) <= period:
+        return None
 
     ranges = []
 
-    for i in range(1, len(close)):
+    for i in range(1, len(candles)):
+        current = candles[i]
+        previous = candles[i - 1]
+
         ranges.append(max(
-            high[i] - low[i],
-            abs(high[i] - close[i - 1]),
-            abs(low[i] - close[i - 1])
+            current["high"] - current["low"],
+            abs(current["high"] - previous["close"]),
+            abs(current["low"] - previous["close"])
         ))
 
     return sum(ranges[-period:]) / period
 
 
-# -------------------- CANDLES --------------------
+# ----------------------------------------------------------
+# MARKET STRUCTURE
+# ----------------------------------------------------------
 
-def get_candles(symbol, timeframe):
+def find_swings(candles, left=3, right=3):
+    highs = []
+    lows = []
 
-    intervals = {
-        "15m": ("Min15", 900),
-        "1h": ("Min60", 3600)
-    }
+    for i in range(left, len(candles) - right):
+        high = candles[i]["high"]
+        low = candles[i]["low"]
 
-    interval, seconds = intervals[timeframe]
-    now = int(time.time())
-
-    result = api_get(
-        "/api/v1/contract/kline/" + symbol,
-        {
-            "interval": interval,
-            "start": now - 240 * seconds,
-            "end": now
-        }
-    )
-
-    data = result.get("data", {})
-
-    if not isinstance(data, dict):
-        return None
-
-    fields = [
-        data.get("time", []),
-        data.get("close", []),
-        data.get("high", []),
-        data.get("low", []),
-        data.get("vol", [])
-    ]
-
-    if not all(isinstance(x, list) for x in fields):
-        return None
-
-    count = min(len(x) for x in fields)
-    candles = []
-
-    for i in range(count):
-        try:
-            timestamp = int(fields[0][i])
-
-            # Ignore unfinished candles.
-            if timestamp + seconds > now:
-                continue
-
-            close = float(fields[1][i])
-            high = float(fields[2][i])
-            low = float(fields[3][i])
-            volume = float(fields[4][i])
-
-            if min(close, high, low) <= 0:
-                continue
-
-            candles.append(
-                (timestamp, close, high, low, volume)
-            )
-
-        except (ValueError, TypeError, IndexError):
-            continue
-
-    candles.sort(key=lambda x: x[0])
-
-    unique = {c[0]: c for c in candles}
-    candles = [unique[k] for k in sorted(unique)]
-
-    if len(candles) < 205:
-        return None
-
-    return {
-        "close": [c[1] for c in candles],
-        "high": [c[2] for c in candles],
-        "low": [c[3] for c in candles],
-        "volume": [c[4] for c in candles]
-    }
-
-
-# -------------------- ANALYSIS --------------------
-
-def analyze(data):
-
-    if not data:
-        return None
-
-    close = data["close"]
-    high = data["high"]
-    low = data["low"]
-    volume = data["volume"]
-
-    if len(close) < 205:
-        return None
-
-    e9 = ema(close, 9)
-    e21 = ema(close, 21)
-    e50 = ema(close, 50)
-    e200 = ema(close, 200)
-
-    current_rsi = rsi(close)
-    current_atr = atr(high, low, close)
-
-    macd_history = []
-
-    for i in range(35, len(close) + 1):
-        part = close[:i]
-        macd_history.append(
-            ema(part, 12) - ema(part, 26)
+        is_high = (
+            all(high > candles[j]["high"]
+                for j in range(i-left, i))
+            and
+            all(high >= candles[j]["high"]
+                for j in range(i+1, i+right+1))
         )
 
-    macd_line = macd_history[-1]
-    macd_signal = ema(macd_history, 9)
+        is_low = (
+            all(low < candles[j]["low"]
+                for j in range(i-left, i))
+            and
+            all(low <= candles[j]["low"]
+                for j in range(i+1, i+right+1))
+        )
 
-    if macd_signal is None:
+        if is_high:
+            highs.append(high)
+
+        if is_low:
+            lows.append(low)
+
+    return highs, lows
+
+
+def nearest_levels(candles, price):
+    highs, lows = find_swings(candles[-120:])
+
+    above = [x for x in highs if x > price]
+    below = [x for x in lows if x < price]
+
+    resistance = min(above) if above else None
+    support = max(below) if below else None
+
+    return support, resistance
+
+
+def detect_structure(candles):
+    last = candles[-1]
+    previous = candles[-100:-4]
+
+    highs, lows = find_swings(previous)
+
+    if not highs or not lows:
+        return "NONE", "NONE", None
+
+    recent_high = highs[-1]
+    recent_low = lows[-1]
+
+    bos = "NONE"
+    sweep = "NONE"
+    level = None
+
+    if last["close"] > recent_high:
+        bos = "BULLISH_BOS"
+        level = recent_high
+
+    elif last["close"] < recent_low:
+        bos = "BEARISH_BOS"
+        level = recent_low
+
+    if last["high"] > recent_high and last["close"] < recent_high:
+        sweep = "BEARISH_SWEEP"
+
+    elif last["low"] < recent_low and last["close"] > recent_low:
+        sweep = "BULLISH_SWEEP"
+
+    return bos, sweep, level
+
+
+# ----------------------------------------------------------
+# TIMEFRAME ANALYSIS
+# ----------------------------------------------------------
+
+def analyze_timeframe(candles):
+    closes = [x["close"] for x in candles]
+    volumes = [x["volume"] for x in candles]
+
+    price = closes[-1]
+
+    e9 = ema(closes, 9)
+    e21 = ema(closes, 21)
+    e50 = ema(closes, 50)
+    e200 = ema(closes, 200)
+
+    rsi = calculate_rsi(closes)
+    atr = calculate_atr(candles)
+
+    if None in (e9, e21, e50, e200, rsi, atr):
         return None
 
-    macd_hist = macd_line - macd_signal
-
-    avg_volume = sum(volume[-21:-1]) / 20
+    avg_volume = sum(volumes[-21:-1]) / 20
 
     volume_ratio = (
-        volume[-1] / avg_volume
-        if avg_volume > 0 else 0
+        volumes[-1] / avg_volume if avg_volume > 0 else 0
     )
 
-    bull = 0
-    bear = 0
+    if e9 > e21 > e50 > e200 and price > e21:
+        trend = "BULLISH"
 
-    if e9 > e21:
-        bull += 1
-    elif e9 < e21:
-        bear += 1
+    elif e9 < e21 < e50 < e200 and price < e21:
+        trend = "BEARISH"
 
-    if e21 > e50:
-        bull += 1
-    elif e21 < e50:
-        bear += 1
+    else:
+        trend = "NEUTRAL"
 
-    if close[-1] > e200:
-        bull += 2
-    elif close[-1] < e200:
-        bear += 2
-
-    if macd_hist > 0:
-        bull += 1
-    elif macd_hist < 0:
-        bear += 1
-
-    if current_rsi >= 52:
-        bull += 1
-    elif current_rsi <= 48:
-        bear += 1
-
-    sentiment = (
-        "BULLISH" if bull > bear
-        else "BEARISH" if bear > bull
-        else "NEUTRAL"
-    )
+    support, resistance = nearest_levels(candles, price)
+    bos, sweep, bos_level = detect_structure(candles)
 
     return {
-        "price": close[-1],
+        "price": price,
+        "trend": trend,
+        "rsi": rsi,
+        "atr": atr,
         "ema9": e9,
         "ema21": e21,
         "ema50": e50,
         "ema200": e200,
-        "rsi": current_rsi,
-        "atr": current_atr,
-        "macd": macd_hist,
         "volume_ratio": volume_ratio,
-        "sentiment": sentiment,
-        "sentiment_score": round(
-            100 * max(bull, bear) / 6
-        )
+        "support": support,
+        "resistance": resistance,
+        "bos": bos,
+        "sweep": sweep,
+        "bos_level": bos_level
     }
 
 
-# -------------------- MARKET METRICS --------------------
+def analyze_symbol(symbol, ticker):
+    results = {}
 
-def get_market_metrics(symbol):
-
-    oi = None
-    funding = None
-
-    try:
-        result = api_get(
-            "/api/v1/contract/ticker",
-            {"symbol": symbol}
-        )
-
-        data = result.get("data", {})
-
-        if isinstance(data, list) and data:
-            data = data[0]
-
-        if isinstance(data, dict):
-            if data.get("holdVol") is not None:
-                oi = float(data["holdVol"])
-
-            if data.get("fundingRate") is not None:
-                funding = float(data["fundingRate"])
-
-    except Exception as exc:
-        print("Market metrics unavailable:", symbol, exc)
-
-    return oi, funding
-
-
-def get_buy_sell_pressure(symbol):
-
-    try:
-        result = api_get(
-            "/api/v1/contract/deals/" + symbol,
-            {"limit": 100}
-        )
-
-        deals = result.get("data", [])
-
-        if not isinstance(deals, list) or not deals:
-            return None
-
-        buy = 0.0
-        sell = 0.0
-
-        for trade in deals:
-            try:
-                volume = float(trade.get("v", 0))
-                side = int(trade.get("T", 0))
-            except (ValueError, TypeError):
-                continue
-
-            if side == 1:
-                buy += volume
-            elif side == 2:
-                sell += volume
-
-        total = buy + sell
-
-        if total <= 0:
-            return None
-
-        return {
-            "buy_percent": 100 * buy / total,
-            "sell_percent": 100 * sell / total
-        }
-
-    except Exception as exc:
-        print("Pressure unavailable:", symbol, exc)
-        return None
-
-
-# -------------------- SIGNAL GENERATOR --------------------
-
-def make_signal(symbol):
-
-    try:
-        data15 = get_candles(symbol, "15m")
+    for name, (interval, seconds) in TIMEFRAMES.items():
+        candles = get_candles(symbol, interval, seconds)
         time.sleep(REQUEST_DELAY)
 
-        data1h = get_candles(symbol, "1h")
-
-        m15 = analyze(data15)
-        h1 = analyze(data1h)
-
-        if not m15 or not h1:
+        if not candles:
+            print(symbol, name, "DATA INCOMPLETE")
             return None
 
-        def trend(item):
+        result = analyze_timeframe(candles)
 
-            if (
-                item["ema9"] > item["ema21"] > item["ema50"]
-                and item["price"] > item["ema21"]
-            ):
-                return "LONG"
-
-            if (
-                item["ema9"] < item["ema21"] < item["ema50"]
-                and item["price"] < item["ema21"]
-            ):
-                return "SHORT"
-
+        if not result:
             return None
 
-        direction = trend(m15)
+        results[name] = result
 
-        # Both timeframes must agree.
-        if not direction or trend(h1) != direction:
-            return None
+        # Keep 5m candles for pullback examination.
+        if name == "5m":
+            results["5m_candles"] = candles
 
-        expected = (
-            "BULLISH" if direction == "LONG"
-            else "BEARISH"
-        )
+    live_price = get_live_price(ticker)
 
-        if (
-            m15["sentiment"] != expected
-            or h1["sentiment"] != expected
-            or m15["sentiment_score"] < 65
-            or h1["sentiment_score"] < 65
-        ):
-            return None
-
-        if direction == "LONG":
-            if not 50 <= m15["rsi"] <= 68:
-                return None
-        else:
-            if not 32 <= m15["rsi"] <= 50:
-                return None
-
-        # Avoid excessively extended entries.
-        if abs(m15["price"] - m15["ema21"]) > m15["atr"] * 1.5:
-            return None
-
-        oi, funding = get_market_metrics(symbol)
-        pressure = get_buy_sell_pressure(symbol)
-
-        score = 65
-
-        if m15["volume_ratio"] >= 1.2:
-            score += 5
-
-        if h1["volume_ratio"] >= 1.1:
-            score += 5
-
-        if m15["sentiment_score"] >= 80:
-            score += 5
-
-        if h1["sentiment_score"] >= 80:
-            score += 5
-
-        if pressure:
-            if (
-                direction == "LONG"
-                and pressure["buy_percent"] > 55
-            ):
-                score += 5
-
-            elif (
-                direction == "SHORT"
-                and pressure["sell_percent"] > 55
-            ):
-                score += 5
-
-        score = min(score, 100)
-
-        if score < MIN_SCORE or m15["atr"] <= 0:
-            return None
-
-        entry = m15["price"]
-        risk = m15["atr"] * 1.5
-
-        if direction == "LONG":
-            sl = entry - risk
-            targets = [
-                entry + risk * x
-                for x in (1, 1.5, 2, 2.5, 3)
-            ]
-        else:
-            sl = entry + risk
-            targets = [
-                entry - risk * x
-                for x in (1, 1.5, 2, 2.5, 3)
-            ]
-
-        return {
-            "symbol": symbol,
-            "direction": direction,
-            "entry": entry,
-            "sl": sl,
-            "targets": targets,
-            "score": score,
-            "rsi": m15["rsi"],
-            "volume": m15["volume_ratio"],
-            "sentiment15": m15["sentiment_score"],
-            "sentiment1h": h1["sentiment_score"],
-            "oi": oi,
-            "funding": funding,
-            "pressure": pressure
-        }
-
-    except Exception as exc:
-        print("Signal error:", symbol, exc)
+    if live_price <= 0:
         return None
 
+    results["live_price"] = live_price
 
-# -------------------- SYMBOL DISCOVERY --------------------
+    return results
 
-def get_symbols():
 
-    result = api_get("/api/v1/contract/detail")
-    contracts = result.get("data", [])
+# ----------------------------------------------------------
+# PULLBACK CONFIRMATION
+# ----------------------------------------------------------
 
-    if not isinstance(contracts, list):
-        raise RuntimeError("Invalid contract list")
+def check_pullback(results, direction):
+    candles = results["5m_candles"]
+    m5 = results["5m"]
 
-    active = {
-        item["symbol"]
-        for item in contracts
-        if item.get("quoteCoin") == "USDT"
-        and item.get("settleCoin") == "USDT"
-        and item.get("futureType") == 1
-        and item.get("state", 0) == 0
-        and item.get("symbol")
+    last = candles[-1]
+    previous = candles[-2]
+
+    atr = m5["atr"]
+    ema21 = m5["ema21"]
+    m15_level = results["15m"]["bos_level"]
+
+    if not atr or not m15_level:
+        return False
+
+    # Retest zone around the 5m EMA21.
+    tolerance = atr * 0.25
+
+    if direction == "LONG":
+        touched_ema = last["low"] <= ema21 + tolerance
+        recovered_ema = last["close"] > ema21
+        bullish_candle = last["close"] > last["open"]
+        higher_close = last["close"] > previous["close"]
+        held_breakout = last["close"] > m15_level
+
+        return all((
+            touched_ema,
+            recovered_ema,
+            bullish_candle,
+            higher_close,
+            held_breakout
+        ))
+
+    if direction == "SHORT":
+        touched_ema = last["high"] >= ema21 - tolerance
+        rejected_ema = last["close"] < ema21
+        bearish_candle = last["close"] < last["open"]
+        lower_close = last["close"] < previous["close"]
+        held_breakdown = last["close"] < m15_level
+
+        return all((
+            touched_ema,
+            rejected_ema,
+            bearish_candle,
+            lower_close,
+            held_breakdown
+        ))
+
+    return False
+
+
+# ----------------------------------------------------------
+# SIGNAL AND RISK CALCULATION
+# ----------------------------------------------------------
+
+def build_trade_plan(results, direction):
+    live = results["live_price"]
+    m5 = results["5m"]
+
+    atr = m5["atr"]
+
+    if not atr or atr <= 0:
+        return None
+
+    if direction == "LONG":
+        support = m5["support"]
+        structural_stop = (
+            support - atr * 0.15 if support else 0
+        )
+
+        atr_stop = live - atr * ATR_SL_MULTIPLIER
+
+        # Use the closer valid stop below entry.
+        candidates = [
+            x for x in (structural_stop, atr_stop)
+            if 0 < x < live
+        ]
+
+        if not candidates:
+            return None
+
+        stop = max(candidates)
+        risk = live - stop
+
+        if risk <= 0 or risk > atr * MAX_STOP_ATR:
+            return None
+
+        resistance = results["15m"]["resistance"]
+
+        if resistance and resistance > live:
+            if (resistance - live) / risk < MIN_RR:
+                return None
+
+        targets = [
+            live + risk * 1.0,
+            live + risk * 1.5,
+            live + risk * 2.0,
+            live + risk * 3.0
+        ]
+
+    else:
+        resistance = m5["resistance"]
+        structural_stop = (
+            resistance + atr * 0.15 if resistance else 0
+        )
+
+        atr_stop = live + atr * ATR_SL_MULTIPLIER
+
+        # Use the closer valid stop above entry.
+        candidates = [
+            x for x in (structural_stop, atr_stop)
+            if x > live
+        ]
+
+        if not candidates:
+            return None
+
+        stop = min(candidates)
+        risk = stop - live
+
+        if risk <= 0 or risk > atr * MAX_STOP_ATR:
+            return None
+
+        support = results["15m"]["support"]
+
+        if support and support < live:
+            if (live - support) / risk < MIN_RR:
+                return None
+
+        targets = [
+            live - risk * 1.0,
+            live - risk * 1.5,
+            live - risk * 2.0,
+            live - risk * 3.0
+        ]
+
+    return {
+        "direction": direction,
+        "entry": live,
+        "stop": stop,
+        "risk": risk,
+        "targets": targets,
+        "rr": 3.0
     }
 
-    tickers_result = api_get("/api/v1/contract/ticker")
-    tickers = tickers_result.get("data", [])
 
-    if not isinstance(tickers, list):
-        raise RuntimeError("Invalid ticker data")
+def make_decision(results):
+    h4 = results["4h"]
+    h1 = results["1h"]
+    m15 = results["15m"]
+    m5 = results["5m"]
 
-    valid = []
+    long_points = 0
+    short_points = 0
 
-    for item in tickers:
+    if h4["trend"] == "BULLISH":
+        long_points += 3
+    elif h4["trend"] == "BEARISH":
+        short_points += 3
 
-        if item.get("symbol") not in active:
+    if h1["trend"] == "BULLISH":
+        long_points += 3
+    elif h1["trend"] == "BEARISH":
+        short_points += 3
+
+    if m15["bos"] == "BULLISH_BOS":
+        long_points += 2
+    elif m15["bos"] == "BEARISH_BOS":
+        short_points += 2
+
+    if m5["bos"] == "BULLISH_BOS":
+        long_points += 1
+    elif m5["bos"] == "BEARISH_BOS":
+        short_points += 1
+
+    if m5["sweep"] == "BEARISH_SWEEP":
+        long_points = max(0, long_points - 2)
+
+    if m5["sweep"] == "BULLISH_SWEEP":
+        short_points = max(0, short_points - 2)
+
+    bias = "NO TRADE"
+    direction = None
+
+    if long_points >= 7 and short_points <= 2:
+        bias = "LONG BIAS"
+        direction = "LONG"
+
+    elif short_points >= 7 and long_points <= 2:
+        bias = "SHORT BIAS"
+        direction = "SHORT"
+
+    status = "NOT CONFIRMED"
+    plan = None
+
+    if direction:
+        higher_trend_ok = (
+            h4["trend"] == ("BULLISH" if direction == "LONG" else "BEARISH")
+            and
+            h1["trend"] == ("BULLISH" if direction == "LONG" else "BEARISH")
+        )
+
+        m15_bos_ok = (
+            m15["bos"] == (
+                "BULLISH_BOS" if direction == "LONG"
+                else "BEARISH_BOS"
+            )
+        )
+
+        m15_rsi_ok = (
+            48 <= m15["rsi"] <= 70
+            if direction == "LONG"
+            else 30 <= m15["rsi"] <= 52
+        )
+
+        m5_rsi_ok = (
+            45 <= m5["rsi"] <= 68
+            if direction == "LONG"
+            else 32 <= m5["rsi"] <= 55
+        )
+
+        volume_ok = m5["volume_ratio"] >= MIN_VOLUME_RATIO
+
+        live_diff = (
+            abs(results["live_price"] - m15["price"])
+            / m15["price"] * 100
+        )
+
+        pullback_ok = check_pullback(results, direction)
+
+        if all((
+            higher_trend_ok,
+            m15_bos_ok,
+            m15_rsi_ok,
+            m5_rsi_ok,
+            volume_ok,
+            pullback_ok,
+            live_diff <= MAX_LIVE_DIFF
+        )):
+            plan = build_trade_plan(results, direction)
+
+            if plan:
+                status = direction + " SETUP TO REVIEW"
+
+    return bias, status, long_points, short_points, plan
+
+
+# ----------------------------------------------------------
+# OUTPUT
+# ----------------------------------------------------------
+
+def fmt(value):
+    return f"{value:.10g}" if value is not None else "N/A"
+
+
+def print_levels(name, data):
+    print(
+        name,
+        "| Trend:", data["trend"],
+        "| RSI:", round(data["rsi"], 2),
+        "| Vol:", round(data["volume_ratio"], 2),
+        "| BOS:", data["bos"],
+        "| Sweep:", data["sweep"]
+    )
+
+    print(
+        "Support:", fmt(data["support"]),
+        "| Resistance:", fmt(data["resistance"])
+    )
+
+
+def print_plan(plan):
+    if not plan:
+        return
+
+    print("\n========== TRADE PLAN TO REVIEW ==========")
+    print("DIRECTION:", plan["direction"])
+    print("ENTRY:", fmt(plan["entry"]))
+    print("STOP LOSS:", fmt(plan["stop"]))
+
+    for index, target in enumerate(plan["targets"], 1):
+        print(f"TP{index}:", fmt(target))
+
+    print("RISK:", fmt(plan["risk"]))
+    print("TP4 RISK/REWARD:", round(plan["rr"], 2))
+    print("WARNING: THIS IS NOT AN ORDER.")
+    print("==========================================\n")
+
+
+# ----------------------------------------------------------
+# MAIN
+# ----------------------------------------------------------
+
+def main():
+    print("=" * 60)
+    print("ARAD CRYPTO PRO V5.3")
+    print("MTF + BOS + PULLBACK + RISK MANAGEMENT")
+    print("ANALYSIS ONLY - NO ORDERS")
+    print("=" * 60)
+
+    contracts = get_contracts()
+    tickers = get_tickers()
+
+    if not contracts or not tickers:
+        print("ERROR: MARKET DATA UNAVAILABLE")
+        return
+
+    ticker_map = {
+        x.get("symbol"): x
+        for x in tickers
+        if x.get("symbol")
+    }
+
+    candidates = []
+
+    for contract in contracts:
+        symbol = contract.get("symbol")
+        ticker = ticker_map.get(symbol)
+
+        if not ticker:
             continue
 
         try:
-            amount = float(item.get("amount24") or 0)
-        except (TypeError, ValueError):
+            amount = float(ticker.get("amount24", 0))
+            price = get_live_price(ticker)
+        except (ValueError, TypeError):
             continue
 
-        if amount > 0:
-            valid.append((item["symbol"], amount))
+        if amount <= 0 or price <= 0:
+            continue
 
-    valid.sort(key=lambda x: x[1], reverse=True)
+        candidates.append((symbol, amount))
 
-    memes = [
-        symbol for symbol in sorted(MEME_COINS)
-        if symbol in active
-    ]
+    candidates.sort(key=lambda x: x[1], reverse=True)
 
-    top = [
-        symbol for symbol, _ in valid[:MAX_TOP_COINS]
-    ]
+    selected = candidates[:MAX_COINS]
+    selected_names = {x[0] for x in selected}
 
-    # Meme coins plus top liquid coins.
-    return list(dict.fromkeys(memes + top))
+    for symbol, amount in candidates:
+        base = symbol.split("_")[0]
 
+        if base in MEME_COINS and symbol not in selected_names:
+            selected.append((symbol, amount))
+            selected_names.add(symbol)
 
-# -------------------- SIGNAL HISTORY --------------------
+    print("Eligible contracts:", len(contracts))
+    print("Selected symbols:", len(selected))
 
-def load_state():
+    confirmed_count = 0
 
-    try:
-        with open(STATE_FILE, "r", encoding="utf-8") as file:
-            data = json.load(file)
+    for symbol, _ in selected:
+        print("\n" + "-" * 60)
+        print("ANALYZING:", symbol)
 
-        return data if isinstance(data, dict) else {}
+        try:
+            ticker = ticker_map.get(symbol)
+            results = analyze_symbol(symbol, ticker)
 
-    except (OSError, ValueError):
-        return {}
+            if not results:
+                print("RESULT: INSUFFICIENT DATA")
+                continue
 
+            bias, status, long_score, short_score, plan = (
+                make_decision(results)
+            )
 
-def save_state(state):
+            live = results["live_price"]
+            reference = results["15m"]["price"]
 
-    temp_file = STATE_FILE + ".tmp"
+            difference = (
+                abs(live - reference) / reference * 100
+                if reference else 0
+            )
 
-    with open(temp_file, "w", encoding="utf-8") as file:
-        json.dump(state, file, indent=2)
+            print("LIVE PRICE:", fmt(live))
+            print("LAST CLOSED 15M:", fmt(reference))
+            print("PRICE DIFFERENCE %:", round(difference, 3))
 
-    os.replace(temp_file, STATE_FILE)
+            print("MARKET BIAS:", bias)
+            print("ENTRY STATUS:", status)
+            print("LONG POINTS:", long_score)
+            print("SHORT POINTS:", short_score)
 
+            for tf in ("4h", "1h", "15m", "5m"):
+                print_levels(tf, results[tf])
 
-def is_duplicate(signal, state):
+            if difference > MAX_LIVE_DIFF:
+                print("WARNING: LIVE PRICE MOVED - RECHECK REQUIRED")
 
-    key = (
-        signal["symbol"] + "|" +
-        signal["direction"]
-    )
+            if plan:
+                confirmed_count += 1
+                print_plan(plan)
 
-    previous = state.get(key)
+        except Exception as error:
+            print("SYMBOL ERROR:", str(error)[:150])
 
-    if previous is None:
-        return False
-
-    try:
-        elapsed = time.time() - float(previous)
-    except (TypeError, ValueError):
-        return False
-
-    return elapsed < COOLDOWN_HOURS * 3600
-
-
-# -------------------- MESSAGE --------------------
-
-def format_message(signal):
-
-    direction = signal["direction"]
-
-    emoji = "🟢" if direction == "LONG" else "🔴"
-
-    pressure = signal["pressure"]
-
-    if pressure:
-        pressure_text = (
-            f"Buy: {pressure['buy_percent']:.1f}% | "
-            f"Sell: {pressure['sell_percent']:.1f}%"
-        )
-    else:
-        pressure_text = "Unavailable"
-
-    oi_text = (
-        f"{signal['oi']:.4f}"
-        if signal["oi"] is not None
-        else "Unavailable"
-    )
-
-    funding_text = (
-        f"{signal['funding']:.6f}"
-        if signal["funding"] is not None
-        else "Unavailable"
-    )
-
-    targets = "\n".join(
-        f"TP{i+1}: <code>{price:.8g}</code>"
-        for i, price in enumerate(signal["targets"])
-    )
-
-    return (
-        f"{emoji} <b>ARAD CRYPTO PRO V4.2</b>\n"
-        f"━━━━━━━━━━━━━━\n"
-        f"Symbol: <b>{html.escape(signal['symbol'])}</b>\n"
-        f"Direction: <b>{direction}</b>\n"
-        f"Score: <b>{signal['score']}/100</b>\n"
-        f"━━━━━━━━━━━━━━\n"
-        f"Entry: <code>{signal['entry']:.8g}</code>\n"
-        f"Stop Loss: <code>{signal['sl']:.8g}</code>\n"
-        f"{targets}\n"
-        f"━━━━━━━━━━━━━━\n"
-        f"RSI 15m: {signal['rsi']:.2f}\n"
-        f"Volume: {signal['volume']:.2f}x\n"
-        f"Trend 15m: {signal['sentiment15']}/100\n"
-        f"Trend 1h: {signal['sentiment1h']}/100\n"
-        f"Open Interest: {oi_text}\n"
-        f"Funding: {funding_text}\n"
-        f"Buy/Sell: {pressure_text}\n"
-        f"━━━━━━━━━━━━━━\n"
-        f"<i>Signals only - No automatic orders</i>\n"
-        f"UTC: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}"
-    )
-
-
-# -------------------- MAIN --------------------
-
-def main():
-
-    print("ARAD CRYPTO PRO V4.2 STARTED")
-    print("Mode: LIVE SIGNALS - NO ORDERS")
-    print("Telegram: ENABLED")
-    print("Minimum score:", MIN_SCORE)
+    print("\n" + "=" * 60)
+    print("V5.3 ANALYSIS COMPLETED")
+    print("REVIEW SETUPS:", confirmed_count)
     print("UTC:", datetime.now(timezone.utc).isoformat())
-
-    # Fail early if Telegram configuration is missing.
-    if not os.getenv("BOT_TOKEN") or not os.getenv("CHAT_ID"):
-        raise RuntimeError("Missing BOT_TOKEN or CHAT_ID")
-
-    symbols = get_symbols()
-
-    print("Symbols to scan:", len(symbols))
-
-    state = load_state()
-
-    sent = 0
-    duplicates = 0
-    errors = 0
-
-    with open(REPORT_FILE, "w", encoding="utf-8") as report:
-
-        for index, symbol in enumerate(symbols, 1):
-
-            print(f"[{index}/{len(symbols)}] Scanning {symbol}")
-
-            try:
-                signal = make_signal(symbol)
-
-                if not signal:
-                    print("No valid signal")
-                    continue
-
-                print(
-                    f"Signal candidate: {symbol} "
-                    f"{signal['direction']} "
-                    f"Score={signal['score']}"
-                )
-
-                if is_duplicate(signal, state):
-                    print("Duplicate skipped:", symbol)
-                    duplicates += 1
-                    continue
-
-                message = format_message(signal)
-
-                # Save only after successful Telegram delivery.
-                send_telegram(message)
-
-                key = (
-                    signal["symbol"] + "|" +
-                    signal["direction"]
-                )
-
-                state[key] = time.time()
-                save_state(state)
-
-                report.write(message + "\n\n")
-                report.flush()
-
-                sent += 1
-                print("Telegram signal sent:", symbol)
-
-            except Exception as exc:
-                errors += 1
-                print("SCAN ERROR:", symbol, exc)
-
-            time.sleep(REQUEST_DELAY)
-
-    print("\n========== SCAN FINISHED ==========")
-    print("Symbols scanned:", len(symbols))
-    print("Signals sent:", sent)
-    print("Duplicates skipped:", duplicates)
-    print("Errors:", errors)
-    print("Report:", REPORT_FILE)
+    print("NO ORDERS WERE PLACED")
+    print("=" * 60)
 
 
 if __name__ == "__main__":
