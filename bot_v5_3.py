@@ -6,7 +6,7 @@ import urllib.parse
 from datetime import datetime, timezone
 
 # ==========================================================
-# ARAD CRYPTO PRO V5.3
+# ARAD CRYPTO PRO V5.3 DEBUG
 # MULTI-TIMEFRAME + BOS + PULLBACK + RISK MANAGEMENT
 # ANALYSIS ONLY - NO ORDERS - NO TELEGRAM
 # ==========================================================
@@ -277,19 +277,27 @@ def find_swings(candles, left=3, right=3):
         low = candles[i]["low"]
 
         is_high = (
-            all(high > candles[j]["high"]
-                for j in range(i-left, i))
+            all(
+                high > candles[j]["high"]
+                for j in range(i - left, i)
+            )
             and
-            all(high >= candles[j]["high"]
-                for j in range(i+1, i+right+1))
+            all(
+                high >= candles[j]["high"]
+                for j in range(i + 1, i + right + 1)
+            )
         )
 
         is_low = (
-            all(low < candles[j]["low"]
-                for j in range(i-left, i))
+            all(
+                low < candles[j]["low"]
+                for j in range(i - left, i)
+            )
             and
-            all(low <= candles[j]["low"]
-                for j in range(i+1, i+right+1))
+            all(
+                low <= candles[j]["low"]
+                for j in range(i + 1, i + right + 1)
+            )
         )
 
         if is_high:
@@ -421,7 +429,6 @@ def analyze_symbol(symbol, ticker):
 
         results[name] = result
 
-        # Keep 5m candles for pullback examination.
         if name == "5m":
             results["5m_candles"] = candles
 
@@ -453,7 +460,6 @@ def check_pullback(results, direction):
     if not atr or not m15_level:
         return False
 
-    # Retest zone around the 5m EMA21.
     tolerance = atr * 0.25
 
     if direction == "LONG":
@@ -504,13 +510,13 @@ def build_trade_plan(results, direction):
 
     if direction == "LONG":
         support = m5["support"]
+
         structural_stop = (
             support - atr * 0.15 if support else 0
         )
 
         atr_stop = live - atr * ATR_SL_MULTIPLIER
 
-        # Use the closer valid stop below entry.
         candidates = [
             x for x in (structural_stop, atr_stop)
             if 0 < x < live
@@ -540,13 +546,13 @@ def build_trade_plan(results, direction):
 
     else:
         resistance = m5["resistance"]
+
         structural_stop = (
             resistance + atr * 0.15 if resistance else 0
         )
 
         atr_stop = live + atr * ATR_SL_MULTIPLIER
 
-        # Use the closer valid stop above entry.
         candidates = [
             x for x in (structural_stop, atr_stop)
             if x > live
@@ -583,6 +589,10 @@ def build_trade_plan(results, direction):
         "rr": 3.0
     }
 
+
+# ----------------------------------------------------------
+# DECISION + REJECTION DIAGNOSTICS
+# ----------------------------------------------------------
 
 def make_decision(results):
     h4 = results["4h"]
@@ -621,6 +631,7 @@ def make_decision(results):
 
     bias = "NO TRADE"
     direction = None
+    reasons = []
 
     if long_points >= 7 and short_points <= 2:
         bias = "LONG BIAS"
@@ -630,22 +641,44 @@ def make_decision(results):
         bias = "SHORT BIAS"
         direction = "SHORT"
 
+    else:
+        if long_points < 7:
+            reasons.append(
+                f"LONG_SCORE_BELOW_7 ({long_points}/7)"
+            )
+
+        if short_points < 7:
+            reasons.append(
+                f"SHORT_SCORE_BELOW_7 ({short_points}/7)"
+            )
+
+        if long_points >= 7 and short_points > 2:
+            reasons.append("OPPOSITE_SHORT_SCORE_TOO_HIGH")
+
+        if short_points >= 7 and long_points > 2:
+            reasons.append("OPPOSITE_LONG_SCORE_TOO_HIGH")
+
     status = "NOT CONFIRMED"
     plan = None
 
     if direction:
-        higher_trend_ok = (
-            h4["trend"] == ("BULLISH" if direction == "LONG" else "BEARISH")
-            and
-            h1["trend"] == ("BULLISH" if direction == "LONG" else "BEARISH")
+        expected_trend = (
+            "BULLISH" if direction == "LONG" else "BEARISH"
         )
 
-        m15_bos_ok = (
-            m15["bos"] == (
-                "BULLISH_BOS" if direction == "LONG"
-                else "BEARISH_BOS"
-            )
+        expected_bos = (
+            "BULLISH_BOS" if direction == "LONG"
+            else "BEARISH_BOS"
         )
+
+        if not (
+            h4["trend"] == expected_trend
+            and h1["trend"] == expected_trend
+        ):
+            reasons.append("HIGHER_TIMEFRAMES_NOT_ALIGNED")
+
+        if m15["bos"] != expected_bos:
+            reasons.append("15M_BOS_NOT_ALIGNED")
 
         m15_rsi_ok = (
             48 <= m15["rsi"] <= 70
@@ -653,36 +686,58 @@ def make_decision(results):
             else 30 <= m15["rsi"] <= 52
         )
 
+        if not m15_rsi_ok:
+            reasons.append("15M_RSI_OUT_OF_RANGE")
+
         m5_rsi_ok = (
             45 <= m5["rsi"] <= 68
             if direction == "LONG"
             else 32 <= m5["rsi"] <= 55
         )
 
-        volume_ok = m5["volume_ratio"] >= MIN_VOLUME_RATIO
+        if not m5_rsi_ok:
+            reasons.append("5M_RSI_OUT_OF_RANGE")
+
+        if m5["volume_ratio"] < MIN_VOLUME_RATIO:
+            reasons.append("VOLUME_TOO_LOW")
 
         live_diff = (
             abs(results["live_price"] - m15["price"])
             / m15["price"] * 100
+            if m15["price"] else 999
         )
+
+        if live_diff > MAX_LIVE_DIFF:
+            reasons.append("LIVE_PRICE_MOVED_TOO_FAR")
 
         pullback_ok = check_pullback(results, direction)
 
-        if all((
-            higher_trend_ok,
-            m15_bos_ok,
-            m15_rsi_ok,
-            m5_rsi_ok,
-            volume_ok,
-            pullback_ok,
-            live_diff <= MAX_LIVE_DIFF
-        )):
+        if not pullback_ok:
+            reasons.append("PULLBACK_NOT_CONFIRMED")
+
+        filters_ok = len(reasons) == 0
+
+        if filters_ok:
             plan = build_trade_plan(results, direction)
 
             if plan:
                 status = direction + " SETUP TO REVIEW"
+            else:
+                reasons.append(
+                    "TRADE_PLAN_REJECTED_BY_RISK_FILTERS"
+                )
 
-    return bias, status, long_points, short_points, plan
+    if not reasons:
+        reasons.append("SETUP_PASSED_ALL_FILTERS")
+
+    return (
+        bias,
+        status,
+        long_points,
+        short_points,
+        plan,
+        reasons
+    )
 
 
 # ----------------------------------------------------------
@@ -733,7 +788,7 @@ def print_plan(plan):
 
 def main():
     print("=" * 60)
-    print("ARAD CRYPTO PRO V5.3")
+    print("ARAD CRYPTO PRO V5.3 DEBUG")
     print("MTF + BOS + PULLBACK + RISK MANAGEMENT")
     print("ANALYSIS ONLY - NO ORDERS")
     print("=" * 60)
@@ -800,9 +855,14 @@ def main():
                 print("RESULT: INSUFFICIENT DATA")
                 continue
 
-            bias, status, long_score, short_score, plan = (
-                make_decision(results)
-            )
+            (
+                bias,
+                status,
+                long_score,
+                short_score,
+                plan,
+                reasons
+            ) = make_decision(results)
 
             live = results["live_price"]
             reference = results["15m"]["price"]
@@ -820,6 +880,10 @@ def main():
             print("ENTRY STATUS:", status)
             print("LONG POINTS:", long_score)
             print("SHORT POINTS:", short_score)
+
+            print("REJECTION REASONS:")
+            for reason in reasons:
+                print("-", reason)
 
             for tf in ("4h", "1h", "15m", "5m"):
                 print_levels(tf, results[tf])
