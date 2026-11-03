@@ -21,4 +21,4 @@ jobs:
           python-version: "3.11"
 
       - name: Run V5.3 Debug Scanner
-        run: python -u bot_v5_3_debug.py
+        run: python -u ./bot_v5_3_debug.py
