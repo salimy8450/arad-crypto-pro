@@ -393,22 +393,21 @@ def parse_candle_data(data):
 
 
 def get_candles(symbol, interval, seconds):
-    # IMPORTANT: Ourbit contract kline start/end are milliseconds.
+    # Ourbit: request candles without start/end parameters.
     path = (
-    "/api/v1/contract/kline/"
-    + urllib.parse.quote(symbol, safe="_")
-)
+        "/api/v1/contract/kline/"
+        + urllib.parse.quote(symbol, safe="_")
+    )
 
-data = api_get(
-    path,
-    {
-        "interval": interval
-    }
-)
+    data = api_get(
+        path,
+        {
+            "interval": interval
         }
     )
 
     if data is None:
+        print("CANDLE API RETURNED NO DATA:", symbol, interval)
         return None
 
     candles = parse_candle_data(data)
@@ -429,21 +428,39 @@ data = api_get(
                 continue
 
             closed.append(candle)
+
         except (KeyError, TypeError):
             continue
 
-    # Deduplicate timestamps and sort oldest -> newest.
-    by_time = {candle["time"]: candle for candle in closed}
-    closed = sorted(by_time.values(), key=lambda item: item["time"])
+    # Remove duplicate timestamps and sort candles.
+    by_time = {
+        candle["time"]: candle
+        for candle in closed
+    }
+
+    closed = sorted(
+        by_time.values(),
+        key=lambda item: item["time"]
+    )
 
     if len(closed) < 205:
         print(
             "CANDLE HISTORY TOO SHORT:",
-            symbol, interval,
-            "received=", len(closed),
+            symbol,
+            interval,
+            "received=",
+            len(closed),
             "required=205"
         )
         return None
+
+    print(
+        "CANDLES OK:",
+        symbol,
+        interval,
+        "count=",
+        len(closed)
+    )
 
     return closed[-CANDLE_LIMIT:]
 
