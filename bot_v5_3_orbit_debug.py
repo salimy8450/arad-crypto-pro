@@ -19,7 +19,7 @@ ANALYSIS ONLY - NO ORDERS - NO TELEGRAM
 ==========================================================
 
 BASE_URL = "https://futures.ourbit.io"
-MAX_COINS = 200
+MAX_COINS = 20
 CANDLE_LIMIT = 240
 REQUEST_DELAY = 0.20
 REQUEST_TIMEOUT = 20
