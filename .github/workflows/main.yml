@@ -1,5 +1,3 @@
-
-
 name: ARAD CRYPTO PRO Scanner
 
 on:
@@ -9,7 +7,7 @@ on:
 
   push:
     paths:
-      - 'bot_v4.py'
+      - 'ARAD_CRYPTO_PRO_V5_5_OURBIT.py'
       - '.github/workflows/main.yml'
 
 permissions:
@@ -43,8 +41,5 @@ jobs:
           restore-keys: |
             signal-state-${{ github.ref }}-
 
-      - name: Run ARAD CRYPTO PRO V4.2
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          CHAT_ID: ${{ secrets.CHAT_ID }}
-        run: python bot_v4.py
+      - name: Run ARAD CRYPTO PRO V5.5
+        run: python -u ARAD_CRYPTO_PRO_V5_5_OURBIT.py
