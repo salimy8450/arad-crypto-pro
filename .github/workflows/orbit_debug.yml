@@ -1,0 +1,24 @@
+name: ARAD V5.3 ORBIT DEBUG TEST
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  orbit-debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run Orbit Debug Scanner
+        run: python -u bot_v5_3_orbit_debug.py
