@@ -2,21 +2,23 @@ import json
 import time
 import urllib.request
 import urllib.parse
+import urllib.error
+import socket
 from datetime import datetime, timezone
 
 # ==========================================================
-# ARAD CRYPTO PRO V5.3 ORBIT DEBUG
-# OURBIT USDT PERPETUALS + CRYPTO + GOLD/SILVER
-# MULTI-TIMEFRAME + BOS + PULLBACK + RISK MANAGEMENT
+# ARAD CRYPTO PRO V5.4 OURBIT
+# OURBIT USDT PERPETUALS | CRYPTO + GOLD + SILVER
+# 5m / 15m / 1h / 4h | BOS | SWEEP | PULLBACK | RISK FILTERS
 # ANALYSIS ONLY - NO ORDERS - NO TELEGRAM
 # ==========================================================
 
 BASE_URL = "https://contract.ourbit.com"
-
 MAX_COINS = 20
 CANDLE_LIMIT = 240
-REQUEST_DELAY = 0.15
+REQUEST_DELAY = 0.20
 REQUEST_TIMEOUT = 20
+API_RETRIES = 3
 
 MIN_VOLUME_RATIO = 0.80
 MIN_RR = 1.30
@@ -31,8 +33,6 @@ TIMEFRAMES = {
     "4h": ("Hour4", 14400),
 }
 
-# Stocks, ETFs, indices and unrelated leveraged products stay excluded.
-# GOLD and SILVER are intentionally NOT excluded.
 EXCLUDED_BASES = {
     "SOXL", "SOXS", "TESLA", "TSLA", "KORU",
     "MUSTOCK", "SNDKSTOCK", "USOIL", "UKOIL",
@@ -41,9 +41,13 @@ EXCLUDED_BASES = {
     "INTC", "NVD", "TQQQ", "SQQQ", "UVXY"
 }
 
+# GOLD and SILVER are deliberately allowed even if their description
+# contains words such as COMMODITY or METAL.
+METAL_BASES = {"GOLD", "SILVER"}
+
 EXCLUDED_WORDS = (
     "STOCK", "EQUITY", "ETF", "OIL", "INDEX",
-    "NASDAQ", "NYSE", "COMMODITY"
+    "NASDAQ", "NYSE"
 )
 
 MEME_COINS = {
@@ -53,181 +57,296 @@ MEME_COINS = {
 
 
 # ----------------------------------------------------------
-# API HELPERS - OURBIT CONTRACT API
+# GENERAL HELPERS
 # ----------------------------------------------------------
 
-def api_get(path, params=None):
-    url = BASE_URL + path
+def as_float(value, default=0.0):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
 
+
+def unwrap_data(result):
+    """Return the API data field while tolerating common wrappers."""
+    if not isinstance(result, dict):
+        return None
+    if "data" in result:
+        return result.get("data")
+    return None
+
+
+def api_get(path, params=None):
+    url = BASE_URL.rstrip("/") + path
     if params:
         url += "?" + urllib.parse.urlencode(params)
 
     request = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "ARAD-CRYPTO-PRO-V5.3-ORBIT",
-            "Accept": "application/json"
-        }
+            "User-Agent": "ARAD-CRYPTO-PRO-V5.4",
+            "Accept": "application/json",
+            "Connection": "close"
+        },
+        method="GET"
     )
 
-    try:
-        with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT) as response:
-            raw = response.read().decode("utf-8")
-            result = json.loads(raw)
+    last_error = None
+    for attempt in range(1, API_RETRIES + 1):
+        try:
+            with urllib.request.urlopen(
+                request, timeout=REQUEST_TIMEOUT
+            ) as response:
+                raw = response.read().decode("utf-8-sig")
+                result = json.loads(raw)
 
-        if not isinstance(result, dict):
-            print("API FORMAT ERROR:", path, "response is not an object")
+            if not isinstance(result, dict):
+                print("API FORMAT ERROR:", path, "expected JSON object")
+                return None
+
+            success = result.get("success")
+            code = result.get("code")
+
+            if success is False:
+                print(
+                    "API REJECTED:", path,
+                    "code=", code,
+                    "message=", result.get("msg", result.get("message", ""))
+                )
+                return None
+
+            # Ourbit contract endpoints commonly return code=0.
+            if code is not None and str(code) not in ("0", "200"):
+                print(
+                    "API ERROR CODE:", path,
+                    "code=", code,
+                    "message=", result.get("msg", result.get("message", ""))
+                )
+                return None
+
+            if "data" not in result:
+                print("API DATA MISSING:", path, "keys=", list(result.keys())[:12])
+                return None
+
+            return result.get("data")
+
+        except urllib.error.HTTPError as error:
+            last_error = error
+            print("HTTP ERROR:", path, "status=", error.code)
+            # Retry only server/rate-limit errors.
+            if error.code not in (429, 500, 502, 503, 504):
+                return None
+
+        except (urllib.error.URLError, socket.gaierror, TimeoutError) as error:
+            last_error = error
+            print(
+                "CONNECTION ERROR:", path,
+                "attempt", attempt, "/", API_RETRIES,
+                str(error)[:160]
+            )
+
+        except (json.JSONDecodeError, UnicodeDecodeError) as error:
+            print("JSON ERROR:", path, str(error)[:160])
             return None
 
-        # Ourbit contract responses commonly use success=true and code=0.
-        # Accept code=0 as well, while rejecting explicit API errors.
-        success = result.get("success")
-        code = result.get("code")
-
-        if success is False:
-            print("API REJECTED:", path, "code=", code,
-                  "msg=", result.get("msg", result.get("message", "")))
+        except Exception as error:
+            print("API ERROR:", path, str(error)[:160])
             return None
 
-        if code is not None and str(code) not in ("0", "200"):
-            print("API ERROR CODE:", path, "code=", code,
-                  "msg=", result.get("msg", result.get("message", "")))
-            return None
+        if attempt < API_RETRIES:
+            time.sleep(attempt * 2)
 
-        if "data" not in result:
-            print("API DATA MISSING:", path)
-            return None
+    print("API REQUEST FAILED AFTER RETRIES:", path, str(last_error)[:160])
+    return None
 
-        return result.get("data")
 
-    except Exception as error:
-        print("API ERROR:", path, str(error)[:180])
-        return None
+def test_api_connection():
+    print("\nTESTING OURBIT API CONNECTION...")
+    data = api_get("/api/v1/contract/ping")
+    if data is not None:
+        print("PING: OK")
+        return True
+
+    # Some deployments may not return a data field for ping.
+    # Contract detail is the definitive public market-data test.
+    print("PING unavailable or unsupported; testing contract detail...")
+    data = api_get("/api/v1/contract/detail")
+    if data is not None:
+        print("CONTRACT API: REACHABLE")
+        return True
+
+    print("OURBIT API CONNECTION: FAILED")
+    print("This may be DNS/network access from the GitHub Actions runner.")
+    return False
+
+
+# ----------------------------------------------------------
+# CONTRACTS AND TICKERS
+# ----------------------------------------------------------
+
+def extract_list(data, keys):
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict):
+        for key in keys:
+            value = data.get(key)
+            if isinstance(value, list):
+                return value
+        # Some APIs wrap the actual response one level deeper.
+        nested = data.get("data")
+        if isinstance(nested, (dict, list)):
+            return extract_list(nested, keys)
+    return []
+
+
+def contract_is_enabled(item):
+    state = item.get("state", item.get("status"))
+    if state is None or state == "":
+        return True
+
+    normalized = str(state).strip().upper()
+    return normalized in {
+        "0", "ENABLED", "ONLINE", "TRADING", "ACTIVE", "OPEN"
+    }
+
+
+def contract_base(item):
+    base = str(item.get("baseCoin", item.get("base_coin", ""))).upper()
+    if base:
+        return base
+    symbol = str(item.get("symbol", "")).upper()
+    return symbol.split("_")[0] if "_" in symbol else ""
+
+
+def is_eligible_contract(item):
+    if not isinstance(item, dict):
+        return False
+
+    symbol = str(item.get("symbol", "")).upper()
+    if not symbol.endswith("_USDT"):
+        return False
+
+    base = contract_base(item)
+    if not base or base in EXCLUDED_BASES:
+        return False
+
+    quote = str(item.get("quoteCoin", item.get("quote_coin", ""))).upper()
+    settle = str(item.get("settleCoin", item.get("settle_coin", ""))).upper()
+
+    # If these fields exist, they must be USDT. If absent, the _USDT
+    # symbol suffix is used rather than rejecting every contract.
+    if quote and quote != "USDT":
+        return False
+    if settle and settle != "USDT":
+        return False
+
+    if not contract_is_enabled(item):
+        return False
+
+    description = (
+        base + " " +
+        str(item.get("displayNameEn", item.get("displayName", "")))
+    ).upper()
+
+    if base not in METAL_BASES:
+        if any(word in description for word in EXCLUDED_WORDS):
+            return False
+
+    return True
 
 
 def get_contracts():
     data = api_get("/api/v1/contract/detail")
+    contracts = extract_list(data, ("contracts", "list", "rows", "items"))
 
-    if isinstance(data, dict):
-        # Some API responses may wrap the contract array.
-        for key in ("contracts", "list", "rows"):
-            if isinstance(data.get(key), list):
-                data = data[key]
-                break
-
-    if not isinstance(data, list):
-        print("CONTRACT FORMAT ERROR: expected a list")
+    if not contracts:
+        print(
+            "CONTRACT FORMAT ERROR: no contract list found.",
+            "Returned type:", type(data).__name__
+        )
+        if isinstance(data, dict):
+            print("CONTRACT DATA KEYS:", list(data.keys())[:20])
         return []
 
-    accepted = []
-
-    for item in data:
-        if not isinstance(item, dict):
-            continue
-
-        symbol = str(item.get("symbol", "")).upper()
-        base = str(item.get("baseCoin", "")).upper()
-        quote = str(item.get("quoteCoin", "")).upper()
-        settle = str(item.get("settleCoin", "")).upper()
-
-        if not symbol.endswith("_USDT"):
-            continue
-
-        if quote != "USDT" or settle != "USDT":
-            continue
-
-        if not base or base in EXCLUDED_BASES:
-            continue
-
-        description = (
-            base + " " + str(item.get("displayNameEn", ""))
-        ).upper()
-
-        if any(word in description for word in EXCLUDED_WORDS):
-            continue
-
-        # Ourbit contract state 0 is normally the enabled state.
-        state = item.get("state")
-        if state is not None and str(state) not in ("0", "ONLINE", "online"):
-            continue
-
-        accepted.append(item)
-
+    accepted = [item for item in contracts if is_eligible_contract(item)]
     return accepted
 
 
 def get_tickers():
     data = api_get("/api/v1/contract/ticker")
+    tickers = extract_list(data, ("list", "rows", "tickers", "items"))
 
-    if isinstance(data, dict):
-        # A single ticker object or a wrapped list.
-        for key in ("list", "rows", "tickers"):
-            if isinstance(data.get(key), list):
-                return data[key]
-        if data.get("symbol"):
-            return [data]
+    if not tickers and isinstance(data, dict) and data.get("symbol"):
+        tickers = [data]
 
-    if isinstance(data, list):
-        return data
+    if not tickers:
+        print(
+            "TICKER FORMAT ERROR: no ticker list found.",
+            "Returned type:", type(data).__name__
+        )
+        if isinstance(data, dict):
+            print("TICKER DATA KEYS:", list(data.keys())[:20])
+        return []
 
-    print("TICKER FORMAT ERROR: expected a list")
-    return []
+    return tickers
 
 
 def get_live_price(ticker):
     if not isinstance(ticker, dict):
         return 0.0
 
-    for key in ("lastPrice", "last", "last_price", "close"):
-        try:
-            value = float(ticker.get(key, 0) or 0)
-            if value > 0:
-                return value
-        except (ValueError, TypeError):
-            pass
-
+    for key in ("lastPrice", "last", "last_price", "close", "price"):
+        value = as_float(ticker.get(key))
+        if value > 0:
+            return value
     return 0.0
 
 
 def get_quote_volume(ticker):
-    # Prefer quote-currency turnover/amount, not base-coin volume.
-    for key in ("amount24", "turnover24", "quoteVolume", "amount", "turnover"):
-        try:
-            value = float(ticker.get(key, 0) or 0)
-            if value > 0:
-                return value
-        except (ValueError, TypeError):
-            pass
+    # amount24 is quote turnover on the contract ticker response.
+    for key in (
+        "amount24", "turnover24", "quoteVolume",
+        "turnover", "amount", "volume24"
+    ):
+        value = as_float(ticker.get(key))
+        if value > 0:
+            return value
     return 0.0
 
 
+# ----------------------------------------------------------
+# CANDLE DATA
+# ----------------------------------------------------------
+
+def normalize_timestamp(value):
+    timestamp = int(float(value))
+    # Convert milliseconds to seconds for internal candle timestamps.
+    if timestamp > 10**12:
+        timestamp //= 1000
+    return timestamp
+
+
 def parse_candle_data(data):
-    """Accept Ourbit/MEXC-style parallel arrays and common row formats."""
     candles = []
 
     if isinstance(data, dict):
-        time_values = data.get("time")
+        time_values = data.get("time", data.get("timestamp"))
         open_values = data.get("open")
         high_values = data.get("high")
         low_values = data.get("low")
         close_values = data.get("close")
         volume_values = data.get("vol", data.get("volume"))
 
-        if all(isinstance(x, list) for x in (
+        arrays = (
             time_values, open_values, high_values,
             low_values, close_values, volume_values
-        )):
-            count = min(
-                len(time_values), len(open_values), len(high_values),
-                len(low_values), len(close_values), len(volume_values)
-            )
+        )
+        if all(isinstance(value, list) for value in arrays):
+            count = min(len(value) for value in arrays)
             for i in range(count):
                 try:
-                    timestamp = int(float(time_values[i]))
-                    if timestamp > 10**12:
-                        timestamp //= 1000
                     candles.append({
-                        "time": timestamp,
+                        "time": normalize_timestamp(time_values[i]),
                         "open": float(open_values[i]),
                         "high": float(high_values[i]),
                         "low": float(low_values[i]),
@@ -238,19 +357,15 @@ def parse_candle_data(data):
                     continue
             return candles
 
-        # Sometimes the candle list is nested in a data object.
-        for key in ("list", "rows", "candles", "result"):
-            if isinstance(data.get(key), list):
-                data = data[key]
-                break
+        data = extract_list(data, ("list", "rows", "candles", "result", "items"))
 
     if isinstance(data, list):
         for row in data:
             try:
                 if isinstance(row, dict):
-                    timestamp = int(float(row.get("time", row.get("timestamp"))))
+                    timestamp_value = row.get("time", row.get("timestamp"))
                     candle = {
-                        "time": timestamp,
+                        "time": normalize_timestamp(timestamp_value),
                         "open": float(row.get("open")),
                         "high": float(row.get("high")),
                         "low": float(row.get("low")),
@@ -258,10 +373,9 @@ def parse_candle_data(data):
                         "volume": float(row.get("vol", row.get("volume", 0)))
                     }
                 elif isinstance(row, (list, tuple)) and len(row) >= 6:
-                    # Expected order: time, open, high, low, close, volume.
-                    timestamp = int(float(row[0]))
+                    # Ourbit contract Kline row: time, open, high, low, close, vol.
                     candle = {
-                        "time": timestamp,
+                        "time": normalize_timestamp(row[0]),
                         "open": float(row[1]),
                         "high": float(row[2]),
                         "low": float(row[3]),
@@ -271,8 +385,6 @@ def parse_candle_data(data):
                 else:
                     continue
 
-                if candle["time"] > 10**12:
-                    candle["time"] //= 1000
                 candles.append(candle)
             except (ValueError, TypeError, IndexError):
                 continue
@@ -281,17 +393,21 @@ def parse_candle_data(data):
 
 
 def get_candles(symbol, interval, seconds):
-    # Ourbit's contract kline endpoint accepts a start/end time range.
-    # Request a little extra history to ensure 205+ closed candles remain.
-    end_time = int(time.time())
-    start_time = end_time - seconds * (CANDLE_LIMIT + 30)
+    # IMPORTANT: Ourbit contract kline start/end are milliseconds.
+    end_ms = int(time.time() * 1000)
+    start_ms = end_ms - seconds * (CANDLE_LIMIT + 30) * 1000
+
+    path = (
+        "/api/v1/contract/kline/" +
+        urllib.parse.quote(symbol, safe="_")
+    )
 
     data = api_get(
-        "/api/v1/contract/kline/" + urllib.parse.quote(symbol, safe="_"),
+        path,
         {
             "interval": interval,
-            "start": start_time,
-            "end": end_time
+            "start": start_ms,
+            "end": end_ms
         }
     )
 
@@ -299,7 +415,7 @@ def get_candles(symbol, interval, seconds):
         return None
 
     candles = parse_candle_data(data)
-    now = int(time.time())
+    now_seconds = int(time.time())
     closed = []
 
     for candle in candles:
@@ -311,22 +427,23 @@ def get_candles(symbol, interval, seconds):
             ):
                 continue
 
-            # Exclude the currently-forming candle.
-            if candle["time"] + seconds > now:
+            # Ignore the currently-forming candle.
+            if candle["time"] + seconds > now_seconds:
                 continue
 
             closed.append(candle)
         except (KeyError, TypeError):
             continue
 
-    # Remove duplicate timestamps and sort oldest -> newest.
-    by_time = {c["time"]: c for c in closed}
-    closed = sorted(by_time.values(), key=lambda x: x["time"])
+    # Deduplicate timestamps and sort oldest -> newest.
+    by_time = {candle["time"]: candle for candle in closed}
+    closed = sorted(by_time.values(), key=lambda item: item["time"])
 
     if len(closed) < 205:
         print(
             "CANDLE HISTORY TOO SHORT:",
-            symbol, interval, "received=", len(closed),
+            symbol, interval,
+            "received=", len(closed),
             "required=205"
         )
         return None
@@ -360,44 +477,38 @@ def calculate_rsi(values, period=14):
         for i in range(1, len(values))
     ]
 
-    gains = [max(x, 0) for x in changes]
-    losses = [max(-x, 0) for x in changes]
+    gains = [max(change, 0) for change in changes]
+    losses = [max(-change, 0) for change in changes]
 
     avg_gain = sum(gains[:period]) / period
     avg_loss = sum(losses[:period]) / period
 
     for i in range(period, len(gains)):
-        avg_gain = (
-            avg_gain * (period - 1) + gains[i]
-        ) / period
-        avg_loss = (
-            avg_loss * (period - 1) + losses[i]
-        ) / period
+        avg_gain = (avg_gain * (period - 1) + gains[i]) / period
+        avg_loss = (avg_loss * (period - 1) + losses[i]) / period
 
     if avg_loss == 0:
         return 100.0
 
-    rs = avg_gain / avg_loss
-    return 100 - (100 / (1 + rs))
+    relative_strength = avg_gain / avg_loss
+    return 100 - (100 / (1 + relative_strength))
 
 
 def calculate_atr(candles, period=14):
     if len(candles) <= period:
         return None
 
-    ranges = []
-
+    true_ranges = []
     for i in range(1, len(candles)):
         current = candles[i]
         previous = candles[i - 1]
-
-        ranges.append(max(
+        true_ranges.append(max(
             current["high"] - current["low"],
             abs(current["high"] - previous["close"]),
             abs(current["low"] - previous["close"])
         ))
 
-    return sum(ranges[-period:]) / period
+    return sum(true_ranges[-period:]) / period
 
 
 # ----------------------------------------------------------
@@ -417,7 +528,6 @@ def find_swings(candles, left=3, right=3):
             and
             all(high >= candles[j]["high"] for j in range(i + 1, i + right + 1))
         )
-
         is_low = (
             all(low < candles[j]["low"] for j in range(i - left, i))
             and
@@ -434,12 +544,11 @@ def find_swings(candles, left=3, right=3):
 
 def nearest_levels(candles, price):
     highs, lows = find_swings(candles[-120:])
-    above = [x for x in highs if x > price]
-    below = [x for x in lows if x < price]
+    above = [value for value in highs if value > price]
+    below = [value for value in lows if value < price]
 
     resistance = min(above) if above else None
     support = max(below) if below else None
-
     return support, resistance
 
 
@@ -477,8 +586,8 @@ def detect_structure(candles):
 # ----------------------------------------------------------
 
 def analyze_timeframe(candles):
-    closes = [x["close"] for x in candles]
-    volumes = [x["volume"] for x in candles]
+    closes = [item["close"] for item in candles]
+    volumes = [item["volume"] for item in candles]
     price = closes[-1]
 
     e9 = ema(closes, 9)
@@ -488,7 +597,7 @@ def analyze_timeframe(candles):
     rsi = calculate_rsi(closes)
     atr = calculate_atr(candles)
 
-    if None in (e9, e21, e50, e200, rsi, atr):
+    if any(value is None for value in (e9, e21, e50, e200, rsi, atr)):
         return None
 
     avg_volume = sum(volumes[-21:-1]) / 20
@@ -535,15 +644,16 @@ def analyze_symbol(symbol, ticker):
 
         result = analyze_timeframe(candles)
         if not result:
+            print(symbol, name, "INDICATOR DATA INCOMPLETE")
             return None
 
         results[name] = result
-
         if name == "5m":
             results["5m_candles"] = candles
 
     live_price = get_live_price(ticker)
     if live_price <= 0:
+        print(symbol, "LIVE PRICE INVALID")
         return None
 
     results["live_price"] = live_price
@@ -560,7 +670,7 @@ def check_pullback(results, direction):
     last = candles[-1]
     previous = candles[-2]
     atr = m5["atr"]
-    ema21 = m5["ema21"]
+    ema21_value = m5["ema21"]
     m15_level = results["15m"]["bos_level"]
 
     if not atr or not m15_level:
@@ -570,8 +680,8 @@ def check_pullback(results, direction):
 
     if direction == "LONG":
         return all((
-            last["low"] <= ema21 + tolerance,
-            last["close"] > ema21,
+            last["low"] <= ema21_value + tolerance,
+            last["close"] > ema21_value,
             last["close"] > last["open"],
             last["close"] > previous["close"],
             last["close"] > m15_level
@@ -579,8 +689,8 @@ def check_pullback(results, direction):
 
     if direction == "SHORT":
         return all((
-            last["high"] >= ema21 - tolerance,
-            last["close"] < ema21,
+            last["high"] >= ema21_value - tolerance,
+            last["close"] < ema21_value,
             last["close"] < last["open"],
             last["close"] < previous["close"],
             last["close"] < m15_level
@@ -605,8 +715,10 @@ def build_trade_plan(results, direction):
         support = m5["support"]
         structural_stop = support - atr * 0.15 if support else 0
         atr_stop = live - atr * ATR_SL_MULTIPLIER
-        candidates = [x for x in (structural_stop, atr_stop) if 0 < x < live]
-
+        candidates = [
+            value for value in (structural_stop, atr_stop)
+            if 0 < value < live
+        ]
         if not candidates:
             return None
 
@@ -632,8 +744,10 @@ def build_trade_plan(results, direction):
         resistance = m5["resistance"]
         structural_stop = resistance + atr * 0.15 if resistance else 0
         atr_stop = live + atr * ATR_SL_MULTIPLIER
-        candidates = [x for x in (structural_stop, atr_stop) if x > live]
-
+        candidates = [
+            value for value in (structural_stop, atr_stop)
+            if value > live
+        ]
         if not candidates:
             return None
 
@@ -715,9 +829,9 @@ def make_decision(results):
         direction = "SHORT"
     else:
         if long_points < 7:
-            reasons.append(f"LONG_SCORE_BELOW_7 ({long_points}/7)")
+            reasons.append("LONG_SCORE_BELOW_7 ({}/7)".format(long_points))
         if short_points < 7:
-            reasons.append(f"SHORT_SCORE_BELOW_7 ({short_points}/7)")
+            reasons.append("SHORT_SCORE_BELOW_7 ({}/7)".format(short_points))
         if long_points >= 7 and short_points > 2:
             reasons.append("OPPOSITE_SHORT_SCORE_TOO_HIGH")
         if short_points >= 7 and long_points > 2:
@@ -730,7 +844,10 @@ def make_decision(results):
         expected_trend = "BULLISH" if direction == "LONG" else "BEARISH"
         expected_bos = "BULLISH_BOS" if direction == "LONG" else "BEARISH_BOS"
 
-        if not (h4["trend"] == expected_trend and h1["trend"] == expected_trend):
+        if not (
+            h4["trend"] == expected_trend
+            and h1["trend"] == expected_trend
+        ):
             reasons.append("HIGHER_TIMEFRAMES_NOT_ALIGNED")
 
         if m15["bos"] != expected_bos:
@@ -765,7 +882,7 @@ def make_decision(results):
         if not check_pullback(results, direction):
             reasons.append("PULLBACK_NOT_CONFIRMED")
 
-        if len(reasons) == 0:
+        if not reasons:
             plan = build_trade_plan(results, direction)
             if plan:
                 status = direction + " SETUP TO REVIEW"
@@ -783,7 +900,7 @@ def make_decision(results):
 # ----------------------------------------------------------
 
 def fmt(value):
-    return f"{value:.10g}" if value is not None else "N/A"
+    return "{:.10g}".format(value) if value is not None else "N/A"
 
 
 def print_levels(name, data):
@@ -811,7 +928,7 @@ def print_plan(plan):
     print("STOP LOSS:", fmt(plan["stop"]))
 
     for index, target in enumerate(plan["targets"], 1):
-        print(f"TP{index}:", fmt(target))
+        print("TP{}:".format(index), fmt(target))
 
     print("RISK:", fmt(plan["risk"]))
     print("TP4 RISK/REWARD:", round(plan["rr"], 2))
@@ -824,60 +941,59 @@ def print_plan(plan):
 # ----------------------------------------------------------
 
 def main():
-    print("=" * 64)
-    print("ARAD CRYPTO PRO V5.3 ORBIT DEBUG")
+    print("=" * 68)
+    print("ARAD CRYPTO PRO V5.4 OURBIT")
     print("OURBIT USDT PERPETUALS | CRYPTO + GOLD + SILVER")
     print("MTF + BOS + PULLBACK + RISK MANAGEMENT")
     print("ANALYSIS ONLY - NO ORDERS - NO TELEGRAM")
-    print("=" * 64)
+    print("=" * 68)
+
+    if not test_api_connection():
+        print("\nSTOP: MARKET DATA NOT AVAILABLE. NO SCAN WAS RUN.")
+        return
 
     contracts = get_contracts()
     tickers = get_tickers()
 
     if not contracts or not tickers:
         print("ERROR: MARKET DATA UNAVAILABLE")
-        print("Check Ourbit API access and response format.")
+        print("Check API response format and Ourbit public API access.")
         return
 
     ticker_map = {
-        x.get("symbol"): x
-        for x in tickers
-        if isinstance(x, dict) and x.get("symbol")
+        str(item.get("symbol", "")).upper(): item
+        for item in tickers
+        if isinstance(item, dict) and item.get("symbol")
     }
 
     candidates = []
-
     for contract in contracts:
-        symbol = contract.get("symbol")
+        symbol = str(contract.get("symbol", "")).upper()
         ticker = ticker_map.get(symbol)
         if not ticker:
             continue
 
         amount = get_quote_volume(ticker)
         price = get_live_price(ticker)
+        if amount > 0 and price > 0:
+            candidates.append((symbol, amount))
 
-        if amount <= 0 or price <= 0:
-            continue
-
-        candidates.append((symbol, amount))
-
-    candidates.sort(key=lambda x: x[1], reverse=True)
+    candidates.sort(key=lambda item: item[1], reverse=True)
 
     selected = candidates[:MAX_COINS]
-    selected_names = {x[0] for x in selected}
+    selected_names = {item[0] for item in selected}
 
-    # Include meme coins even when they fall outside the top-volume list.
+    # Include configured meme coins even if outside the top-volume 20.
     for symbol, amount in candidates:
         base = symbol.split("_")[0].upper()
         if base in MEME_COINS and symbol not in selected_names:
             selected.append((symbol, amount))
             selected_names.add(symbol)
 
-    # Make sure gold/silver contracts are included when returned by the API,
-    # even if their 24h quote volume ranks below the top MAX_COINS.
+    # Always include GOLD/SILVER if Ourbit returns eligible USDT contracts.
     for symbol, amount in candidates:
         base = symbol.split("_")[0].upper()
-        if base in ("GOLD", "SILVER") and symbol not in selected_names:
+        if base in METAL_BASES and symbol not in selected_names:
             selected.append((symbol, amount))
             selected_names.add(symbol)
 
@@ -887,13 +1003,18 @@ def main():
     print("Selected symbols:", len(selected))
     print("Selected GOLD/SILVER:", [
         symbol for symbol, _ in selected
-        if symbol.split("_")[0].upper() in ("GOLD", "SILVER")
+        if symbol.split("_")[0].upper() in METAL_BASES
     ])
 
+    if not selected:
+        print("ERROR: No matching USDT perpetual symbols with usable ticker data.")
+        return
+
     confirmed_count = 0
+    scanned_count = 0
 
     for symbol, _ in selected:
-        print("\n" + "-" * 64)
+        print("\n" + "-" * 68)
         print("ANALYZING:", symbol)
 
         try:
@@ -904,6 +1025,7 @@ def main():
                 print("RESULT: INSUFFICIENT DATA")
                 continue
 
+            scanned_count += 1
             (
                 bias,
                 status,
@@ -932,8 +1054,8 @@ def main():
             for reason in reasons:
                 print("-", reason)
 
-            for tf in ("4h", "1h", "15m", "5m"):
-                print_levels(tf, results[tf])
+            for timeframe in ("4h", "1h", "15m", "5m"):
+                print_levels(timeframe, results[timeframe])
 
             if difference > MAX_LIVE_DIFF:
                 print("WARNING: LIVE PRICE MOVED - RECHECK REQUIRED")
@@ -943,16 +1065,17 @@ def main():
                 print_plan(plan)
 
         except Exception as error:
-            print("SYMBOL ERROR:", str(error)[:180])
+            print("SYMBOL ERROR:", symbol, str(error)[:180])
 
         time.sleep(REQUEST_DELAY)
 
-    print("\n" + "=" * 64)
-    print("V5.3 ORBIT ANALYSIS COMPLETED")
+    print("\n" + "=" * 68)
+    print("V5.4 OURBIT ANALYSIS COMPLETED")
+    print("SYMBOLS WITH COMPLETE DATA:", scanned_count)
     print("REVIEW SETUPS:", confirmed_count)
     print("UTC:", datetime.now(timezone.utc).isoformat())
     print("NO ORDERS WERE PLACED")
-    print("=" * 64)
+    print("=" * 68)
 
 
 if __name__ == "__main__":
