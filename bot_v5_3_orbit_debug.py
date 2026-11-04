@@ -394,20 +394,17 @@ def parse_candle_data(data):
 
 def get_candles(symbol, interval, seconds):
     # IMPORTANT: Ourbit contract kline start/end are milliseconds.
-    end_ms = int(time.time() * 1000)
-    start_ms = end_ms - seconds * (CANDLE_LIMIT + 30) * 1000
-
     path = (
-        "/api/v1/contract/kline/" +
-        urllib.parse.quote(symbol, safe="_")
-    )
+    "/api/v1/contract/kline/"
+    + urllib.parse.quote(symbol, safe="_")
+)
 
-    data = api_get(
-        path,
-        {
-            "interval": interval,
-            "start": start_ms,
-            "end": end_ms
+data = api_get(
+    path,
+    {
+        "interval": interval
+    }
+)
         }
     )
 
