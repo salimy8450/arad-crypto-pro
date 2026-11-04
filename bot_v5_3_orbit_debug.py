@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 # ANALYSIS ONLY - NO ORDERS - NO TELEGRAM
 # ==========================================================
 
-BASE_URL = "https://contract.ourbit.com"
+BASE_URL = "https://futures.ourbit.io"
 MAX_COINS = 20
 CANDLE_LIMIT = 240
 REQUEST_DELAY = 0.20
