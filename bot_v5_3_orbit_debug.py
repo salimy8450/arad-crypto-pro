@@ -14,7 +14,6 @@ from datetime import datetime, timezone
 # ==========================================================
 
 BASE_URL = "https://futures.ourbit.io"
-MAX_COINS = 20
 CANDLE_LIMIT = 240
 REQUEST_DELAY = 0.20
 REQUEST_TIMEOUT = 20
@@ -992,7 +991,8 @@ def main():
         if amount > 0 and price > 0:
             candidates.append((symbol, amount))
 
-    candidates.sort(key=lambda item: item[1], reverse=True)
+    selected = candidates[:MAX_COINS]
+selected_names = {item[0] for item in selected}
 
     selected = candidates[:MAX_COINS]
     selected_names = {item[0] for item in selected}
