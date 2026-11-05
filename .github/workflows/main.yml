@@ -1,4 +1,3 @@
-
 name: ARAD CRYPTO PRO Scanner
 
 on:
@@ -9,11 +8,11 @@ on:
 
   push:
     paths:
-      - 'ARAD_CRYPTO_PRO_V5_5_OURBIT.py'
+      - 'bot_v5_3_orbit_debug.py'
       - '.github/workflows/main.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: arad-crypto-pro-scanner
@@ -33,9 +32,9 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Run ARAD CRYPTO PRO V5.6
+      - name: Run ARAD CRYPTO PRO V5.6 ORBIT
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: python -u ARAD_CRYPTO_PRO_V5_5_OURBIT.py
+        run: python -u bot_v5_3_orbit_debug.py
