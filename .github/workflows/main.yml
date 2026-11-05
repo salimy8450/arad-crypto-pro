@@ -12,7 +12,7 @@ on:
       - '.github/workflows/main.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: arad-crypto-pro-scanner
