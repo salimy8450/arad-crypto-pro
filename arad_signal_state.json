@@ -13,11 +13,11 @@
   },
   "SOXSX_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1793882178
+    "sent_at": 1793905175
   },
   "CBRS_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793882178
+    "sent_at": 1793905174
   },
   "SNXX_USDT|SHORT": {
     "type": "WATCH",
@@ -29,7 +29,7 @@
   },
   "MU_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793882180
+    "sent_at": 1793905173
   },
   "INJ_USDT|LONG": {
     "type": "WATCH",
@@ -122,5 +122,29 @@
   "DOGE_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1793902905
+  },
+  "PENGU_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793905172
+  },
+  "LINK_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793905172
+  },
+  "HBAR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793905172
+  },
+  "WLFI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793905173
+  },
+  "HYPE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793905174
+  },
+  "NEAR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793905175
   }
 }
