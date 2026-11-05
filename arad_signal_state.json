@@ -1,15 +1,15 @@
 {
   "KORU_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902900
+    "sent_at": 1793923136
   },
   "SOXL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902901
+    "sent_at": 1793923137
   },
   "SKHY_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902903
+    "sent_at": 1793923141
   },
   "SOXSX_USDT|LONG": {
     "type": "WATCH",
@@ -21,7 +21,7 @@
   },
   "SNXX_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902903
+    "sent_at": 1793923141
   },
   "SKHYNIX_USDT|SHORT": {
     "type": "WATCH",
@@ -69,7 +69,7 @@
   },
   "TRUMPSOL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793882185
+    "sent_at": 1793923139
   },
   "DOT_USDT|SHORT": {
     "type": "WATCH",
@@ -77,27 +77,27 @@
   },
   "SOL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902900
+    "sent_at": 1793923137
   },
   "SLP_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902901
+    "sent_at": 1793923137
   },
   "SAGA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902901
+    "sent_at": 1793923138
   },
   "INTC_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902902
+    "sent_at": 1793923138
   },
   "TIA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902902
+    "sent_at": 1793923140
   },
   "MELANIA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902902
+    "sent_at": 1793923142
   },
   "PIXEL_USDT|SHORT": {
     "type": "WATCH",
@@ -109,7 +109,7 @@
   },
   "ZHIPU_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902904
+    "sent_at": 1793923135
   },
   "BERA_USDT|SHORT": {
     "type": "WATCH",
@@ -117,7 +117,7 @@
   },
   "SPCX_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902905
+    "sent_at": 1793923136
   },
   "DOGE_USDT|SHORT": {
     "type": "WATCH",
@@ -125,7 +125,7 @@
   },
   "PENGU_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793905172
+    "sent_at": 1793923139
   },
   "LINK_USDT|SHORT": {
     "type": "WATCH",
@@ -141,10 +141,22 @@
   },
   "HYPE_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793905174
+    "sent_at": 1793923140
   },
   "NEAR_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1793905175
+  },
+  "PUMPFUN_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793923136
+  },
+  "ADA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793923139
+  },
+  "CLANKER_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1793923141
   }
 }
