@@ -33,7 +33,7 @@
   },
   "INJ_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1793882180
+    "sent_at": 1793970269
   },
   "NVDA_USDT|SHORT": {
     "type": "WATCH",
@@ -109,7 +109,7 @@
   },
   "ZHIPU_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793942492
+    "sent_at": 1793970268
   },
   "BERA_USDT|SHORT": {
     "type": "WATCH",
@@ -133,7 +133,7 @@
   },
   "HBAR_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793942498
+    "sent_at": 1793970265
   },
   "WLFI_USDT|SHORT": {
     "type": "WATCH",
@@ -145,7 +145,7 @@
   },
   "NEAR_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793942496
+    "sent_at": 1793970266
   },
   "PUMPFUN_USDT|SHORT": {
     "type": "WATCH",
@@ -161,7 +161,7 @@
   },
   "SPY_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793942492
+    "sent_at": 1793970267
   },
   "BMNR_USDT|SHORT": {
     "type": "WATCH",
@@ -173,7 +173,7 @@
   },
   "XRP_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793942495
+    "sent_at": 1793970265
   },
   "BNB_USDT|SHORT": {
     "type": "WATCH",
@@ -190,5 +190,53 @@
   "JCT_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1793942499
+  },
+  "CYBER_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1793970264
+  },
+  "TA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1793970265
+  },
+  "FET_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793970266
+  },
+  "LAB_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1793970267
+  },
+  "ZEC_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1793970267
+  },
+  "1000PEPE_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1793970268
+  },
+  "MRNA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1793970268
+  },
+  "MINIMAX_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793970269
+  },
+  "PARTI_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1793970269
+  },
+  "TRX_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793970270
+  },
+  "HOME_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1793970270
+  },
+  "BEAT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1793970271
   }
 }
