@@ -1,7 +1,7 @@
 {
   "KORU_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793923136
+    "sent_at": 1793942493
   },
   "SOXL_USDT|SHORT": {
     "type": "WATCH",
@@ -9,7 +9,7 @@
   },
   "SKHY_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793923141
+    "sent_at": 1793942497
   },
   "SOXSX_USDT|LONG": {
     "type": "WATCH",
@@ -25,7 +25,7 @@
   },
   "SKHYNIX_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793882179
+    "sent_at": 1793942498
   },
   "MU_USDT|SHORT": {
     "type": "WATCH",
@@ -77,7 +77,7 @@
   },
   "SOL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793923137
+    "sent_at": 1793942494
   },
   "SLP_USDT|SHORT": {
     "type": "WATCH",
@@ -109,7 +109,7 @@
   },
   "ZHIPU_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793923135
+    "sent_at": 1793942492
   },
   "BERA_USDT|SHORT": {
     "type": "WATCH",
@@ -121,7 +121,7 @@
   },
   "DOGE_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793902905
+    "sent_at": 1793942495
   },
   "PENGU_USDT|SHORT": {
     "type": "WATCH",
@@ -129,11 +129,11 @@
   },
   "LINK_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793905172
+    "sent_at": 1793942495
   },
   "HBAR_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793905172
+    "sent_at": 1793942498
   },
   "WLFI_USDT|SHORT": {
     "type": "WATCH",
@@ -145,7 +145,7 @@
   },
   "NEAR_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793905175
+    "sent_at": 1793942496
   },
   "PUMPFUN_USDT|SHORT": {
     "type": "WATCH",
@@ -153,10 +153,42 @@
   },
   "ADA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793923139
+    "sent_at": 1793942497
   },
   "CLANKER_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1793923141
+  },
+  "SPY_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793942492
+  },
+  "BMNR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793942493
+  },
+  "BTC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793942494
+  },
+  "XRP_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793942495
+  },
+  "BNB_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793942496
+  },
+  "ONDO_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793942498
+  },
+  "XPL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793942499
+  },
+  "JCT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1793942499
   }
 }
