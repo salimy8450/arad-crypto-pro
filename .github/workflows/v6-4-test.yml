@@ -21,6 +21,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Validate Python syntax
+        run: python -m py_compile bot_v6_4_ourbit_test.py
       - name: Run ARAD CRYPTO PRO V6.4.0 TEST
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
