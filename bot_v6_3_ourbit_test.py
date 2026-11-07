@@ -9,7 +9,7 @@ import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================================
-# ARAD CRYPTO PRO V6.3 OURBIT TEST
+# ARAD CRYPTO PRO V6.3.1 OURBIT TEST
 # EARLY WATCH + CONFIRMED TELEGRAM ALERTS
 # MTF | BOS | SWEEP | PULLBACK | RISK FILTERS
 # ANALYSIS ONLY - NO ORDERS
@@ -42,7 +42,13 @@ MAX_STOP_ATR = 2.00
 MAX_LIVE_DIFF = 0.50
 ATR_SL_MULTIPLIER = 1.20
 PIVOT_LOOKBACK = 12
-PULLBACK_MAX_ATR = 1.00
+PULLBACK_MAX_ATR = 1.25
+MICRO_BREAKOUT_LOOKBACK = 4
+MICRO_BREAKOUT_MIN_BODY = 0.40
+EXTREME_RSI_SHORT_15M = 27.0
+EXTREME_RSI_SHORT_5M = 23.0
+EXTREME_RSI_LONG_15M = 73.0
+EXTREME_RSI_LONG_5M = 77.0
 
 # Persistent anti-duplicate settings
 WATCH_COOLDOWN_MIN = 45
@@ -348,6 +354,28 @@ def structure_signal(candles):
     return "NONE", False, False
 
 
+def micro_breakout_signal(candles, direction, min_volume_ratio=MIN_VOLUME_RATIO):
+    """Alternative to strict 12-candle BOS: strong closed-candle break of the
+    immediately preceding 4-candle range. Never uses the live candle."""
+    lookback = MICRO_BREAKOUT_LOOKBACK
+    if len(candles) < lookback + 2:
+        return False
+    last = candles[-1]
+    prior = candles[-lookback - 1:-1]
+    candle_range = max(last["high"] - last["low"], 1e-12)
+    body_ratio = abs(last["close"] - last["open"]) / candle_range
+    if body_ratio < MICRO_BREAKOUT_MIN_BODY:
+        return False
+    if direction == "LONG":
+        broke_level = last["close"] > max(x["high"] for x in prior)
+        directional = last["close"] > last["open"]
+    else:
+        broke_level = last["close"] < min(x["low"] for x in prior)
+        directional = last["close"] < last["open"]
+    volume_ok = volume_ratio(candles) >= min_volume_ratio or body_ratio >= 0.60
+    return broke_level and directional and volume_ok
+
+
 def pullback_ok(metrics, direction):
     price, e21, current_atr = metrics["price"], metrics["ema21"], metrics["atr"]
     if not e21 or current_atr <= 0:
@@ -355,12 +383,18 @@ def pullback_ok(metrics, direction):
     distance_atr = abs(price - e21) / current_atr
     if distance_atr > PULLBACK_MAX_ATR:
         return False
-    # Require the pullback to hold on the correct side of EMA21.
     return price >= e21 if direction == "LONG" else price <= e21
 
 
+def late_entry_ok(m15, m5, direction):
+    # Avoid chasing an exhausted dump or an overextended spike.
+    if direction == "SHORT":
+        return not (m15["rsi"] < EXTREME_RSI_SHORT_15M or m5["rsi"] < EXTREME_RSI_SHORT_5M)
+    return not (m15["rsi"] > EXTREME_RSI_LONG_15M or m5["rsi"] > EXTREME_RSI_LONG_5M)
+
+
 def momentum_confirmed(m15, m5, direction):
-    # V6.3: 15m is the directional momentum authority.
+    # V6.3.1: 15m is the directional momentum authority.
     # 5m is the entry trigger/pullback timeframe; requiring its MACD and
     # full EMA stack to agree simultaneously caused excessive false blocking.
     if direction == "LONG":
@@ -471,9 +505,10 @@ def analyze_stage2(candidate):
     )
     if score < MIN_SCORE_WATCH:
         return None
+    micro15 = micro_breakout_signal(candles, candidate["direction"], MIN_VOLUME_RATIO)
     candidate.update({
         "score": score, "m15": metrics, "structure": structure, "sweep": sweep,
-        "bos15": bos, "candles15": candles,
+        "bos15": bos, "micro15": micro15, "candles15": candles,
     })
     return candidate
 
@@ -528,20 +563,22 @@ def analyze_stage3(candidate):
     near_pullback = pullback_ok(m5, direction)
     trigger5 = five_minute_trigger(candles, m5, direction)
     score = candidate["score"]
+    micro5 = micro_breakout_signal(candles, direction, MIN_VOLUME_RATIO)
     score += 1 if structure5 == direction else 0
     score += int(sweep5) + int(m5["trend"] == direction) + int(near_pullback) + int(trigger5)
-    candidate.update({"m5": m5, "score": score, "bos5": bos5, "trigger5": trigger5})
+    score += 1 if candidate.get("micro15") else 0
+    candidate.update({"m5": m5, "score": score, "bos5": bos5, "trigger5": trigger5, "micro5": micro5})
     higher_aligned = candidate["m4"]["trend"] == direction and candidate["m1"]["trend"] == direction
     volume_ok = candidate["m15"]["volume_ratio"] >= MIN_VOLUME_RATIO or m5["volume_ratio"] >= MIN_VOLUME_RATIO
     live_diff = abs(candidate["price"] - m5["price"]) / m5["price"] * 100 if m5["price"] > 0 else 999
     live_ok = live_diff <= MAX_LIVE_DIFF
     momentum_ok = momentum_confirmed(candidate["m15"], m5, direction)
-    structure_ok = candidate["bos15"] or candidate["sweep"]
-    # A trend label alone cannot substitute for a fresh 5m trigger.
-    trigger_ok = trigger5 or (bos5 and structure5 == direction)
+    structure_ok = candidate["bos15"] or candidate["sweep"] or candidate.get("micro15", False)
+    late_ok = late_entry_ok(candidate["m15"], m5, direction)
+    trigger_ok = trigger5 or (bos5 and structure5 == direction) or micro5
     confirmed = (
         score >= MIN_SCORE_TRADE and higher_aligned and structure_ok
-        and trigger_ok and near_pullback and momentum_ok
+        and trigger_ok and near_pullback and momentum_ok and late_ok
         and volume_ok and live_ok
     )
     if confirmed:
@@ -558,6 +595,7 @@ def analyze_stage3(candidate):
         if not trigger_ok: failed.append("5M_TRIGGER")
         if not near_pullback: failed.append("PULLBACK")
         if not momentum_ok: failed.append("RSI_MACD_TREND")
+        if not late_ok: failed.append("LATE_ENTRY")
         if not volume_ok: failed.append("VOLUME")
         if not live_ok: failed.append("LIVE_PRICE_GAP")
         candidate["rejection_reason"] = ",".join(failed) or "SCORE"
@@ -779,7 +817,13 @@ def print_result(item):
         log("5M: {} | RSI {:.1f} | VOL {:.2f}x".format(
             item["m5"]["trend"], item["m5"]["rsi"], item["m5"]["volume_ratio"]
         ))
-    log("15M BOS: {} | SWEEP: {}".format(item.get("bos15", False), item.get("sweep", False)))
+    log("15M BOS: {} | SWEEP: {} | MICRO BREAK: {}".format(
+        item.get("bos15", False), item.get("sweep", False), item.get("micro15", False)
+    ))
+    log("STRUCTURE SOURCE: {}".format(
+        "BOS" if item.get("bos15") else "SWEEP" if item.get("sweep") else
+        "MICRO_BREAKOUT" if item.get("micro15") else "NONE"
+    ))
     if "m5" in item:
         log("5M TRIGGER: {} | MACD HIST 15m/5m: {:.8f}/{:.8f}".format(
             item.get("trigger5", False), item["m15"].get("macd_hist", 0.0),
@@ -802,7 +846,7 @@ def print_result(item):
 def main():
     started = time.time()
     log("")
-    log("ARAD CRYPTO PRO V6.3 OURBIT TEST")
+    log("ARAD CRYPTO PRO V6.3.1 OURBIT TEST")
     log("START: " + now_text())
     log("MODE: FULL ELIGIBLE UNIVERSE + QUALITY RANKING + PULLBACK CONFIRMATION | NO ORDERS")
     log("BASE URL: " + BASE_URL)
