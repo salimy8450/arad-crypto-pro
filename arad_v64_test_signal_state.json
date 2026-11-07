@@ -2,5 +2,9 @@
   "DOT_USDT|SHORT": {
     "type": "CONFIRMED",
     "sent_at": 1794069261
+  },
+  "ETH_USDT|SHORT": {
+    "type": "CONFIRMED",
+    "sent_at": 1794069426
   }
 }
