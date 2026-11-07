@@ -2,6 +2,8 @@ name: ARAD CRYPTO PRO V6.4.1 TEST
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
 
 permissions:
   contents: write
