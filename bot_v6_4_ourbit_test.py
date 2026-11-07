@@ -314,13 +314,16 @@ def macd_histogram(values):
 def market_metrics(candles):
     closes = [c["close"] for c in candles]
     e9, e21, e50, e200 = (ema(closes, p) for p in (9, 21, 50, 200))
+    e21_prev = ema(closes[:-1], 21) if len(closes) > 22 else e21
     if e200 is None:
         e200 = e50
     last = closes[-1]
     trend = "NEUTRAL"
-    if e9 and e21 and e50 and last > e9 > e21 > e50 and last > e200:
+    # Robust trend definition: short EMA alignment + EMA21 slope + price vs EMA50.
+    # EMA200 is a context filter, not a hard requirement, avoiding needless neutral states.
+    if e9 and e21 and e50 and e21_prev and last > e9 > e21 and e21 >= e21_prev and last > e50:
         trend = "LONG"
-    elif e9 and e21 and e50 and last < e9 < e21 < e50 and last < e200:
+    elif e9 and e21 and e50 and e21_prev and last < e9 < e21 and e21 <= e21_prev and last < e50:
         trend = "SHORT"
     return {
         "price": last, "ema9": e9, "ema21": e21, "ema50": e50, "ema200": e200,
