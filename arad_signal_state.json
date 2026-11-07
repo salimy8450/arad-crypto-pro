@@ -53,7 +53,7 @@
   },
   "ZIL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794070083
+    "sent_at": 1794083709
   },
   "MAV_USDT|SHORT": {
     "type": "WATCH",
@@ -69,7 +69,7 @@
   },
   "TRUMPSOL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794024247
+    "sent_at": 1794083704
   },
   "DOT_USDT|SHORT": {
     "type": "WATCH",
@@ -77,15 +77,15 @@
   },
   "SOL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794070085
+    "sent_at": 1794083707
   },
   "SLP_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794049229
+    "sent_at": 1794083707
   },
   "SAGA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794070081
+    "sent_at": 1794083708
   },
   "INTC_USDT|SHORT": {
     "type": "WATCH",
@@ -121,7 +121,7 @@
   },
   "DOGE_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794024249
+    "sent_at": 1794083703
   },
   "PENGU_USDT|SHORT": {
     "type": "WATCH",
@@ -169,11 +169,11 @@
   },
   "BTC_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794070084
+    "sent_at": 1794083706
   },
   "XRP_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794070081
+    "sent_at": 1794083709
   },
   "BNB_USDT|SHORT": {
     "type": "WATCH",
@@ -197,7 +197,7 @@
   },
   "TA_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794070086
+    "sent_at": 1794083709
   },
   "FET_USDT|SHORT": {
     "type": "WATCH",
@@ -241,7 +241,7 @@
   },
   "ETH_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794070085
+    "sent_at": 1794083702
   },
   "BCH_USDT|SHORT": {
     "type": "WATCH",
@@ -261,7 +261,7 @@
   },
   "FOGO_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794049231
+    "sent_at": 1794083708
   },
   "SOPH_USDT|SHORT": {
     "type": "WATCH",
@@ -273,11 +273,11 @@
   },
   "PHA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794070083
+    "sent_at": 1794083704
   },
   "SUI_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794049233
+    "sent_at": 1794083705
   },
   "PRL_USDT|LONG": {
     "type": "WATCH",
@@ -297,10 +297,22 @@
   },
   "APR_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794070084
+    "sent_at": 1794083705
   },
   "HOT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794070085
+    "sent_at": 1794083703
+  },
+  "ACT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794083705
+  },
+  "OP_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794083706
+  },
+  "UAI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794083707
   }
 }
