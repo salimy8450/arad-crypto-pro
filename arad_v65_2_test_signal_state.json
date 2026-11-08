@@ -1,0 +1,22 @@
+{
+  "LINK_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794168701
+  },
+  "ICNT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794168702
+  },
+  "KAT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794168702
+  },
+  "HAEDAL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794168703
+  },
+  "CAT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794168703
+  }
+}
