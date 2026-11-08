@@ -32,6 +32,26 @@ jobs:
         run: |
           test -n "$BOT_TOKEN" || (echo "Missing GitHub secret: BOT_TOKEN" && exit 1)
           test -n "$CHAT_ID" || (echo "Missing GitHub secret: CHAT_ID" && exit 1)
+      - name: Telegram connection test (manual runs only)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          url = "https://api.telegram.org/bot{}/sendMessage".format(os.environ["BOT_TOKEN"])
+          payload = json.dumps({
+              "chat_id": os.environ["CHAT_ID"],
+              "text": "✅ ARAD CRYPTO PRO V6.5.3 فعال است. اتصال تلگرام موفق بود؛ اسکن سیگنال آغاز می‌شود."
+          }).encode()
+          req = urllib.request.Request(url, data=payload, headers={"Content-Type":"application/json"})
+          with urllib.request.urlopen(req, timeout=20) as response:
+              result = json.loads(response.read().decode())
+          if not result.get("ok"):
+              raise SystemExit("Telegram test failed: " + str(result))
+          print("TELEGRAM TEST MESSAGE SENT")
+          PY
       - name: Run ARAD CRYPTO PRO V6.5.3 EARLY 15M ENTRY TEST
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
