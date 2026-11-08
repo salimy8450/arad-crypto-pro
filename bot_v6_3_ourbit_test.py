@@ -42,6 +42,10 @@ MAX_STOP_ATR = 2.00
 MAX_LIVE_DIFF = 0.50
 ATR_SL_MULTIPLIER = 1.20
 PIVOT_LOOKBACK = 12
+SR_PIVOT_LEFT = 3
+SR_PIVOT_RIGHT = 3
+SR_ZONE_ATR_WIDTH = 0.22
+SR_MIN_STRENGTH = 1.0
 PULLBACK_MAX_ATR = 1.25
 MICRO_BREAKOUT_LOOKBACK = 4
 MICRO_BREAKOUT_MIN_BODY = 0.40
@@ -354,6 +358,97 @@ def structure_signal(candles):
     return "NONE", False, False
 
 
+def confirmed_pivot_levels(candles, kind, atr_value):
+    """Return confirmed swing-pivot levels; right-side candles prevent look-ahead."""
+    left, right = SR_PIVOT_LEFT, SR_PIVOT_RIGHT
+    if len(candles) < left + right + 10:
+        return []
+    levels = []
+    start = max(left, len(candles) - 100)
+    end = len(candles) - right
+    for i in range(start, end):
+        value = candles[i]["high"] if kind == "RESISTANCE" else candles[i]["low"]
+        before = candles[i-left:i]
+        after = candles[i+1:i+right+1]
+        if kind == "RESISTANCE":
+            is_pivot = value >= max(x["high"] for x in before) and value > max(x["high"] for x in after)
+        else:
+            is_pivot = value <= min(x["low"] for x in before) and value < min(x["low"] for x in after)
+        if not is_pivot:
+            continue
+        avg_vol = sum(x["volume"] for x in candles[max(0, i-20):i]) / max(1, len(candles[max(0, i-20):i]))
+        vol_ratio = candles[i]["volume"] / avg_vol if avg_vol > 0 else 1.0
+        tolerance = max(atr_value * SR_ZONE_ATR_WIDTH, value * 0.001)
+        touches = 0
+        for x in candles[max(0, i+right+1):]:
+            test_price = x["high"] if kind == "RESISTANCE" else x["low"]
+            if abs(test_price - value) <= tolerance:
+                touches += 1
+        strength = 1.0 + min(vol_ratio, 3.0) * 0.35 + min(touches, 3) * 0.25
+        levels.append({"price": value, "strength": strength, "time": candles[i]["time"]})
+    return levels
+
+
+def build_support_resistance(c15, c1, price):
+    """Build multi-timeframe S/R zones from confirmed 15m and 1h pivots."""
+    atr15 = atr(c15)
+    atr1 = atr(c1)
+    raw = []
+    for candles, atr_value, timeframe, weight in (
+        (c15, atr15, "15m", 1.0), (c1, atr1, "1h", 1.5)
+    ):
+        if atr_value <= 0:
+            continue
+        for kind in ("SUPPORT", "RESISTANCE"):
+            for level in confirmed_pivot_levels(candles, kind, atr_value):
+                level.update({"kind": kind, "timeframe": timeframe,
+                              "strength": level["strength"] * weight})
+                raw.append(level)
+
+    zones = []
+    for kind in ("SUPPORT", "RESISTANCE"):
+        items = sorted((x for x in raw if x["kind"] == kind), key=lambda x: x["price"])
+        clusters = []
+        for item in items:
+            tolerance = max(atr15 * SR_ZONE_ATR_WIDTH, item["price"] * 0.001)
+            if clusters and abs(item["price"] - clusters[-1]["center"]) <= tolerance:
+                cluster = clusters[-1]
+                cluster["levels"].append(item)
+                weights = [x["strength"] for x in cluster["levels"]]
+                cluster["center"] = sum(x["price"] * x["strength"] for x in cluster["levels"]) / sum(weights)
+            else:
+                clusters.append({"center": item["price"], "levels": [item]})
+        for cluster in clusters:
+            vals = [x["price"] for x in cluster["levels"]]
+            width = max(atr15 * SR_ZONE_ATR_WIDTH, cluster["center"] * 0.001)
+            tfs = sorted(set(x["timeframe"] for x in cluster["levels"]))
+            zones.append({
+                "kind": kind, "low": min(vals) - width, "high": max(vals) + width,
+                "center": cluster["center"],
+                "strength": sum(x["strength"] for x in cluster["levels"]),
+                "timeframes": "/".join(tfs),
+            })
+
+    supports = sorted((z for z in zones if z["kind"] == "SUPPORT" and z["center"] <= price),
+                      key=lambda z: price - z["center"])
+    resistances = sorted((z for z in zones if z["kind"] == "RESISTANCE" and z["center"] >= price),
+                         key=lambda z: z["center"] - price)
+    return {
+        "support": supports[0] if supports else None,
+        "resistance": resistances[0] if resistances else None,
+        "all_zones": zones,
+    }
+
+
+def format_zone(zone):
+    if not zone:
+        return "N/A"
+    return "{}-{} ({}, strength {:.1f})".format(
+        format_price(zone["low"]), format_price(zone["high"]),
+        zone["timeframes"], zone["strength"]
+    )
+
+
 def micro_breakout_signal(candles, direction, min_volume_ratio=MIN_VOLUME_RATIO):
     """Alternative to strict 12-candle BOS: strong closed-candle break of the
     immediately preceding 4-candle range. Never uses the live candle."""
@@ -411,20 +506,22 @@ def momentum_confirmed(m15, m5, direction):
 
 
 def room_to_structure(candidate, plan):
-    candles = candidate.get("candles15", [])
-    if len(candles) < 22:
-        return False
-    window = candles[-22:-2]
-    if not window:
-        return False
     entry, risk = plan["entry"], abs(plan["entry"] - plan["sl"])
     if risk <= 0:
         return False
+    sr = candidate.get("sr", {})
     if candidate["direction"] == "LONG":
-        resistance = max(c["high"] for c in window)
-        return resistance <= entry or (resistance - entry) >= risk * 1.30
-    support = min(c["low"] for c in window)
-    return support >= entry or (entry - support) >= risk * 1.30
+        zone = sr.get("resistance")
+        if not zone:
+            return True
+        free_room = zone["low"] - entry
+    else:
+        zone = sr.get("support")
+        if not zone:
+            return True
+        free_room = entry - zone["high"]
+    # Ignore a zone already behind the entry; only the next opposing zone matters.
+    return free_room <= 0 or free_room >= risk * 1.30
 
 
 def analyze_higher_timeframes(c4, c1):
@@ -492,6 +589,7 @@ def analyze_symbol(symbol, ticker):
     return {
         "symbol": symbol, "direction": direction, "price": price,
         "long_score": ls, "short_score": ss, "score": score, "m4": m4, "m1": m1,
+        "candles1": c1,
     }
 
 
@@ -506,9 +604,10 @@ def analyze_stage2(candidate):
     if score < MIN_SCORE_WATCH:
         return None
     micro15 = micro_breakout_signal(candles, candidate["direction"], MIN_VOLUME_RATIO)
+    sr = build_support_resistance(candles, candidate.get("candles1", []), metrics["price"])
     candidate.update({
         "score": score, "m15": metrics, "structure": structure, "sweep": sweep,
-        "bos15": bos, "micro15": micro15, "candles15": candles,
+        "bos15": bos, "micro15": micro15, "candles15": candles, "sr": sr,
     })
     return candidate
 
@@ -740,6 +839,8 @@ def watch_message(item):
         "15M: {} | RSI {:.1f} | حجم {:.2f}x".format(m15["trend"], m15["rsi"], m15["volume_ratio"]),
         "BOS 15m: {}".format("بله" if item["bos15"] else "خیر"),
         "Sweep: {}".format("بله" if item["sweep"] else "خیر"),
+        "حمایت: {}".format(format_zone(item.get("sr", {}).get("support"))),
+        "مقاومت: {}".format(format_zone(item.get("sr", {}).get("resistance"))),
         "",
         "⚠️ فقط تحت نظر بگیر؛ ورود بدون تأیید نهایی توصیه نمی‌شود.",
         "زمان: " + now_text(),
@@ -765,8 +866,10 @@ def confirmed_message(item):
         "فاصله حد ضرر: {:.2f} ATR".format(plan["risk_atr"]),
         "نسبت سود به زیان تا TP6: {:.2f}".format(plan["rr"]),
         "امتیاز تحلیلی: {} امتیاز".format(item["score"]),
+        "حمایت: {}".format(format_zone(item.get("sr", {}).get("support"))),
+        "مقاومت: {}".format(format_zone(item.get("sr", {}).get("resistance"))),
         "",
-        "⚠️ این پیام تحلیل است، نه دستور معامله. سفارش خودکار ثبت نشده است.",
+        "⚠️ این پیام تحلیل است، نه دستور معامله." سفارش خودکار ثبت نشده است.",
         "زمان: " + now_text(),
     ]
     return "\n".join(lines)
