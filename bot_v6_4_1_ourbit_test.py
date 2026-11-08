@@ -21,6 +21,7 @@ TELEGRAM_API = "https://api.telegram.org"
 MAX_STAGE1_SYMBOLS = 10000  # scan the full eligible USDT futures universe
 MAX_STAGE2_SYMBOLS = 80
 MAX_STAGE3_SYMBOLS = 60
+MAX_TELEGRAM_WATCH_ALERTS = 5  # cap WATCH messages per test run to prevent Telegram flooding
 
 TIMEFRAMES = {
     "5m": ("Min5", 300),
@@ -814,7 +815,7 @@ def mark_alert_sent(state, item, alert_type):
 def watch_message(item):
     m15 = item["m15"]
     lines = [
-        "🟡 ARAD CRYPTO PRO | WATCH",
+        "🟡 ARAD CRYPTO PRO | TEST WATCH",
         "هشدار زودهنگام - هنوز نقطه ورود قطعی نیست",
         "",
         "نماد: {}".format(item["symbol"]),
@@ -836,7 +837,7 @@ def watch_message(item):
 def confirmed_message(item):
     plan = item["plan"]
     lines = [
-        "🟢 ARAD CRYPTO PRO | CONFIRMED",
+        "🟢 ARAD CRYPTO PRO | TEST CONFIRMED",
         "سیگنال تأییدشده - بررسی ورود با مدیریت ریسک",
         "",
         "نماد: {}".format(item["symbol"]),
@@ -1006,9 +1007,9 @@ def main():
     stage2 = stage2[:MAX_STAGE3_SYMBOLS]
     log("STAGE 2 COMPLETE: {}".format(len(stage2)))
 
-    # Send early WATCH alerts as soon as 15m analysis passes.
-    # A later CONFIRMED message upgrades the WATCH if 5m checks pass.
-    log("WATCH notifications disabled; only fully confirmed entries can alert.")
+    # TEST MODE: send a capped number of WATCH alerts plus every CONFIRMED alert.
+    # WATCH is informational only; CONFIRMED includes an entry/SL/TP plan.
+    log("TELEGRAM TEST MODE: WATCH alerts enabled, capped at {} per run; no orders.".format(MAX_TELEGRAM_WATCH_ALERTS))
 
     final_results = []
     for i, candidate in enumerate(stage2, 1):
@@ -1021,8 +1022,11 @@ def main():
     confirmed = [x for x in final_results if x.get("status") == "CONFIRMED"]
     watch = [x for x in final_results if x.get("status") == "WATCH"]
 
-    # Send only confirmed here; WATCH was already sent at stage 2.
-    dispatch_alerts([], confirmed)
+    # Send best WATCH candidates for visibility and all CONFIRMED setups.
+    watch.sort(key=candidate_quality, reverse=True)
+    watch_to_send = watch[:MAX_TELEGRAM_WATCH_ALERTS]
+    log("TELEGRAM ALERT QUEUE: {} WATCH + {} CONFIRMED".format(len(watch_to_send), len(confirmed)))
+    dispatch_alerts(watch_to_send, confirmed)
 
     elapsed = time.time() - started
     log("")
