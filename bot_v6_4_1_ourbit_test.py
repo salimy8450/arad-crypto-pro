@@ -285,6 +285,44 @@ def volume_ratio(candles, period=20):
     return candles[-1]["volume"] / average if average > 0 else 0.0
 
 
+def impulse_volume_ok(candles, direction, baseline_period=20, recent_bars=3):
+    """
+    Confirm volume over a short impulse window instead of relying only on
+    the final candle. This avoids rejecting a strong multi-candle move merely
+    because the latest closed candle has below-average volume.
+    """
+    if len(candles) < baseline_period + recent_bars:
+        return False
+
+    recent = candles[-recent_bars:]
+    baseline = candles[-(baseline_period + recent_bars):-recent_bars]
+    baseline_volumes = [c["volume"] for c in baseline if c["volume"] > 0]
+    if len(baseline_volumes) < max(10, baseline_period // 2):
+        return False
+
+    average_volume = sum(baseline_volumes) / len(baseline_volumes)
+    if average_volume <= 0:
+        return False
+
+    recent_average = sum(c["volume"] for c in recent) / recent_bars
+    window_ratio = recent_average / average_volume
+    if window_ratio < 0.85:
+        return False
+
+    # Require at least one decisive candle in the intended direction.
+    for candle in recent:
+        candle_range = max(candle["high"] - candle["low"], 1e-12)
+        body_ratio = abs(candle["close"] - candle["open"]) / candle_range
+        close_position = (candle["close"] - candle["low"]) / candle_range
+        if direction == "SHORT":
+            if candle["close"] < candle["open"] and body_ratio >= 0.50 and close_position <= 0.35:
+                return True
+        else:
+            if candle["close"] > candle["open"] and body_ratio >= 0.50 and close_position >= 0.65:
+                return True
+    return False
+
+
 def ema_series(values, period):
     if len(values) < period:
         return []
@@ -605,7 +643,19 @@ def analyze_stage3(candidate):
     score += 1 if candidate.get("micro15") else 0
     candidate.update({"m5": m5, "score": score, "bos5": bos5, "trigger5": trigger5, "micro5": micro5})
     higher_aligned = candidate["m4"]["trend"] == direction and candidate["m1"]["trend"] == direction
-    volume_ok = candidate["m15"]["volume_ratio"] >= MIN_VOLUME_RATIO or m5["volume_ratio"] >= MIN_VOLUME_RATIO
+    # Volume is checked on both the latest candle and a 3-candle impulse window.
+    # This prevents a strong multi-candle selloff/bounce from being blocked only
+    # because the final candle's individual volume has cooled.
+    volume_impulse_ok = (
+        impulse_volume_ok(candidate["candles15"], direction)
+        or impulse_volume_ok(candles, direction)
+    )
+    volume_ok = (
+        candidate["m15"]["volume_ratio"] >= MIN_VOLUME_RATIO
+        or m5["volume_ratio"] >= MIN_VOLUME_RATIO
+        or volume_impulse_ok
+    )
+    candidate["volume_impulse_ok"] = volume_impulse_ok
     live_diff = abs(candidate["price"] - m5["price"]) / m5["price"] * 100 if m5["price"] > 0 else 999
     live_ok = live_diff <= MAX_LIVE_DIFF
     momentum_ok = momentum_confirmed(candidate["m15"], m5, direction)
@@ -846,8 +896,9 @@ def print_result(item):
     log("PRICE: {}".format(format_price(item["price"])))
     log("4H: {} | RSI {:.1f}".format(item["m4"]["trend"], item["m4"]["rsi"]))
     log("1H: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]))
-    log("15M: {} | RSI {:.1f} | VOL {:.2f}x".format(
-        item["m15"]["trend"], item["m15"]["rsi"], item["m15"]["volume_ratio"]
+    log("15M: {} | RSI {:.1f} | VOL {:.2f}x | IMPULSE VOL: {}".format(
+        item["m15"]["trend"], item["m15"]["rsi"], item["m15"]["volume_ratio"],
+        item.get("volume_impulse_ok", False)
     ))
     if "m5" in item:
         log("5M: {} | RSI {:.1f} | VOL {:.2f}x".format(
@@ -886,7 +937,7 @@ def main():
     log("START: " + now_text())
     log("MODE: V6.4 FULL SCAN + CLOSED-CANDLE STRUCTURE + EMA21 RETEST + RISK FILTERS | NO ORDERS")
     log("BASE URL: " + BASE_URL)
-    log("V6.4.1 RULESET: 3-candle structure scan + confirmed swing levels; volume>=0.75x, live gap<=0.35%, score>=8")
+    log("V6.4.1 PATCH: latest-candle volume OR 3-candle directional impulse volume; live gap<=0.35%, score>=8")
 
     ping = api_get("/api/v1/contract/ping")
     if ping is None:
