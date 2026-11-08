@@ -1,0 +1,31 @@
+name: ARAD CRYPTO PRO V6.5.1 DIAGNOSTIC TEST
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: arad-crypto-pro-v651-test
+  cancel-in-progress: false
+
+jobs:
+  scanner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Python syntax
+        run: python -m py_compile bot_v6_5_1_test.py
+      - name: Run ARAD CRYPTO PRO V6.5.1 DIAGNOSTIC TEST
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -u bot_v6_5_1_test.py
