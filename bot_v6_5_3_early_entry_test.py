@@ -989,6 +989,11 @@ def should_send_alert(state, item, alert_type):
     # A confirmed alert is allowed immediately after a WATCH alert.
     if alert_type == "CONFIRMED" and previous.get("type") == "WATCH":
         return True
+    # Avoid repeating an early entry if another alert type for the same
+    # symbol/direction was sent moments earlier.
+    if alert_type == "EARLY" and previous.get("type") in ("EARLY", "WATCH", "CONFIRMED"):
+        if now - int(previous.get("sent_at", 0)) < EARLY_COOLDOWN_MIN * 60:
+            return False
     if previous.get("type") == alert_type and now - int(previous.get("sent_at", 0)) < cooldown * 60:
         return False
     return True
