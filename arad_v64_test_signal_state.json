@@ -26,5 +26,13 @@
   "SOPH_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794161763
+  },
+  "EVAA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794162298
+  },
+  "1000PEPE_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794162299
   }
 }
