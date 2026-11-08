@@ -2,6 +2,8 @@ name: ARAD CRYPTO PRO V6.5.3 EARLY 15M ENTRY TEST
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
 
 permissions:
   contents: write
@@ -23,6 +25,13 @@ jobs:
           python-version: '3.12'
       - name: Validate Python syntax
         run: python -m py_compile bot_v6_5_3_early_entry_test.py
+      - name: Verify Telegram configuration
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: |
+          test -n "$BOT_TOKEN" || (echo "Missing GitHub secret: BOT_TOKEN" && exit 1)
+          test -n "$CHAT_ID" || (echo "Missing GitHub secret: CHAT_ID" && exit 1)
       - name: Run ARAD CRYPTO PRO V6.5.3 EARLY 15M ENTRY TEST
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
