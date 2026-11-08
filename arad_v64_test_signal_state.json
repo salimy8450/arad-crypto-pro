@@ -46,5 +46,29 @@
   "MEGA_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794163900
+  },
+  "MINIMAX_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794177082
+  },
+  "PENGU_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794177082
+  },
+  "ADA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794177083
+  },
+  "NEAR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794177083
+  },
+  "OP_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794177084
+  },
+  "REZ_USDT|SHORT": {
+    "type": "CONFIRMED",
+    "sent_at": 1794177084
   }
 }
