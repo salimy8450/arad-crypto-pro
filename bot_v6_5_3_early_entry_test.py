@@ -904,7 +904,7 @@ def early_entry_message(item):
     direction_fa = "فروش SHORT" if item["direction"] == "SHORT" else "خرید LONG"
     lines = [
         "🟠 ARAD CRYPTO PRO | EARLY 15M ENTRY",
-        "هشدار شروع حرکت در تایم ۱۵ دقیقه - ورود زودهنگام و پرریسک‌تر از سیگنال تأییدشده",
+        "هشدار ورود زودهنگام تأییدشده بر اساس کندل بسته ۱۵ دقیقه؛ شامل شکست حرکت یا برگشت از سقف/کف",
         "",
         "نماد: {}".format(item["symbol"]),
         "جهت: {}".format(direction_fa),
@@ -913,7 +913,7 @@ def early_entry_message(item):
         "TP1: {}".format(format_price(item["tp"][0])),
         "TP2: {}".format(format_price(item["tp"][1])),
         "RSI 15m: {:.1f} | حجم: {:.2f}x".format(item["m15"]["rsi"], item["m15"]["volume_ratio"]),
-        "محرک: {} | قدرت کندل: {:.0f}%".format(item["trigger"], item["body_ratio"] * 100),
+        "محرک: {} | قدرت بدنه: {:.0f}%".format(item["trigger"], item["body_ratio"] * 100),
         "امتیاز شروع حرکت: {}".format(item["score"]),
         "",
         "⚠️ هشدار زودهنگام است؛ منتظر مدیریت ریسک باش. سفارش خودکار ثبت نمی‌شود.",
