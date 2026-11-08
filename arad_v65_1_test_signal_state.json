@@ -1,0 +1,22 @@
+{
+  "ICNT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794165841
+  },
+  "CAT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794165842
+  },
+  "MAV_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794165842
+  },
+  "THE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794165843
+  },
+  "APR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794165843
+  }
+}
