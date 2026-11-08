@@ -520,8 +520,8 @@ def room_to_structure(candidate, plan):
         if not zone:
             return True
         free_room = entry - zone["high"]
-    # Ignore a zone already behind the entry; only the next opposing zone matters.
-    return free_room <= 0 or free_room >= risk * 1.30
+    # If entry is inside/too close to the opposing zone, reject the setup.
+    return free_room >= risk * 1.30
 
 
 def analyze_higher_timeframes(c4, c1):
