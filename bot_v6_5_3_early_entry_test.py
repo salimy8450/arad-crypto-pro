@@ -787,8 +787,9 @@ def analyze_stage3(candidate):
 
 def detect_early_15m(candles, live_price):
     """
-    Detect the FIRST directional 15m impulse, independent of 4H/1H alignment.
-    Uses only completed candles; this is an early-entry alert, not a confirmed setup.
+    Detect early continuation OR a confirmed 15m swing-rejection reversal.
+    Only closed candles are used. This creates an actionable early-entry alert
+    with an invalidation stop; it does not place orders.
     """
     if len(candles) < 30 or live_price <= 0:
         return None
@@ -800,64 +801,104 @@ def detect_early_15m(candles, live_price):
     previous = candles[-2]
     prior = candles[-5:-1]
     candle_range = max(last["high"] - last["low"], 1e-12)
-    body_ratio = abs(last["close"] - last["open"]) / candle_range
+    body = abs(last["close"] - last["open"])
+    body_ratio = body / candle_range
     close_position = (last["close"] - last["low"]) / candle_range
+    upper_wick = last["high"] - max(last["open"], last["close"])
+    lower_wick = min(last["open"], last["close"]) - last["low"]
+    upper_wick_ratio = upper_wick / candle_range
+    lower_wick_ratio = lower_wick / candle_range
     prev_ema9 = ema([c["close"] for c in candles[:-1]], 9)
     if not prev_ema9:
         return None
 
-    # Reject alerts that arrive after price has already travelled too far.
+    # Reject late entries, abnormal candles and poor live-price tracking.
     live_gap_atr = abs(live_price - last["close"]) / m["atr"]
     ema21_distance_atr = abs(last["close"] - m["ema21"]) / m["atr"]
     candle_size_atr = candle_range / m["atr"]
-    if live_gap_atr > 0.60 or ema21_distance_atr > 1.60 or candle_size_atr > 2.20:
+    if live_gap_atr > 0.60 or ema21_distance_atr > 1.80 or candle_size_atr > 2.20:
         return None
-    if body_ratio < 0.45 or m["volume_ratio"] < 0.90:
+    if m["volume_ratio"] < 0.75:
         return None
 
+    prior_high = max(c["high"] for c in candles[-7:-1])
+    prior_low = min(c["low"] for c in candles[-7:-1])
     short_break = last["close"] < min(c["low"] for c in prior)
     short_cross = previous["close"] >= prev_ema9 and last["close"] < m["ema9"]
     long_break = last["close"] > max(c["high"] for c in prior)
     long_cross = previous["close"] <= prev_ema9 and last["close"] > m["ema9"]
 
+    # Reversal at a local extreme: sweep the recent swing, then close back
+    # inside the range with a rejection wick and directional candle body.
+    short_reversal = (
+        last["high"] > prior_high
+        and last["close"] < prior_high
+        and last["close"] < last["open"]
+        and upper_wick_ratio >= 0.30
+        and close_position <= 0.55
+        and 48.0 <= m["rsi"] <= 76.0
+    )
+    long_reversal = (
+        last["low"] < prior_low
+        and last["close"] > prior_low
+        and last["close"] > last["open"]
+        and lower_wick_ratio >= 0.30
+        and close_position >= 0.45
+        and 24.0 <= m["rsi"] <= 52.0
+    )
+
     direction = None
-    if (
+    trigger = None
+    if short_reversal:
+        direction, trigger = "SHORT", "15M_SWING_HIGH_REJECTION"
+    elif long_reversal:
+        direction, trigger = "LONG", "15M_SWING_LOW_RECLAIM"
+    elif (
         last["close"] < last["open"]
-        and close_position <= 0.35
+        and close_position <= 0.40
         and (short_break or short_cross)
-        and 25.0 <= m["rsi"] <= 68.0
+        and 25.0 <= m["rsi"] <= 70.0
+        and body_ratio >= 0.40
     ):
         direction = "SHORT"
+        trigger = "15M_RANGE_BREAK" if short_break else "15M_EMA9_CROSS"
     elif (
         last["close"] > last["open"]
-        and close_position >= 0.65
+        and close_position >= 0.60
         and (long_break or long_cross)
-        and 32.0 <= m["rsi"] <= 75.0
+        and 30.0 <= m["rsi"] <= 75.0
+        and body_ratio >= 0.40
     ):
         direction = "LONG"
+        trigger = "15M_RANGE_BREAK" if long_break else "15M_EMA9_CROSS"
 
     if not direction:
         return None
 
     entry = live_price
-    buffer = m["atr"] * 0.15
+    buffer = max(m["atr"] * 0.15, entry * 0.0005)
     stop = last["high"] + buffer if direction == "SHORT" else last["low"] - buffer
     risk = abs(stop - entry)
     if risk <= 0 or risk / m["atr"] > 1.80:
         return None
+
+    # Keep targets realistic for an early scalp setup.
     targets = (
         [entry - risk, entry - risk * 1.5]
         if direction == "SHORT"
         else [entry + risk, entry + risk * 1.5]
     )
-    score = 5 + int(short_break or long_break) * 2 + int(m["volume_ratio"] >= 1.20) + int(body_ratio >= 0.60)
+    score = 6
+    score += 2 if trigger in ("15M_SWING_HIGH_REJECTION", "15M_SWING_LOW_RECLAIM") else 0
+    score += 1 if m["volume_ratio"] >= 1.20 else 0
+    score += 1 if body_ratio >= 0.60 or upper_wick_ratio >= 0.40 or lower_wick_ratio >= 0.40 else 0
+
     return {
         "symbol": "", "direction": direction, "price": entry, "entry": entry,
         "sl": stop, "tp": targets, "score": score, "m15": m,
         "body_ratio": body_ratio, "breakout": short_break if direction == "SHORT" else long_break,
-        "trigger": "15M_RANGE_BREAK" if (short_break or long_break) else "15M_EMA9_CROSS",
+        "trigger": trigger,
     }
-
 
 def early_entry_message(item):
     direction_fa = "فروش SHORT" if item["direction"] == "SHORT" else "خرید LONG"
