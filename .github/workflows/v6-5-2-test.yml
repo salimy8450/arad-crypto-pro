@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: arad-crypto-pro-v651-test
+  group: arad-crypto-pro-v652-test
   cancel-in-progress: false
 
 jobs:
