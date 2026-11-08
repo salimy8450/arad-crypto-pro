@@ -6,5 +6,25 @@
   "ETH_USDT|SHORT": {
     "type": "CONFIRMED",
     "sent_at": 1794069426
+  },
+  "BERA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794161761
+  },
+  "JCT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794161762
+  },
+  "SKYAI_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794161762
+  },
+  "US_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794161763
+  },
+  "SOPH_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794161763
   }
 }
