@@ -34,5 +34,17 @@
   "1000PEPE_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794162299
+  },
+  "PARTI_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794163899
+  },
+  "UAI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794163899
+  },
+  "MEGA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794163900
   }
 }
