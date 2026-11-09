@@ -781,6 +781,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ICP_USDT|SHORT|EARLY|1794257243",
+      "symbol": "ICP_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 2.392,
+      "sl": 2.403037902579113,
+      "tp": [
+        2.3809620974208867,
+        2.37544314613133
+      ],
+      "created_at": 1794257243,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
