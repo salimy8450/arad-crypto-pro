@@ -815,6 +815,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SANTOS_USDT|SHORT|EARLY|1794257246",
+      "symbol": "SANTOS_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.3902,
+      "sl": 0.3924812397339916,
+      "tp": [
+        0.38791876026600836,
+        0.38677814039901254
+      ],
+      "created_at": 1794257246,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
