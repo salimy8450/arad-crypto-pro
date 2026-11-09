@@ -288,6 +288,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SONIC_USDT|SHORT|EARLY|1794257193",
+      "symbol": "SONIC_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.02033,
+      "sl": 0.02055210967283261,
+      "tp": [
+        0.02010789032716739,
+        0.019996835490751083
+      ],
+      "created_at": 1794257193,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
