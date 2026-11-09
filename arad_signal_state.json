@@ -69,7 +69,7 @@
   },
   "TRUMPSOL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794204995
+    "sent_at": 1794241854
   },
   "DOT_USDT|SHORT": {
     "type": "WATCH",
@@ -113,7 +113,7 @@
   },
   "BERA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794156526
+    "sent_at": 1794241854
   },
   "SPCX_USDT|SHORT": {
     "type": "WATCH",
@@ -213,11 +213,11 @@
   },
   "1000PEPE_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1793970268
+    "sent_at": 1794241850
   },
   "MRNA_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1793995057
+    "sent_at": 1794241849
   },
   "MINIMAX_USDT|SHORT": {
     "type": "WATCH",
@@ -229,7 +229,7 @@
   },
   "TRX_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793970270
+    "sent_at": 1794241851
   },
   "HOME_USDT|LONG": {
     "type": "WATCH",
@@ -241,7 +241,7 @@
   },
   "ETH_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794182983
+    "sent_at": 1794241853
   },
   "BCH_USDT|SHORT": {
     "type": "WATCH",
@@ -297,7 +297,7 @@
   },
   "APR_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794170962
+    "sent_at": 1794241849
   },
   "HOT_USDT|SHORT": {
     "type": "WATCH",
@@ -313,7 +313,7 @@
   },
   "UAI_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794204992
+    "sent_at": 1794241849
   },
   "SXT_USDT|LONG": {
     "type": "WATCH",
@@ -357,6 +357,42 @@
   },
   "XAU_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794204988
+    "sent_at": 1794241851
+  },
+  "USO_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794241850
+  },
+  "ARB_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794241851
+  },
+  "JCT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794241851
+  },
+  "PAXG_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794241852
+  },
+  "ZEC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794241852
+  },
+  "XAUT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794241852
+  },
+  "COHR_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794241853
+  },
+  "INTC_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794241853
+  },
+  "SQQQ_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794241854
   }
 }
