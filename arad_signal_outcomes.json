@@ -900,6 +900,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BERA_USDT|SHORT|EARLY|1794257255",
+      "symbol": "BERA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.1052,
+      "sl": 0.10719187641400116,
+      "tp": [
+        0.10320812358599885,
+        0.10221218537899826
+      ],
+      "created_at": 1794257255,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
