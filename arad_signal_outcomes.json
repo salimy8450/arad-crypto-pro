@@ -543,6 +543,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "NEX_USDT|SHORT|EARLY|1794257218",
+      "symbol": "NEX_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 6.24e-07,
+      "sl": 6.254452304906583e-07,
+      "tp": [
+        6.225547695093417e-07,
+        6.218321542640125e-07
+      ],
+      "created_at": 1794257218,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
