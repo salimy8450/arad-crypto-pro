@@ -25,6 +25,20 @@ jobs:
           python-version: '3.12'
       - name: Validate tracker syntax
         run: python -m py_compile track_signal_outcomes.py
+      - name: Test TP1 and SL evaluation rules
+        run: |
+          python - <<'PY'
+          import runpy
+          ns = runpy.run_path("track_signal_outcomes.py")
+          check = ns["check_signal"]
+          base = {"direction":"LONG","entry":100,"sl":98,"tp":[102,104]}
+          assert check(base,[{"time":300,"open":100,"high":103,"low":99,"close":102}])["result"] == "WIN_TP1"
+          assert check(base,[{"time":300,"open":100,"high":101,"low":97,"close":99}])["result"] == "LOSS_SL"
+          assert check(base,[{"time":300,"open":100,"high":103,"low":97,"close":100}])["result"] == "AMBIGUOUS_SAME_CANDLE"
+          short = {"direction":"SHORT","entry":100,"sl":102,"tp":[98,96]}
+          assert check(short,[{"time":300,"open":100,"high":101,"low":97,"close":98}])["result"] == "WIN_TP1"
+          print("TP1/SL outcome tests passed")
+          PY
       - name: Track TP1 and SL outcomes
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
