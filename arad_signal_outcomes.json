@@ -883,6 +883,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "OKB_USDT|LONG|EARLY|1794257253",
+      "symbol": "OKB_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 96.54,
+      "sl": 96.22419709745468,
+      "tp": [
+        96.85580290254534,
+        97.013704353818
+      ],
+      "created_at": 1794257253,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
