@@ -169,6 +169,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "KERNEL_USDT|LONG|EARLY|1794257181",
+      "symbol": "KERNEL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.04417,
+      "sl": 0.04388144117265735,
+      "tp": [
+        0.044458558827342655,
+        0.04460283824101398
+      ],
+      "created_at": 1794257181,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
