@@ -1,0 +1,54 @@
+name: ARAD CRYPTO PRO V6.5.7 QUALITY ENTRY TEST
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: arad-crypto-pro-outcomes
+  cancel-in-progress: false
+
+jobs:
+  scanner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate Python syntax
+        run: python -m py_compile bot_v6_5_7_quality_entry_test.py
+      - name: Verify Telegram configuration
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: |
+          test -n "$BOT_TOKEN" || (echo "Missing GitHub secret: BOT_TOKEN" && exit 1)
+          test -n "$CHAT_ID" || (echo "Missing GitHub secret: CHAT_ID" && exit 1)
+      - name: Telegram connection test
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          url = "https://api.telegram.org/bot{}/sendMessage".format(os.environ["BOT_TOKEN"])
+          payload = json.dumps({"chat_id": os.environ["CHAT_ID"], "text": "✅ ARAD V6.5.7 quality test started; production scanner unchanged."}).encode()
+          req = urllib.request.Request(url, data=payload, headers={"Content-Type":"application/json"})
+          with urllib.request.urlopen(req, timeout=20) as response:
+              result = json.loads(response.read().decode())
+          if not result.get("ok"):
+              raise SystemExit("Telegram test failed: " + str(result))
+          print("TELEGRAM TEST MESSAGE SENT")
+          PY
+      - name: Run V6.5.7 quality test scanner
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python -u bot_v6_5_7_quality_entry_test.py
