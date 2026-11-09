@@ -118,6 +118,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BABA_USDT|LONG|EARLY|1794257176",
+      "symbol": "BABA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 105.82,
+      "sl": 105.69709,
+      "tp": [
+        105.94290999999998,
+        106.00436499999998
+      ],
+      "created_at": 1794257176,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
