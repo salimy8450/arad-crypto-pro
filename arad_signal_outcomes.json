@@ -237,6 +237,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "KNC_USDT|SHORT|EARLY|1794257188",
+      "symbol": "KNC_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.1042,
+      "sl": 0.10467740588589787,
+      "tp": [
+        0.10372259411410213,
+        0.1034838911711532
+      ],
+      "created_at": 1794257188,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
