@@ -1,0 +1,122 @@
+{
+  "NIULAI_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794245768
+  },
+  "MET_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245768
+  },
+  "AIO_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245768
+  },
+  "TRX_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794245777
+  },
+  "MAGIC_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794245769
+  },
+  "NFLX_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794245769
+  },
+  "POPCAT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245770
+  },
+  "PHA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245770
+  },
+  "MERL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245770
+  },
+  "OKB_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245771
+  },
+  "NAVER_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794245771
+  },
+  "HOME_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245772
+  },
+  "PLUME_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794245772
+  },
+  "LAB_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794245772
+  },
+  "CVC_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245773
+  },
+  "SENT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794245773
+  },
+  "AIINU_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245773
+  },
+  "KAIA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245774
+  },
+  "XDC_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245774
+  },
+  "DIA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245775
+  },
+  "TIA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245775
+  },
+  "BASED_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245775
+  },
+  "RIF_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794245776
+  },
+  "ORCL_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794245776
+  },
+  "BEAT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794245776
+  },
+  "FOGO_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794245777
+  },
+  "PIEVERSE_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794245777
+  },
+  "US_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794245778
+  },
+  "BEAT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794245778
+  },
+  "SENT_USDT|SHORT": {
+    "type": "CONFIRMED",
+    "sent_at": 1794245778
+  }
+}
