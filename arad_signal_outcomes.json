@@ -67,6 +67,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ALLO_USDT|SHORT|EARLY|1794257171",
+      "symbol": "ALLO_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.14763,
+      "sl": 0.14850096449466196,
+      "tp": [
+        0.14675903550533806,
+        0.14632355325800708
+      ],
+      "created_at": 1794257171,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
