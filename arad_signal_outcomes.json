@@ -662,6 +662,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "XTZ_USDT|SHORT|EARLY|1794257230",
+      "symbol": "XTZ_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.2524,
+      "sl": 0.2539124689351599,
+      "tp": [
+        0.25088753106484013,
+        0.2501312965972602
+      ],
+      "created_at": 1794257230,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
