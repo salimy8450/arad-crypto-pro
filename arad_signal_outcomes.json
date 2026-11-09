@@ -917,6 +917,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ETHFI_USDT|SHORT|EARLY|1794257257",
+      "symbol": "ETHFI_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.6262,
+      "sl": 0.6336355006435537,
+      "tp": [
+        0.6187644993564463,
+        0.6150467490346694
+      ],
+      "created_at": 1794257257,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
