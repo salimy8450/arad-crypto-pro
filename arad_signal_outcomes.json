@@ -254,6 +254,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BMT_USDT|LONG|EARLY|1794257189",
+      "symbol": "BMT_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.02318,
+      "sl": 0.023058543209234086,
+      "tp": [
+        0.023301456790765913,
+        0.023362185186148868
+      ],
+      "created_at": 1794257189,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
