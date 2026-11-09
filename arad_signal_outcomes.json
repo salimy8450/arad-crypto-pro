@@ -951,6 +951,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "KAIA_USDT|SHORT|EARLY|1794257260",
+      "symbol": "KAIA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.03118,
+      "sl": 0.03133280525825424,
+      "tp": [
+        0.031027194741745756,
+        0.030950792112618634
+      ],
+      "created_at": 1794257260,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
