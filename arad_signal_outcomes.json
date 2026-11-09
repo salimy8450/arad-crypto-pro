@@ -594,6 +594,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ZCSH_USDT|SHORT|EARLY|1794257223",
+      "symbol": "ZCSH_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 31.2,
+      "sl": 31.599870061503047,
+      "tp": [
+        30.80012993849695,
+        30.600194907745426
+      ],
+      "created_at": 1794257223,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
