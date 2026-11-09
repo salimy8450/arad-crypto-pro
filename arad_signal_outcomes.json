@@ -50,6 +50,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "FOGO_USDT|SHORT|EARLY|1794257170",
+      "symbol": "FOGO_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.001955,
+      "sl": 0.001978017193475383,
+      "tp": [
+        0.0019319828065246171,
+        0.0019204742097869256
+      ],
+      "created_at": 1794257170,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
