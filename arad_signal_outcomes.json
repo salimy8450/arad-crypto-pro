@@ -407,6 +407,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "AIINU_USDT|LONG|EARLY|1794257204",
+      "symbol": "AIINU_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.03218,
+      "sl": 0.0312520961393384,
+      "tp": [
+        0.0331079038606616,
+        0.033571855790992394
+      ],
+      "created_at": 1794257204,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
