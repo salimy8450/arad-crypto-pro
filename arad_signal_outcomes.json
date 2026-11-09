@@ -577,6 +577,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CELO_USDT|SHORT|EARLY|1794257221",
+      "symbol": "CELO_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.06554,
+      "sl": 0.06588972860172121,
+      "tp": [
+        0.06519027139827879,
+        0.06501540709741818
+      ],
+      "created_at": 1794257221,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
