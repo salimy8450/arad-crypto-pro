@@ -696,6 +696,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TST_USDT|SHORT|EARLY|1794257234",
+      "symbol": "TST_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.01317,
+      "sl": 0.013521889519437698,
+      "tp": [
+        0.0128181104805623,
+        0.012642165720843451
+      ],
+      "created_at": 1794257234,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
