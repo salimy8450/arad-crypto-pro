@@ -29,7 +29,7 @@
   },
   "EVAA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794162298
+    "sent_at": 1794189587
   },
   "1000PEPE_USDT|LONG": {
     "type": "WATCH",
@@ -70,5 +70,21 @@
   "REZ_USDT|SHORT": {
     "type": "CONFIRMED",
     "sent_at": 1794177084
+  },
+  "CYBER_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794189586
+  },
+  "APR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794189586
+  },
+  "KORU_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794189587
+  },
+  "MON_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794189587
   }
 }
