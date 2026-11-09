@@ -220,6 +220,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ICNT_USDT|LONG|EARLY|1794257186",
+      "symbol": "ICNT_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.3293,
+      "sl": 0.3229327812210191,
+      "tp": [
+        0.33566721877898087,
+        0.33885082816847134
+      ],
+      "created_at": 1794257186,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
