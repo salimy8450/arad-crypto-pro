@@ -645,6 +645,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CRDO_USDT|LONG|EARLY|1794257228",
+      "symbol": "CRDO_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 135.2,
+      "sl": 133.51546524248948,
+      "tp": [
+        136.8845347575105,
+        137.72680213626575
+      ],
+      "created_at": 1794257228,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
