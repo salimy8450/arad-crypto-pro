@@ -86,5 +86,29 @@
   "MON_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794189587
+  },
+  "ON_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794216480
+  },
+  "NBIS_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794216481
+  },
+  "SKHY_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794216481
+  },
+  "SNDK_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794216482
+  },
+  "CARV_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794216482
+  },
+  "USD1_USDT|SHORT": {
+    "type": "CONFIRMED",
+    "sent_at": 1794216483
   }
 }
