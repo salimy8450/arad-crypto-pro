@@ -118,5 +118,101 @@
   "SENT_USDT|SHORT": {
     "type": "CONFIRMED",
     "sent_at": 1794245778
+  },
+  "FOGO_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251548
+  },
+  "NAORIS_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794251548
+  },
+  "FLUID_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251548
+  },
+  "TRUMPSOL_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251549
+  },
+  "ACT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251549
+  },
+  "BRETT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251550
+  },
+  "PI_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251550
+  },
+  "PARTI_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251550
+  },
+  "HEMI_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251551
+  },
+  "DNA_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251551
+  },
+  "VTHO_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251552
+  },
+  "NVDA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794251552
+  },
+  "UB_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794251552
+  },
+  "SONY_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251553
+  },
+  "PROS_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794251553
+  },
+  "CLANKER_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251554
+  },
+  "USTC_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794251554
+  },
+  "EDGEX_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794251554
+  },
+  "XRP_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794251555
+  },
+  "ETH_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794251555
+  },
+  "DODO_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794251556
+  },
+  "BCH_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794251556
+  },
+  "AMD_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794251556
+  },
+  "CELR_USDT|SHORT": {
+    "type": "CONFIRMED",
+    "sent_at": 1794251557
   }
 }
