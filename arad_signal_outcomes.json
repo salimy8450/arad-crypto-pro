@@ -441,6 +441,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ONT_USDT|SHORT|EARLY|1794257207",
+      "symbol": "ONT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.04102,
+      "sl": 0.04131445824123797,
+      "tp": [
+        0.04072554175876203,
+        0.040578312638143044
+      ],
+      "created_at": 1794257207,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
