@@ -390,6 +390,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "NXPC_USDT|SHORT|EARLY|1794257203",
+      "symbol": "NXPC_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.1559,
+      "sl": 0.16005231075479806,
+      "tp": [
+        0.15174768924520196,
+        0.14967153386780294
+      ],
+      "created_at": 1794257203,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
