@@ -152,6 +152,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BAS_USDT|SHORT|EARLY|1794257180",
+      "symbol": "BAS_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.014123,
+      "sl": 0.014234750885415112,
+      "tp": [
+        0.014011249114584888,
+        0.013955373671877332
+      ],
+      "created_at": 1794257180,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
