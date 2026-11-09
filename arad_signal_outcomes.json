@@ -492,6 +492,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "FLR_USDT|SHORT|EARLY|1794257212",
+      "symbol": "FLR_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.005447,
+      "sl": 0.005475851395639901,
+      "tp": [
+        0.005418148604360098,
+        0.0054037229065401465
+      ],
+      "created_at": 1794257212,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
