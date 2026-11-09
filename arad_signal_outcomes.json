@@ -424,6 +424,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SYN_USDT|SHORT|EARLY|1794257206",
+      "symbol": "SYN_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.13927,
+      "sl": 0.1401248059375155,
+      "tp": [
+        0.1384151940624845,
+        0.13798779109372677
+      ],
+      "created_at": 1794257206,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
