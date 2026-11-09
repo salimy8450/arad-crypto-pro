@@ -509,6 +509,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BSB_USDT|LONG|EARLY|1794257214",
+      "symbol": "BSB_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.08091,
+      "sl": 0.08061530124792518,
+      "tp": [
+        0.08120469875207481,
+        0.08135204812811223
+      ],
+      "created_at": 1794257214,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
