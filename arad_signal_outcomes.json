@@ -186,6 +186,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SENT_USDT|SHORT|EARLY|1794257183",
+      "symbol": "SENT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.01653,
+      "sl": 0.01662623786108545,
+      "tp": [
+        0.016433762138914548,
+        0.01638564320837182
+      ],
+      "created_at": 1794257183,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
