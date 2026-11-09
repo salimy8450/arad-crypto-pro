@@ -1,0 +1,21 @@
+{
+  "signals": [
+    {
+      "id": "NFLX_USDT|SHORT|EARLY|1794257164",
+      "symbol": "NFLX_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 63.82,
+      "sl": 63.96191,
+      "tp": [
+        63.67809,
+        63.607135
+      ],
+      "created_at": 1794257164,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
+    }
+  ]
+}
