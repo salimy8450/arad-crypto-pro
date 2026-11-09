@@ -135,6 +135,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "IOST_USDT|SHORT|EARLY|1794257178",
+      "symbol": "IOST_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.000683,
+      "sl": 0.0006857608222140748,
+      "tp": [
+        0.0006802391777859252,
+        0.0006788587666788878
+      ],
+      "created_at": 1794257178,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
