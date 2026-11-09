@@ -560,6 +560,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SOLV_USDT|SHORT|EARLY|1794257219",
+      "symbol": "SOLV_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.004461,
+      "sl": 0.004494747159047155,
+      "tp": [
+        0.004427252840952844,
+        0.004410379261429266
+      ],
+      "created_at": 1794257219,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
