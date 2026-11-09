@@ -17,7 +17,7 @@
   },
   "SKYAI_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794161762
+    "sent_at": 1794254847
   },
   "US_USDT|SHORT": {
     "type": "WATCH",
@@ -110,5 +110,21 @@
   "USD1_USDT|SHORT": {
     "type": "CONFIRMED",
     "sent_at": 1794216483
+  },
+  "DOS_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794254845
+  },
+  "IRYS_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794254845
+  },
+  "BEAT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794254846
+  },
+  "AVGO_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794254846
   }
 }
