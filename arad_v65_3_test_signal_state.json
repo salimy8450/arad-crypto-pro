@@ -29,7 +29,7 @@
   },
   "MET_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794173326
+    "sent_at": 1794186340
   },
   "WINBOND_USDT|SHORT": {
     "type": "EARLY",
@@ -124,8 +124,8 @@
     "sent_at": 1794173335
   },
   "MAV_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794173335
+    "type": "EARLY",
+    "sent_at": 1794186339
   },
   "MELANIA_USDT|SHORT": {
     "type": "WATCH",
@@ -134,5 +134,97 @@
   "SUI_USDT|SHORT": {
     "type": "CONFIRMED",
     "sent_at": 1794173336
+  },
+  "PROVE_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794186338
+  },
+  "KITE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794186338
+  },
+  "OPENAI_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794186339
+  },
+  "GUN_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794186340
+  },
+  "NAVER_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794186341
+  },
+  "HOT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794186341
+  },
+  "WAXP_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794186342
+  },
+  "NOW_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794186342
+  },
+  "TA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794186343
+  },
+  "CARDS_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794186343
+  },
+  "NVO_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794186344
+  },
+  "TBT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794186344
+  },
+  "BAT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794186345
+  },
+  "RKLB_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794186345
+  },
+  "RUNE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794186346
+  },
+  "APR_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794186346
+  },
+  "ARX_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794186347
+  },
+  "ASTS_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794186347
+  },
+  "MU_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794186348
+  },
+  "SKHY_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794186348
+  },
+  "POWR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794186349
+  },
+  "KORU_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794186349
+  },
+  "BNB_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794186350
   }
 }
