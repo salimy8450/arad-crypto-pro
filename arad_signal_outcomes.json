@@ -611,6 +611,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ZEN_USDT|SHORT|EARLY|1794257225",
+      "symbol": "ZEN_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 5.029,
+      "sl": 5.062477751632954,
+      "tp": [
+        4.995522248367045,
+        4.978783372550568
+      ],
+      "created_at": 1794257225,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
