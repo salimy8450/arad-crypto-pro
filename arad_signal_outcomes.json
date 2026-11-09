@@ -322,6 +322,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CRV_USDT|SHORT|EARLY|1794257196",
+      "symbol": "CRV_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.263,
+      "sl": 0.26463525525683773,
+      "tp": [
+        0.2613647447431623,
+        0.26054711711474343
+      ],
+      "created_at": 1794257196,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
