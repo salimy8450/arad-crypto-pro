@@ -713,6 +713,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SSV_USDT|SHORT|EARLY|1794257235",
+      "symbol": "SSV_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 2.097,
+      "sl": 2.112861424937756,
+      "tp": [
+        2.0811385750622438,
+        2.0732078625933656
+      ],
+      "created_at": 1794257235,
+      "first_candle_time": 1794257400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
