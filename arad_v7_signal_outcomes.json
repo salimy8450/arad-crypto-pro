@@ -265,6 +265,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BOME_USDT|SHORT|EARLY|1794289549",
+      "symbol": "BOME_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.0006108,
+      "sl": 0.0006145529971821321,
+      "tp": [
+        0.0006070470028178679,
+        0.0006051705042268018
+      ],
+      "created_at": 1794289549,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1317,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
