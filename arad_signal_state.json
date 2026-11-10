@@ -37,7 +37,7 @@
   },
   "NVDA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794024245
+    "sent_at": 1794325548
   },
   "SMSN_USDT|SHORT": {
     "type": "WATCH",
@@ -77,7 +77,7 @@
   },
   "SOL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794270275
+    "sent_at": 1794325546
   },
   "SLP_USDT|SHORT": {
     "type": "WATCH",
@@ -121,7 +121,7 @@
   },
   "DOGE_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794182980
+    "sent_at": 1794325549
   },
   "PENGU_USDT|SHORT": {
     "type": "WATCH",
@@ -141,7 +141,7 @@
   },
   "HYPE_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794295955
+    "sent_at": 1794325547
   },
   "NEAR_USDT|SHORT": {
     "type": "WATCH",
@@ -153,7 +153,7 @@
   },
   "ADA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794204987
+    "sent_at": 1794325547
   },
   "CLANKER_USDT|LONG": {
     "type": "WATCH",
@@ -173,7 +173,7 @@
   },
   "XRP_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794204994
+    "sent_at": 1794325548
   },
   "BNB_USDT|SHORT": {
     "type": "WATCH",
@@ -241,7 +241,7 @@
   },
   "ETH_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794295959
+    "sent_at": 1794325546
   },
   "BCH_USDT|SHORT": {
     "type": "WATCH",
@@ -257,7 +257,7 @@
   },
   "IDOL_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794070081
+    "sent_at": 1794325553
   },
   "FOGO_USDT|SHORT": {
     "type": "WATCH",
@@ -289,7 +289,7 @@
   },
   "ERA_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794156530
+    "sent_at": 1794325552
   },
   "WAL_USDT|SHORT": {
     "type": "WATCH",
@@ -317,7 +317,7 @@
   },
   "SXT_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794108656
+    "sent_at": 1794325554
   },
   "RVN_USDT|SHORT": {
     "type": "WATCH",
@@ -337,7 +337,7 @@
   },
   "CT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794134600
+    "sent_at": 1794325550
   },
   "SIGN_USDT|SHORT": {
     "type": "WATCH",
@@ -421,10 +421,34 @@
   },
   "HYPER_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794295954
+    "sent_at": 1794325553
   },
   "SQD_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794295956
+  },
+  "EDGEX_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794325549
+  },
+  "AAVE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794325550
+  },
+  "NATGAS_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794325551
+  },
+  "XMR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794325551
+  },
+  "INIT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794325552
+  },
+  "ANTHROPIC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794325554
   }
 }
