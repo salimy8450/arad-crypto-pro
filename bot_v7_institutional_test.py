@@ -9,7 +9,7 @@ import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================================
-# ARAD CRYPTO PRO V7.0 INSTITUTIONAL CONFLUENCE OURBIT
+# ARAD CRYPTO PRO V7.3.2 EARLY RISK QUALITY OURBIT
 # EARLY WATCH + CONFIRMED TELEGRAM ALERTS
 # MTF | BOS | SWEEP | PULLBACK | RISK FILTERS
 # ANALYSIS ONLY - NO ORDERS
@@ -2039,11 +2039,11 @@ def print_result(item):
 def main():
     started = time.time()
     log("")
-    log("ARAD CRYPTO PRO V7.3 SECOND-CANDLE REVERSAL TEST OURBIT")
+    log("ARAD CRYPTO PRO V7.3.2 EARLY RISK QUALITY TEST OURBIT")
     log("START: " + now_text())
     log("MODE: V7 TEST ONLY | institutional confluence filters | no orders")
     log("BASE URL: " + BASE_URL)
-    log("V7.3 PATCH: general swing-reversal second-candle confirmation + pump/dump confirmation + preserved HTF/structure/volume/risk gates")
+    log("V7.3.2 PATCH: second-candle confirmation + cost-adjusted early RR + nearby structure room + first-candle WATCH-only")
 
     if os.getenv("ARAD_SELF_TEST", "0") == "1":
         institutional_self_test()
