@@ -94,9 +94,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1307,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794290400
     },
     {
       "id": "KAT_USDT|SHORT|EARLY|1794289533",
@@ -132,9 +133,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1309,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794290700
     },
     {
       "id": "TAC_USDT|LONG|EARLY|1794289536",
@@ -247,9 +249,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1315,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 2,
+      "exit_candle": 1794290700
     },
     {
       "id": "ORDER_USDT|SHORT|EARLY|1794289547",
@@ -306,9 +309,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1318,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794290700
     },
     {
       "id": "ALT_USDT|SHORT|EARLY|1794289552",
@@ -518,9 +522,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1329,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794290700
     },
     {
       "id": "TQQQ_USDT|LONG|EARLY|1794289573",
@@ -556,9 +561,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1331,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794290400
     },
     {
       "id": "BHARTIARTL_USDT|LONG|EARLY|1794289577",
