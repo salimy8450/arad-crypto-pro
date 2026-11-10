@@ -65,7 +65,7 @@
   },
   "OP_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794177084
+    "sent_at": 1794306987
   },
   "REZ_USDT|SHORT": {
     "type": "CONFIRMED",
@@ -113,7 +113,7 @@
   },
   "DOS_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794254845
+    "sent_at": 1794306987
   },
   "IRYS_USDT|SHORT": {
     "type": "WATCH",
@@ -142,5 +142,17 @@
   "PUMPFUN_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794278915
+  },
+  "WOO_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794306986
+  },
+  "SXT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794306987
+  },
+  "CFX_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794306988
   }
 }
