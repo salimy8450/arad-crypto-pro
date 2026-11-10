@@ -455,6 +455,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "GOOGL_USDT|LONG|EARLY|1794289567",
+      "symbol": "GOOGL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 291.26,
+      "sl": 290.75437,
+      "tp": [
+        291.76563,
+        292.018445
+      ],
+      "created_at": 1794289567,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1327,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
