@@ -4,8 +4,8 @@
     "sent_at": 1794069261
   },
   "ETH_USDT|SHORT": {
-    "type": "CONFIRMED",
-    "sent_at": 1794069426
+    "type": "WATCH",
+    "sent_at": 1794278914
   },
   "BERA_USDT|SHORT": {
     "type": "WATCH",
@@ -126,5 +126,21 @@
   "AVGO_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794254846
+  },
+  "B2_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794278914
+  },
+  "POWR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794278914
+  },
+  "XMR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794278914
+  },
+  "PUMPFUN_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794278915
   }
 }
