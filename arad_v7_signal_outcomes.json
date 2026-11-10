@@ -417,6 +417,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MANA_USDT|SHORT|EARLY|1794289563",
+      "symbol": "MANA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.07135,
+      "sl": 0.07145167592802898,
+      "tp": [
+        0.07124832407197101,
+        0.07119748610795652
+      ],
+      "created_at": 1794289563,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1325,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
