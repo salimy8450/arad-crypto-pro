@@ -75,6 +75,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CAT_USDT|SHORT|EARLY|1794289531",
+      "symbol": "CAT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 1.659e-06,
+      "sl": 1.664102417656225e-06,
+      "tp": [
+        1.6538975823437748e-06,
+        1.6513463735156622e-06
+      ],
+      "created_at": 1794289531,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1307,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
