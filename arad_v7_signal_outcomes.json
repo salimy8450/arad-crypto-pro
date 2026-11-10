@@ -57,7 +57,9 @@
       "telegram_message_id": 1305,
       "status": "OPEN",
       "result": null,
-      "max_tp": 0
+      "max_tp": 0,
+      "evaluated_through": 1794294000,
+      "evaluated_at": 1794294083
     },
     {
       "id": "MERL_USDT|SHORT|EARLY|1794289529",
@@ -116,7 +118,9 @@
       "telegram_message_id": 1308,
       "status": "OPEN",
       "result": null,
-      "max_tp": 0
+      "max_tp": 0,
+      "evaluated_through": 1794294000,
+      "evaluated_at": 1794294083
     },
     {
       "id": "CRCL_USDT|SHORT|EARLY|1794289534",
@@ -215,7 +219,9 @@
       "telegram_message_id": 1313,
       "status": "OPEN",
       "result": null,
-      "max_tp": 0
+      "max_tp": 0,
+      "evaluated_through": 1794294000,
+      "evaluated_at": 1794294083
     },
     {
       "id": "BNC_USDT|SHORT|EARLY|1794289543",
@@ -354,7 +360,9 @@
       "telegram_message_id": 1320,
       "status": "OPEN",
       "result": null,
-      "max_tp": 0
+      "max_tp": 0,
+      "evaluated_through": 1794294000,
+      "evaluated_at": 1794294083
     },
     {
       "id": "XPT_USDT|LONG|EARLY|1794289556",
@@ -393,7 +401,9 @@
       "telegram_message_id": 1322,
       "status": "OPEN",
       "result": null,
-      "max_tp": 0
+      "max_tp": 0,
+      "evaluated_through": 1794294000,
+      "evaluated_at": 1794294083
     },
     {
       "id": "XAUT_USDT|LONG|EARLY|1794289560",
@@ -412,7 +422,9 @@
       "telegram_message_id": 1323,
       "status": "OPEN",
       "result": null,
-      "max_tp": 0
+      "max_tp": 0,
+      "evaluated_through": 1794294000,
+      "evaluated_at": 1794294083
     },
     {
       "id": "ALLO_USDT|SHORT|EARLY|1794289562",
@@ -489,9 +501,12 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1327,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED_TP1",
+      "result": "TP1_FIRST",
+      "max_tp": 1,
+      "evaluated_through": 1794294000,
+      "closed_at": 1794294000,
+      "evaluated_at": 1794294083
     },
     {
       "id": "INTW_USDT|LONG|EARLY|1794289569",
@@ -650,7 +665,9 @@
       "telegram_message_id": 1370,
       "status": "OPEN",
       "result": null,
-      "max_tp": 0
+      "max_tp": 0,
+      "evaluated_through": 1794294000,
+      "evaluated_at": 1794294083
     }
   ]
 }
