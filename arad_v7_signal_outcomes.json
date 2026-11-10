@@ -189,6 +189,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "PAXG_USDT|LONG|EARLY|1794289542",
+      "symbol": "PAXG_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 4108.27,
+      "sl": 4102.125865,
+      "tp": [
+        4114.414135000001,
+        4117.486202500001
+      ],
+      "created_at": 1794289542,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1313,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
