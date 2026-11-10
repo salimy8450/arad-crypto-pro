@@ -364,8 +364,8 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0,
-      "evaluated_through": 1794320100,
-      "evaluated_at": 1794320116
+      "evaluated_through": 1794343500,
+      "evaluated_at": 1794343891
     },
     {
       "id": "XPT_USDT|LONG|EARLY|1794289556",
@@ -402,11 +402,12 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1322,
-      "status": "OPEN",
-      "result": null,
+      "status": "CLOSED_SL",
+      "result": "SL_FIRST",
       "max_tp": 0,
-      "evaluated_through": 1794320100,
-      "evaluated_at": 1794320116
+      "evaluated_through": 1794321900,
+      "evaluated_at": 1794343891,
+      "closed_at": 1794321900
     },
     {
       "id": "XAUT_USDT|LONG|EARLY|1794289560",
