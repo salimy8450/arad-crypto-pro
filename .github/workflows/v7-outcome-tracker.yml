@@ -1,0 +1,47 @@
+name: ARAD V7 DELIVERY VERIFIED OUTCOME TRACKER
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: arad-v7-outcomes
+  cancel-in-progress: false
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile tracker
+        run: python -m py_compile track_v7_signal_outcomes.py
+      - name: Test TP and SL evaluation
+        run: |
+          python - <<'PY'
+          import runpy
+          ns = runpy.run_path("track_v7_signal_outcomes.py")
+          check = ns["check_signal"]
+          long = {"direction":"LONG","entry":100,"sl":98,"tp":[102,104,106]}
+          assert check(long,[{"time":300,"open":100,"high":105,"low":99,"close":104}])["max_tp"] == 2
+          assert check(long,[{"time":300,"open":100,"high":101,"low":97,"close":99}])["result"] == "LOSS_SL"
+          assert check(long,[{"time":300,"open":100,"high":103,"low":97,"close":100}])["result"] == "AMBIGUOUS_SAME_CANDLE"
+          short = {"direction":"SHORT","entry":100,"sl":102,"tp":[98,96]}
+          assert check(short,[{"time":300,"open":100,"high":101,"low":97,"close":98}])["result"] == "WIN_TP1"
+          print("V7 TP/SL tests passed")
+          PY
+      - name: Track V7 verified outcomes
+        env:
+          BOT_TOKEN: \${{ secrets.BOT_TOKEN }}
+          CHAT_ID: \${{ secrets.CHAT_ID }}
+          GITHUB_TOKEN: \${{ github.token }}
+        run: python -u track_v7_signal_outcomes.py
