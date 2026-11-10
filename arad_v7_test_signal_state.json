@@ -182,5 +182,25 @@
     "type": "WATCH",
     "sent_at": 1794290572,
     "trigger": ""
+  },
+  "HYPE_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794291112,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "SAND_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794291112,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "SOL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794291112,
+    "trigger": ""
+  },
+  "CELR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794291113,
+    "trigger": ""
   }
 }
