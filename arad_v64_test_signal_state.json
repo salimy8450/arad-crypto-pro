@@ -5,7 +5,7 @@
   },
   "ETH_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794278914
+    "sent_at": 1794334588
   },
   "BERA_USDT|SHORT": {
     "type": "WATCH",
@@ -53,7 +53,7 @@
   },
   "PENGU_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794177082
+    "sent_at": 1794334589
   },
   "ADA_USDT|SHORT": {
     "type": "WATCH",
@@ -121,7 +121,7 @@
   },
   "BEAT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794254846
+    "sent_at": 1794334587
   },
   "AVGO_USDT|LONG": {
     "type": "WATCH",
@@ -154,5 +154,21 @@
   "CFX_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794306988
+  },
+  "BCH_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794334588
+  },
+  "SUI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794334589
+  },
+  "MELANIA_USDT|SHORT": {
+    "type": "CONFIRMED",
+    "sent_at": 1794334590
+  },
+  "BIO_USDT|SHORT": {
+    "type": "CONFIRMED",
+    "sent_at": 1794334590
   }
 }
