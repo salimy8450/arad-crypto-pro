@@ -341,6 +341,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "XPT_USDT|LONG|EARLY|1794289556",
+      "symbol": "XPT_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 1583.5,
+      "sl": 1579.58825,
+      "tp": [
+        1587.41175,
+        1589.3676249999999
+      ],
+      "created_at": 1794289556,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1321,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
