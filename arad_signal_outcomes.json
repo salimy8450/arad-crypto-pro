@@ -13,9 +13,10 @@
       ],
       "created_at": 1794257164,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794257400
     },
     {
       "id": "BNB_USDT|SHORT|EARLY|1794257166",
@@ -30,9 +31,10 @@
       ],
       "created_at": 1794257166,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794263700
     },
     {
       "id": "CORE_USDT|SHORT|EARLY|1794257168",
@@ -47,9 +49,10 @@
       ],
       "created_at": 1794257168,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794261900
     },
     {
       "id": "FOGO_USDT|SHORT|EARLY|1794257170",
@@ -64,9 +67,10 @@
       ],
       "created_at": 1794257170,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 2,
+      "exit_candle": 1794261600
     },
     {
       "id": "ALLO_USDT|SHORT|EARLY|1794257171",
@@ -81,9 +85,10 @@
       ],
       "created_at": 1794257171,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794258000
     },
     {
       "id": "THETA_USDT|SHORT|EARLY|1794257173",
@@ -98,9 +103,10 @@
       ],
       "created_at": 1794257173,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794258600
     },
     {
       "id": "DNA_USDT|SHORT|EARLY|1794257175",
@@ -115,9 +121,10 @@
       ],
       "created_at": 1794257175,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794257400
     },
     {
       "id": "BABA_USDT|LONG|EARLY|1794257176",
@@ -132,9 +139,10 @@
       ],
       "created_at": 1794257176,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794257400
     },
     {
       "id": "IOST_USDT|SHORT|EARLY|1794257178",
@@ -149,9 +157,10 @@
       ],
       "created_at": 1794257178,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794258000
     },
     {
       "id": "BAS_USDT|SHORT|EARLY|1794257180",
@@ -166,9 +175,10 @@
       ],
       "created_at": 1794257180,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794266400
     },
     {
       "id": "KERNEL_USDT|LONG|EARLY|1794257181",
@@ -183,9 +193,10 @@
       ],
       "created_at": 1794257181,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794259200
     },
     {
       "id": "SENT_USDT|SHORT|EARLY|1794257183",
@@ -200,9 +211,10 @@
       ],
       "created_at": 1794257183,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794258600
     },
     {
       "id": "HOT_USDT|LONG|EARLY|1794257185",
@@ -217,9 +229,10 @@
       ],
       "created_at": 1794257185,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794257400
     },
     {
       "id": "ICNT_USDT|LONG|EARLY|1794257186",
@@ -234,9 +247,10 @@
       ],
       "created_at": 1794257186,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794258300
     },
     {
       "id": "KNC_USDT|SHORT|EARLY|1794257188",
@@ -251,9 +265,10 @@
       ],
       "created_at": 1794257188,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794258600
     },
     {
       "id": "BMT_USDT|LONG|EARLY|1794257189",
@@ -268,9 +283,10 @@
       ],
       "created_at": 1794257189,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 2,
+      "exit_candle": 1794258000
     },
     {
       "id": "TAO_USDT|SHORT|EARLY|1794257191",
@@ -285,9 +301,10 @@
       ],
       "created_at": 1794257191,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794270600
     },
     {
       "id": "SONIC_USDT|SHORT|EARLY|1794257193",
@@ -302,9 +319,10 @@
       ],
       "created_at": 1794257193,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794266100
     },
     {
       "id": "CYBER_USDT|SHORT|EARLY|1794257194",
@@ -319,9 +337,10 @@
       ],
       "created_at": 1794257194,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794257400
     },
     {
       "id": "CRV_USDT|SHORT|EARLY|1794257196",
@@ -336,9 +355,10 @@
       ],
       "created_at": 1794257196,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794258600
     },
     {
       "id": "STBL_USDT|SHORT|EARLY|1794257198",
@@ -353,9 +373,10 @@
       ],
       "created_at": 1794257198,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794258000
     },
     {
       "id": "CYS_USDT|SHORT|EARLY|1794257200",
@@ -370,9 +391,10 @@
       ],
       "created_at": 1794257200,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794269700
     },
     {
       "id": "PREDICT_USDT|LONG|EARLY|1794257201",
@@ -387,9 +409,10 @@
       ],
       "created_at": 1794257201,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794258600
     },
     {
       "id": "NXPC_USDT|SHORT|EARLY|1794257203",
@@ -404,9 +427,10 @@
       ],
       "created_at": 1794257203,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794268800
     },
     {
       "id": "AIINU_USDT|LONG|EARLY|1794257204",
@@ -421,9 +445,10 @@
       ],
       "created_at": 1794257204,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 2,
+      "exit_candle": 1794257400
     },
     {
       "id": "SYN_USDT|SHORT|EARLY|1794257206",
@@ -438,9 +463,10 @@
       ],
       "created_at": 1794257206,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 2,
+      "exit_candle": 1794265200
     },
     {
       "id": "ONT_USDT|SHORT|EARLY|1794257207",
@@ -455,9 +481,10 @@
       ],
       "created_at": 1794257207,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794265800
     },
     {
       "id": "IN_USDT|SHORT|EARLY|1794257209",
@@ -472,9 +499,10 @@
       ],
       "created_at": 1794257209,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794264900
     },
     {
       "id": "OPG_USDT|SHORT|EARLY|1794257211",
@@ -506,9 +534,10 @@
       ],
       "created_at": 1794257212,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794257400
     },
     {
       "id": "BSB_USDT|LONG|EARLY|1794257214",
@@ -523,9 +552,10 @@
       ],
       "created_at": 1794257214,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794257400
     },
     {
       "id": "GRVT_USDT|SHORT|EARLY|1794257216",
@@ -540,9 +570,10 @@
       ],
       "created_at": 1794257216,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794257400
     },
     {
       "id": "NEX_USDT|SHORT|EARLY|1794257218",
@@ -557,9 +588,10 @@
       ],
       "created_at": 1794257218,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 2,
+      "exit_candle": 1794257400
     },
     {
       "id": "SOLV_USDT|SHORT|EARLY|1794257219",
@@ -574,9 +606,10 @@
       ],
       "created_at": 1794257219,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794259500
     },
     {
       "id": "CELO_USDT|SHORT|EARLY|1794257221",
@@ -591,9 +624,10 @@
       ],
       "created_at": 1794257221,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794258600
     },
     {
       "id": "ZCSH_USDT|SHORT|EARLY|1794257223",
@@ -608,9 +642,10 @@
       ],
       "created_at": 1794257223,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794265200
     },
     {
       "id": "ZEN_USDT|SHORT|EARLY|1794257225",
@@ -625,9 +660,10 @@
       ],
       "created_at": 1794257225,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794261600
     },
     {
       "id": "PLUME_USDT|SHORT|EARLY|1794257227",
@@ -642,9 +678,10 @@
       ],
       "created_at": 1794257227,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794263400
     },
     {
       "id": "CRDO_USDT|LONG|EARLY|1794257228",
@@ -659,9 +696,10 @@
       ],
       "created_at": 1794257228,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794257400
     },
     {
       "id": "XTZ_USDT|SHORT|EARLY|1794257230",
@@ -676,9 +714,10 @@
       ],
       "created_at": 1794257230,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794261600
     },
     {
       "id": "PLAY_USDT|SHORT|EARLY|1794257232",
@@ -693,9 +732,10 @@
       ],
       "created_at": 1794257232,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794257400
     },
     {
       "id": "TST_USDT|SHORT|EARLY|1794257234",
@@ -710,9 +750,10 @@
       ],
       "created_at": 1794257234,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 2,
+      "exit_candle": 1794267000
     },
     {
       "id": "SSV_USDT|SHORT|EARLY|1794257235",
@@ -727,9 +768,10 @@
       ],
       "created_at": 1794257235,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794266100
     },
     {
       "id": "SHELL_USDT|SHORT|EARLY|1794257237",
@@ -744,9 +786,10 @@
       ],
       "created_at": 1794257237,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794258000
     },
     {
       "id": "CARV_USDT|SHORT|EARLY|1794257239",
@@ -761,9 +804,10 @@
       ],
       "created_at": 1794257239,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794261900
     },
     {
       "id": "FIDA_USDT|SHORT|EARLY|1794257241",
@@ -778,9 +822,10 @@
       ],
       "created_at": 1794257241,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794265800
     },
     {
       "id": "ICP_USDT|SHORT|EARLY|1794257243",
@@ -812,9 +857,10 @@
       ],
       "created_at": 1794257244,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794259200
     },
     {
       "id": "SANTOS_USDT|SHORT|EARLY|1794257246",
@@ -829,9 +875,10 @@
       ],
       "created_at": 1794257246,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794265200
     },
     {
       "id": "SUPER_USDT|SHORT|EARLY|1794257248",
@@ -846,9 +893,10 @@
       ],
       "created_at": 1794257248,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794258300
     },
     {
       "id": "STRK_USDT|SHORT|EARLY|1794257249",
@@ -863,9 +911,10 @@
       ],
       "created_at": 1794257249,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794261600
     },
     {
       "id": "VIRTUAL_USDT|SHORT|EARLY|1794257251",
@@ -880,9 +929,10 @@
       ],
       "created_at": 1794257251,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794265500
     },
     {
       "id": "OKB_USDT|LONG|EARLY|1794257253",
@@ -897,9 +947,10 @@
       ],
       "created_at": 1794257253,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794258600
     },
     {
       "id": "BERA_USDT|SHORT|EARLY|1794257255",
@@ -914,9 +965,10 @@
       ],
       "created_at": 1794257255,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794258600
     },
     {
       "id": "ETHFI_USDT|SHORT|EARLY|1794257257",
@@ -948,9 +1000,10 @@
       ],
       "created_at": 1794257259,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794258600
     },
     {
       "id": "KAIA_USDT|SHORT|EARLY|1794257260",
@@ -965,9 +1018,10 @@
       ],
       "created_at": 1794257260,
       "first_candle_time": 1794257400,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794264900
     }
   ]
 }
