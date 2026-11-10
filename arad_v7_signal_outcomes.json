@@ -322,6 +322,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ELITEMAT_USDT|LONG|EARLY|1794289554",
+      "symbol": "ELITEMAT_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 133.17,
+      "sl": 131.10266888929542,
+      "tp": [
+        135.23733111070456,
+        136.27099666605685
+      ],
+      "created_at": 1794289554,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1320,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
