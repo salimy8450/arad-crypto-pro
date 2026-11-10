@@ -1112,12 +1112,12 @@ def detect_second_candle_pump_dump(candles, live_price):
     impulse_high = max(c["high"] for c in prior)
     impulse_low = min(c["low"] for c in prior)
     impulse_pct = (prior[-1]["close"] - prior[0]["open"]) / max(prior[0]["open"], 1e-12) * 100.0
-    impulse_atr = abs(prior[-1]["close"] - prior[0]["open"]) / m["atr"]
+    impulse_atr_signed = (prior[-1]["close"] - prior[0]["open"]) / m["atr"]
     recent_vol = sum(c["volume"] for c in prior[-3:]) / 3.0
     base_vol = sum(c["volume"] for c in candles[-23:-3]) / 20.0
     vol_multiple = recent_vol / base_vol if base_vol > 0 else 0.0
-    abnormal_up = impulse_pct >= 3.0 or impulse_atr >= 3.5
-    abnormal_down = impulse_pct <= -3.0 or impulse_atr >= 3.5
+    abnormal_up = impulse_pct >= 3.0 or impulse_atr_signed >= 3.5
+    abnormal_down = impulse_pct <= -3.0 or impulse_atr_signed <= -3.5
     abnormal_volume = vol_multiple >= 1.60
 
     first_range = max(first["high"] - first["low"], 1e-12)
@@ -1457,12 +1457,17 @@ def should_send_alert(state, item, alert_type):
         return True
     # Avoid repeating an early entry if another alert type for the same
     # symbol/direction was sent moments earlier.
+    second_after_first = (
+        alert_type == "EARLY"
+        and item.get("trigger") == "SECOND_CANDLE_CONFIRMATION"
+        and previous.get("type") == "EARLY"
+        and previous.get("trigger") != "SECOND_CANDLE_CONFIRMATION"
+    )
+    if second_after_first:
+        return True
     if alert_type == "EARLY" and previous.get("type") in ("EARLY", "WATCH", "CONFIRMED"):
-        is_second_candle = item.get("trigger") == "SECOND_CANDLE_CONFIRMATION"
-        prior_was_first_candle = previous.get("type") == "EARLY" and previous.get("trigger") != "SECOND_CANDLE_CONFIRMATION"
-        if not (is_second_candle and prior_was_first_candle):
-            if now - int(previous.get("sent_at", 0)) < EARLY_COOLDOWN_MIN * 60:
-                return False
+        if now - int(previous.get("sent_at", 0)) < EARLY_COOLDOWN_MIN * 60:
+            return False
     if previous.get("type") == alert_type and now - int(previous.get("sent_at", 0)) < cooldown * 60:
         return False
     return True
