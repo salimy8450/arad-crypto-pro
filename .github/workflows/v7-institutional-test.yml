@@ -1,0 +1,43 @@
+name: ARAD CRYPTO PRO V7 Institutional Test
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: arad-v7-institutional-test
+  cancel-in-progress: false
+
+jobs:
+  scanner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile V7
+        run: python -m py_compile bot_v7_institutional_test.py
+
+      - name: Run V7 self-test
+        env:
+          ARAD_SELF_TEST: "1"
+        run: python -u bot_v7_institutional_test.py
+
+      - name: Run V7 scanner
+        env:
+          BOT_TOKEN: \${{ secrets.BOT_TOKEN }}
+          CHAT_ID: \${{ secrets.CHAT_ID }}
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: \${{ github.repository }}
+          GITHUB_REF_NAME: \${{ github.ref_name }}
+        run: python -u bot_v7_institutional_test.py
