@@ -1454,7 +1454,7 @@ def early_entry_message(item):
         ("✅ کندل دوم برگشت را تأیید کرده؛ قبل از ورود فاصله قیمت تا ورود و حدضرر را بررسی کن."
          if str(item.get("trigger", "")).startswith("SECOND_CANDLE_")
          else "⚠️ این فقط هشدار کندل اول است؛ تا تأیید کندل دوم وارد نشو."),
-        "پامپ/دامپ: {:.2f}% | حجم موج: {:.2f}x".format(item.get("pump_dump_pct", 0.0), item.get("pump_dump_volume", 0.0)),
+        "حرکت قبلی: {:.2f}% | نسبت حجم: {:.2f}x".format(item.get("pump_dump_pct", 0.0), item.get("pump_dump_volume", 0.0)),
         "زمان: " + now_text(),
     ]
     return "\n".join(lines)
@@ -1671,7 +1671,7 @@ def dispatch_alerts(early_items, watch_items, confirmed_items):
     for item in early_items:
         if should_send_alert(state, item, "EARLY"):
             if telegram_send(early_entry_message(item)):
-                if item.get("trigger") == "SECOND_CANDLE_CONFIRMATION":
+                if str(item.get("trigger", "")).startswith("SECOND_CANDLE_"):
                     journal_ok = save_outcome_signal(item, "EARLY")
                     log("SECOND-CANDLE OUTCOME TRACKING: {}".format("ON" if journal_ok else "FAILED"))
                 else:
@@ -1710,7 +1710,7 @@ def save_outcome_signal(item, alert_type):
     """Persist actionable alerts for later TP1/SL-first evaluation."""
     if alert_type == "EARLY":
         # First-candle heads-up is not an entry and must not pollute trade outcomes.
-        if item.get("trigger") != "SECOND_CANDLE_CONFIRMATION":
+        if not str(item.get("trigger", "")).startswith("SECOND_CANDLE_"):
             log("OUTCOME JOURNAL SKIP: first-candle heads-up is not an entry")
             return False
         entry = as_float(item.get("entry"))
