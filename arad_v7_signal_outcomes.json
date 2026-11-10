@@ -623,6 +623,25 @@
       "result": "LOSS_SL",
       "max_tp": 0,
       "exit_candle": 1794289800
+    },
+    {
+      "id": "MELANIA_USDT|LONG|EARLY|1794293530",
+      "symbol": "MELANIA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.05645,
+      "sl": 0.056076945214295085,
+      "tp": [
+        0.056823054785704916,
+        0.05700958217855737
+      ],
+      "created_at": 1794293530,
+      "first_candle_time": 1794293700,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1370,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
