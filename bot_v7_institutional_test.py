@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 BASE_URL = "https://futures.ourbit.io"
 TELEGRAM_API = "https://api.telegram.org"
 
-MAX_STAGE1_SYMBOLS = 10000  # scan the full eligible USDT futures universe
+MAX_STAGE1_SYMBOLS = 350  # liquidity-ranked universe cap for reliable 5m scheduling
 MAX_STAGE2_SYMBOLS = 80
 MAX_STAGE3_SYMBOLS = 60
 MAX_TELEGRAM_WATCH_ALERTS = 5  # cap WATCH messages per test run to prevent Telegram flooding
@@ -579,9 +579,9 @@ def smart_money_context(candles, direction):
     structure_aligned = (bos_up or choch_up or sweep_up) if direction == "LONG" else (bos_down or choch_down or sweep_down)
     score = sum(bool(x) for x in (structure_aligned, fvg_aligned, ob_aligned, vwap_aligned, profile_aligned, delta_aligned))
     reasons = []
-    if bos_up if direction == "LONG" else bos_down: reasons.append("BOS")
-    if choch_up if direction == "LONG" else choch_down: reasons.append("CHoCH")
-    if sweep_up if direction == "LONG" else sweep_down: reasons.append("LIQUIDITY_SWEEP")
+    if (bos_up if direction == "LONG" else bos_down): reasons.append("BOS")
+    if (choch_up if direction == "LONG" else choch_down): reasons.append("CHoCH")
+    if (sweep_up if direction == "LONG" else sweep_down): reasons.append("LIQUIDITY_SWEEP")
     if fvg_aligned: reasons.append("FVG_NEAR")
     if ob_aligned: reasons.append("ORDER_BLOCK_NEAR")
     if vwap_aligned: reasons.append("VWAP_SIDE_OK")
@@ -1230,10 +1230,6 @@ def early_entry_message(item):
         "امتیاز شروع حرکت: {}".format(item["score"]),
         "",
         "⚠️ هشدار زودهنگام است؛ منتظر مدیریت ریسک باش. سفارش خودکار ثبت نمی‌شود.",
-        "همگرایی V7: {}".format(", ".join(item.get("institutional", {}).get("reasons", [])) or "ندارد"),
-        "VWAP: {}".format(format_price(item["institutional"]["vwap"]) if item.get("institutional", {}).get("vwap") else "N/A"),
-        "POC: {}".format(format_price(item["institutional"]["profile"]["poc"]) if item.get("institutional", {}).get("profile") else "N/A"),
-        "جریان سفارش واقعی/OI/Funding: فقط در صورت وجود فیلد معتبر صرافی؛ در غیر این صورت N/A",
         "زمان: " + now_text(),
     ]
     return "\n".join(lines)
@@ -1251,7 +1247,11 @@ def format_price(value):
 
 # ---------------- TELEGRAM ----------------
 
+LAST_TELEGRAM_MESSAGE_ID = None
+
 def telegram_send(message):
+    global LAST_TELEGRAM_MESSAGE_ID
+    LAST_TELEGRAM_MESSAGE_ID = None
     token = os.getenv("BOT_TOKEN", "").strip()
     chat_id = os.getenv("CHAT_ID", "").strip()
     if not token or not chat_id:
@@ -1266,7 +1266,9 @@ def telegram_send(message):
     try:
         result = http_json(url, method="POST", payload=payload, timeout=20)
         if isinstance(result, dict) and result.get("ok") is True:
-            log("TELEGRAM SENT")
+            message_data = result.get("result", {})
+            LAST_TELEGRAM_MESSAGE_ID = message_data.get("message_id") if isinstance(message_data, dict) else None
+            log("TELEGRAM SENT | MESSAGE_ID: {}".format(LAST_TELEGRAM_MESSAGE_ID))
             return True
         log("TELEGRAM ERROR: {}".format(str(result)[:220]))
     except Exception as exc:
@@ -1520,6 +1522,9 @@ def save_outcome_signal(item, alert_type):
         "alert_type": alert_type, "entry": entry, "sl": stop, "tp": targets,
         "created_at": created,
         "first_candle_time": ((created + 299) // 300) * 300,
+        "delivery_status": "TELEGRAM_API_ACCEPTED" if LAST_TELEGRAM_MESSAGE_ID else "UNVERIFIED_DELIVERY",
+        "telegram_message_id": LAST_TELEGRAM_MESSAGE_ID,
+        "chat_id_fingerprint": (str(os.getenv("CHAT_ID", ""))[-4:] if os.getenv("CHAT_ID") else None),
         "status": "OPEN", "result": None, "max_tp": 0,
     })
     current = {"signals": signals[-500:]}
@@ -1595,9 +1600,9 @@ def print_result(item):
 def main():
     started = time.time()
     log("")
-    log("ARAD CRYPTO PRO V6.5.7 QUALITY ENTRY + OUTCOME TRACKING OURBIT")
+    log("ARAD CRYPTO PRO V7.0 INSTITUTIONAL CONFLUENCE TEST OURBIT")
     log("START: " + now_text())
-    log("MODE: V6.5.7 TEST ONLY | stricter entry filters | no orders")
+    log("MODE: V7 TEST ONLY | institutional confluence filters | no orders")
     log("BASE URL: " + BASE_URL)
     log("V7 PATCH: SMC + FVG + OB + liquidity + VWAP + volume profile + candle delta proxy + strict confluence gate")
 
