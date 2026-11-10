@@ -1,0 +1,23 @@
+{
+  "signals": [
+    {
+      "id": "INJ_USDT|LONG|EARLY|1794289524",
+      "symbol": "INJ_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 8.015,
+      "sl": 7.933215384339369,
+      "tp": [
+        8.096784615660631,
+        8.137676923490949
+      ],
+      "created_at": 1794289524,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1303,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
+    }
+  ]
+}
