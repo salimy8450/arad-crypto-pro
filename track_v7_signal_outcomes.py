@@ -184,8 +184,9 @@ def main():
             msg = ("📊 ARAD | نتیجه سیگنال\n"
                    "نماد: {} | جهت: {} | نوع: {}\n"
                    "ورود: {} | نتیجه: {}{}\n"
-                   "آمار قطعی: برد {} / باخت {} | نرخ برد: {:.1f}%\n"
-                   "موارد مبهم: {} | منقضی: {}").format(
+                   "آمار تحویل‌تأییدشده: برد {} / باخت {} | نرخ TP1: {:.1f}%\\n"
+                   "TP2: {} ({:.1f}%) | TP3: {} ({:.1f}%)\\n"
+                   "مبهم: {} | منقضی: {}").format(
                        s["symbol"],s["direction"],s.get("alert_type","?"),fmt_price(s["entry"]),
                        label,tp_text,wins,losses,rate,tp2,tp2_rate,tp3,tp3_rate,ambiguous,expired)
             if not telegram(msg):
