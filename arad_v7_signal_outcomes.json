@@ -531,6 +531,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MELANIA_USDT|SHORT|EARLY|1794289575",
+      "symbol": "MELANIA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.05656,
+      "sl": 0.05675570928124832,
+      "tp": [
+        0.05636429071875168,
+        0.05626643607812752
+      ],
+      "created_at": 1794289575,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1331,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
