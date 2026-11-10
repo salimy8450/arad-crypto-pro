@@ -398,6 +398,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ALLO_USDT|SHORT|EARLY|1794289562",
+      "symbol": "ALLO_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.14852,
+      "sl": 0.14909803375253888,
+      "tp": [
+        0.14794196624746114,
+        0.14765294937119172
+      ],
+      "created_at": 1794289562,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1324,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
