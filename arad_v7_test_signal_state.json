@@ -238,5 +238,35 @@
     "type": "WATCH",
     "sent_at": 1794293533,
     "trigger": ""
+  },
+  "LUMIA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794294217,
+    "trigger": "15M_RANGE_BREAK"
+  },
+  "TRUMPSOL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794294217,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "MAVIA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794294218,
+    "trigger": "FIRST_BEARISH_15M_CANDLE"
+  },
+  "FOGO_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794294219,
+    "trigger": ""
+  },
+  "SQD_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794294220,
+    "trigger": ""
+  },
+  "TRIA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794294219,
+    "trigger": ""
   }
 }
