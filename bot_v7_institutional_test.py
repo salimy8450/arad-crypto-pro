@@ -1539,7 +1539,6 @@ def save_outcome_signal(item, alert_type):
         "first_candle_time": ((created + 299) // 300) * 300,
         "delivery_status": "TELEGRAM_API_ACCEPTED" if LAST_TELEGRAM_MESSAGE_ID else "UNVERIFIED_DELIVERY",
         "telegram_message_id": LAST_TELEGRAM_MESSAGE_ID,
-        "chat_id_fingerprint": (str(os.getenv("CHAT_ID", ""))[-4:] if os.getenv("CHAT_ID") else None),
         "status": "OPEN", "result": None, "max_tp": 0,
     })
     current = {"signals": signals[-500:]}
