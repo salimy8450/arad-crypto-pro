@@ -142,5 +142,45 @@
   "CBRS_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794289584
+  },
+  "ADA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794290569,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "USUAL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794290569,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "BCH_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794290570,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "ETH_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794290570,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "NEAR_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794290571,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "MRNA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794290571,
+    "trigger": ""
+  },
+  "SPCX_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794290572,
+    "trigger": ""
+  },
+  "BTC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794290572,
+    "trigger": ""
   }
 }
