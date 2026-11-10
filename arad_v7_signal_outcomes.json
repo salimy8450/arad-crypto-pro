@@ -436,6 +436,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ICNT_USDT|SHORT|EARLY|1794289565",
+      "symbol": "ICNT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.2956,
+      "sl": 0.3009141836023845,
+      "tp": [
+        0.29028581639761547,
+        0.2876287245964232
+      ],
+      "created_at": 1794289565,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1326,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
