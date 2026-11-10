@@ -132,6 +132,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TAC_USDT|LONG|EARLY|1794289536",
+      "symbol": "TAC_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.000933,
+      "sl": 0.0009249785989732955,
+      "tp": [
+        0.0009410214010267046,
+        0.0009450321015400569
+      ],
+      "created_at": 1794289536,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1310,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
