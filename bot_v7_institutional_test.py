@@ -81,6 +81,10 @@ EXCLUDED_BASES = {
     "MSFT", "GOOGL", "GOOG", "AAPL", "AMZN", "NVDA", "META", "TSLA",
     "AVGO", "AMD", "NFLX", "COIN", "MSTR", "TQQQ", "SQQQ",
     "PAXG", "XAUT", "XPT", "XPD", "XAU", "XAG", "GOLD", "SILVER",
+    # Additional synthetic equity / ETF / commodity contracts observed in V7.1.
+    "SPY", "QQQ", "SOXL", "SOXS", "SOXSX", "USO", "NATGAS", "NG",
+    "INTC", "MU", "MRNA", "SKHYNIX", "SNDK", "COHR", "SPCX", "NBIS",
+    "ASTS", "IREN", "CRCL", "SMSN", "BMNR",
 }
 NON_CRYPTO_CLASS_WORDS = (
     "STOCK", "EQUITY", "ETF", "COMMODITY", "METAL", "FOREX",
@@ -183,7 +187,11 @@ def is_target_symbol(symbol, contract=None):
         return False
     if isinstance(contract, dict):
         # Field names vary between exchange contract-detail versions.
-        for key in ("category", "assetClass", "asset_class", "typeName", "displayName", "underlyingType"):
+        for key in (
+            "category", "assetClass", "asset_class", "typeName", "displayName",
+            "underlyingType", "underlying", "instrumentType", "productType",
+            "contractType", "sector", "industry", "baseCoinName", "underlyingName"
+        ):
             value = str(contract.get(key, "")).upper()
             if value and any(word in value for word in NON_CRYPTO_CLASS_WORDS):
                 return False
@@ -656,7 +664,10 @@ def institutional_self_test():
     assert is_target_symbol("MSFT_USDT") is False
     assert is_target_symbol("PAXG_USDT") is False
     assert is_target_symbol("ABC_USDT", {"category": "STOCK"}) is False
-    log("V7.1 SELF-TEST: PASS (VWAP / VOLUME PROFILE / SMC / CRYPTO FILTER)")
+    for synthetic in ("SPY_USDT", "QQQ_USDT", "SOXL_USDT", "NATGAS_USDT", "MRNA_USDT", "INTC_USDT"):
+        assert is_target_symbol(synthetic) is False
+    assert is_target_symbol("SOL_USDT") is True
+    log("V7.2 SELF-TEST: PASS (VWAP / VOLUME PROFILE / SMC / SYNTHETIC FILTER)")
 
 def micro_breakout_signal(candles, direction, min_volume_ratio=MIN_VOLUME_RATIO):
     """A directional break of the prior 4 completed candles; volume is checked separately."""
@@ -1051,13 +1062,16 @@ def analyze_stage3(candidate):
     pullback_path = near_pullback and trigger5
     continuation_path = continuation5
     first_candle_path = first_candle15 == direction and (trigger5 or micro5)
+    micro_break_path = micro5 and m5["trend"] == direction and momentum_ok
     entry_path = (
         "PULLBACK" if pullback_path
         else "MOMENTUM_CONTINUATION" if continuation_path
+        else "MICRO_BREAKOUT" if micro_break_path
         else "FIRST_CANDLE_15M" if first_candle_path
         else "NONE"
     )
-    trigger_ok = pullback_path or continuation_path or first_candle_path
+    trigger_ok = pullback_path or continuation_path or micro_break_path or first_candle_path
+    candidate["micro_break_path"] = micro_break_path
     candidate["first_candle15"] = first_candle15
     candidate["first_candle_path"] = first_candle_path
     candidate["entry_path"] = entry_path
@@ -1118,8 +1132,10 @@ def detect_second_candle_pump_dump(candles, live_price):
     impulse_low = min(c["low"] for c in prior)
     impulse_pct = (prior[-1]["close"] - prior[0]["open"]) / max(prior[0]["open"], 1e-12) * 100.0
     impulse_atr_signed = (prior[-1]["close"] - prior[0]["open"]) / m["atr"]
-    recent_vol = sum(c["volume"] for c in prior[-3:]) / 3.0
-    base_vol = sum(c["volume"] for c in candles[-23:-3]) / 20.0
+    # Include the first reversal candle in the spike check; previously the
+    # volume calculation sampled only candles BEFORE that reversal candle.
+    recent_vol = (sum(c["volume"] for c in prior[-2:]) + first["volume"]) / 3.0
+    base_vol = sum(c["volume"] for c in candles[-24:-4]) / 20.0
     vol_multiple = recent_vol / base_vol if base_vol > 0 else 0.0
     abnormal_up = impulse_pct >= 3.0 or impulse_atr_signed >= 3.5
     abnormal_down = impulse_pct <= -3.0 or impulse_atr_signed <= -3.5
@@ -1721,9 +1737,9 @@ def print_result(item):
             item["structure_ok"], item.get("structure", "NONE")
         ))
     if "pullback_path" in item:
-        log("ENTRY PATH CHECK: PULLBACK={} | CONTINUATION={} | FIRST_CANDLE={} | TRIGGER_OK={}".format(
+        log("ENTRY PATH CHECK: PULLBACK={} | CONTINUATION={} | MICRO_BREAK={} | FIRST_CANDLE={} | TRIGGER_OK={}".format(
             item.get("pullback_path"), item.get("continuation_path"),
-            item.get("first_candle_path", False), item.get("trigger_ok")
+            item.get("micro_break_path", False), item.get("first_candle_path", False), item.get("trigger_ok")
         ))
     if item.get("rejection_reason"):
         log("CONFIRMATION BLOCK: {}".format(item["rejection_reason"]))
@@ -1784,7 +1800,7 @@ def main():
 
     log("ELIGIBLE CONTRACTS: {}".format(len(universe)))
     log("STAGE 1 SCAN COUNT: {}".format(len(selected)))
-    log("NON-CRYPTO CLASS FILTER: active | synthetic equities/ETFs/commodities excluded where metadata is available")
+    log("NON-CRYPTO CLASS FILTER: metadata + observed synthetic-underlier denylist active")
 
     # Independent 15m early-entry scan across the FULL eligible universe, not only Stage 2 candidates.
     early_alerts = []
