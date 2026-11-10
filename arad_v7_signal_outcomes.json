@@ -227,6 +227,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "QNT_USDT|SHORT|EARLY|1794289545",
+      "symbol": "QNT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 191.54,
+      "sl": 192.40202117110138,
+      "tp": [
+        190.6779788288986,
+        190.2469682433479
+      ],
+      "created_at": 1794289545,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1315,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
