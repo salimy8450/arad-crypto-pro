@@ -94,6 +94,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "KAT_USDT|SHORT|EARLY|1794289533",
+      "symbol": "KAT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.003349,
+      "sl": 0.0033684879629844802,
+      "tp": [
+        0.0033295120370155197,
+        0.0033197680555232794
+      ],
+      "created_at": 1794289533,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1308,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
