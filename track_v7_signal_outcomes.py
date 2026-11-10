@@ -162,12 +162,20 @@ def main():
         losses = sum(1 for s in verified if s.get("result")=="LOSS_SL")
         tp2 = sum(1 for s in verified if s.get("result")=="WIN_TP1" and int(s.get("max_tp",0)) >= 2)
         tp3 = sum(1 for s in verified if s.get("result")=="WIN_TP1" and int(s.get("max_tp",0)) >= 3)
+        tp4 = sum(1 for s in verified if s.get("result")=="WIN_TP1" and int(s.get("max_tp",0)) >= 4)
+        early_done = [s for s in verified if s.get("alert_type") == "EARLY" and s.get("result") in ("WIN_TP1", "LOSS_SL")]
+        confirmed_done = [s for s in verified if s.get("alert_type") == "CONFIRMED" and s.get("result") in ("WIN_TP1", "LOSS_SL")]
+        early_wins = sum(1 for s in early_done if s.get("result") == "WIN_TP1")
+        confirmed_wins = sum(1 for s in confirmed_done if s.get("result") == "WIN_TP1")
+        early_rate = 100.0 * early_wins / len(early_done) if early_done else 0.0
+        confirmed_rate = 100.0 * confirmed_wins / len(confirmed_done) if confirmed_done else 0.0
         ambiguous = sum(1 for s in completed if s.get("result")=="AMBIGUOUS_SAME_CANDLE")
         expired = sum(1 for s in completed if s.get("result")=="EXPIRED_24H")
         decisive = wins + losses
         rate = (100.0*wins/decisive) if decisive else 0.0
         tp2_rate = (100.0*tp2/decisive) if decisive else 0.0
         tp3_rate = (100.0*tp3/decisive) if decisive else 0.0
+        tp4_rate = (100.0*tp4/decisive) if decisive else 0.0
         for s in resolved:
             result = s["result"]
             if result == "UNVERIFIED_DELIVERY":
@@ -188,10 +196,10 @@ def main():
                    "TP2: {} ({:.1f}%) | TP3: {} ({:.1f}%)\n"
                    "مبهم: {} | منقضی: {}").format(
                        s["symbol"],s["direction"],s.get("alert_type","?"),fmt_price(s["entry"]),
-                       label,tp_text,wins,losses,rate,tp2,tp2_rate,tp3,tp3_rate,ambiguous,expired)
+                       label,tp_text,wins,losses,rate,tp2,tp2_rate,tp3,tp3_rate,tp4,tp4_rate,early_rate,len(early_done),confirmed_rate,len(confirmed_done),ambiguous,expired)
             if not telegram(msg):
                 log("Outcome saved but Telegram notification failed")
-        log("JOURNAL SAVED | verified wins={} losses={} TP2={} TP3={} ambiguous={} expired={}".format(wins,losses,tp2,tp3,ambiguous,expired))
+        log("JOURNAL SAVED | verified wins={} losses={} TP2={} TP3={} TP4={} EARLY={} CONFIRMED={} ambiguous={} expired={}".format(wins,losses,tp2,tp3,tp4,len(early_done),len(confirmed_done),ambiguous,expired))
     else:
         log("No signal reached TP1/SL; journal unchanged")
 
