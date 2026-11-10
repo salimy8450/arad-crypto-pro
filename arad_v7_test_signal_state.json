@@ -230,9 +230,9 @@
     "trigger": "FIRST_BULLISH_15M_CANDLE"
   },
   "TA_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794293532,
-    "trigger": ""
+    "type": "EARLY",
+    "sent_at": 1794320228,
+    "trigger": "15M_SWING_LOW_RECLAIM"
   },
   "ZIL_USDT|SHORT": {
     "type": "WATCH",
@@ -267,6 +267,41 @@
   "TRIA_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794294219,
+    "trigger": ""
+  },
+  "PHA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794320229,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "PIEVERSE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794320229,
+    "trigger": "15M_SWING_LOW_RECLAIM"
+  },
+  "SOPH_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794320230,
+    "trigger": "FIRST_BEARISH_15M_CANDLE"
+  },
+  "TREE_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794320230,
+    "trigger": "FIRST_BEARISH_15M_CANDLE"
+  },
+  "HBAR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794320231,
+    "trigger": ""
+  },
+  "WLD_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794320231,
+    "trigger": ""
+  },
+  "OP_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794320232,
     "trigger": ""
   }
 }
