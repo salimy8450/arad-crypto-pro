@@ -651,7 +651,12 @@ def institutional_self_test():
     assert rolling_vwap(sample) is not None
     assert volume_profile(sample) is not None
     assert smart_money_context(sample, "LONG")["ready"] is True
-    log("V7 SELF-TEST: PASS (VWAP / VOLUME PROFILE / SMC CONTEXT)")
+    assert is_target_symbol("BTC_USDT") is True
+    assert is_target_symbol("PEPE_USDT") is True
+    assert is_target_symbol("MSFT_USDT") is False
+    assert is_target_symbol("PAXG_USDT") is False
+    assert is_target_symbol("ABC_USDT", {"category": "STOCK"}) is False
+    log("V7.1 SELF-TEST: PASS (VWAP / VOLUME PROFILE / SMC / CRYPTO FILTER)")
 
 def micro_breakout_signal(candles, direction, min_volume_ratio=MIN_VOLUME_RATIO):
     """A directional break of the prior 4 completed candles; volume is checked separately."""
