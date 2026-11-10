@@ -193,7 +193,8 @@ def main():
                    "نماد: {} | جهت: {} | نوع: {}\n"
                    "ورود: {} | نتیجه: {}{}\n"
                    "آمار تحویل‌تأییدشده: برد {} / باخت {} | نرخ TP1: {:.1f}%\n"
-                   "TP2: {} ({:.1f}%) | TP3: {} ({:.1f}%)\n"
+                   "TP2: {} ({:.1f}%) | TP3: {} ({:.1f}%) | TP4: {} ({:.1f}%)\n"
+                   "EARLY: {:.1f}% ({}) | CONFIRMED: {:.1f}% ({})\n"
                    "مبهم: {} | منقضی: {}").format(
                        s["symbol"],s["direction"],s.get("alert_type","?"),fmt_price(s["entry"]),
                        label,tp_text,wins,losses,rate,tp2,tp2_rate,tp3,tp3_rate,tp4,tp4_rate,early_rate,len(early_done),confirmed_rate,len(confirmed_done),ambiguous,expired)
