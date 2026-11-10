@@ -550,6 +550,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BHARTIARTL_USDT|LONG|EARLY|1794289577",
+      "symbol": "BHARTIARTL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 22.037,
+      "sl": 22.018981500000002,
+      "tp": [
+        22.055018499999996,
+        22.064027749999994
+      ],
+      "created_at": 1794289577,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1332,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
