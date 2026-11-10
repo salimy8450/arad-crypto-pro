@@ -37,6 +37,11 @@ REQUEST_TIMEOUT = 18
 REQUEST_PAUSE = 0.12
 
 MIN_VOLUME_RATIO = 0.75
+# Conservative estimated all-in round-trip trading cost (fees + slippage).
+# Adjust to the user's actual Ourbit fee tier before using live trades.
+ESTIMATED_ROUND_TRIP_COST_PCT = 0.0015
+MIN_EARLY_NET_RR = 0.80
+MIN_EARLY_STRUCTURE_ROOM_R = 1.25
 MIN_SCORE_WATCH = 5
 MIN_SCORE_TRADE = 8
 MIN_RR = 1.30
@@ -1282,6 +1287,38 @@ def detect_second_candle_pump_dump(candles, live_price):
     }
 
 
+def early_risk_quality(candles, direction, entry, stop, target):
+    """
+    Reject early alerts when nearby 15m structure blocks TP1 or estimated
+    round-trip costs leave too little net reward relative to stop risk.
+    Fee/slippage is an estimate, not an exchange fee quote.
+    """
+    risk = abs(entry - stop)
+    gross_reward = abs(target - entry)
+    if risk <= 0 or gross_reward <= 0 or len(candles) < 22:
+        return False, "INVALID_RISK_PLAN", 0.0, 0.0
+
+    estimated_cost = entry * ESTIMATED_ROUND_TRIP_COST_PCT
+    net_reward = gross_reward - estimated_cost
+    net_rr = net_reward / risk if net_reward > 0 else 0.0
+    if net_rr < MIN_EARLY_NET_RR:
+        return False, "COST_ADJUSTED_RR", net_rr, 0.0
+
+    # Use completed candles before the signal candle; do not use the live candle.
+    structure = candles[-22:-1]
+    if direction == "SHORT":
+        nearest_level = min(x["low"] for x in structure)
+        room = entry - nearest_level
+    else:
+        nearest_level = max(x["high"] for x in structure)
+        room = nearest_level - entry
+
+    room_r = room / risk if room > 0 else 0.0
+    if room_r < MIN_EARLY_STRUCTURE_ROOM_R:
+        return False, "NEARBY_SUPPORT_RESISTANCE", net_rr, room_r
+    return True, "PASS", net_rr, room_r
+
+
 def detect_early_15m(candles, live_price):
     """
     Detect early continuation OR a confirmed 15m swing-rejection reversal.
@@ -1440,10 +1477,20 @@ def early_entry_message(item):
         "",
         "نماد: {}".format(item["symbol"]),
         "جهت: {}".format(direction_fa),
-        "قیمت/ورود لحظه هشدار: {}".format(format_price(item["entry"])),
-        "حد ضرر: {}".format(format_price(item["sl"])),
-        "TP1: {}".format(format_price(item["tp"][0])),
-        "TP2: {}".format(format_price(item["tp"][1])),
+        *(
+            [
+                "ورود: صادر نشده؛ این فقط هشدار اولیه است",
+                "سطح ابطال ایده: {}".format(format_price(item["sl"])),
+                "هدف‌ها: پس از تأیید کندل دوم محاسبه می‌شوند",
+            ] if not str(item.get("trigger", "")).startswith("SECOND_CANDLE_") else [
+                "قیمت/ورود لحظه هشدار: {}".format(format_price(item["entry"])),
+                "حد ضرر: {}".format(format_price(item["sl"])),
+                "TP1: {}".format(format_price(item["tp"][0])),
+                "TP2: {}".format(format_price(item["tp"][1])),
+                "R/R خالص تخمینی: {:.2f}".format(item.get("net_rr", 0.0)),
+                "فضای ساختاری تا حمایت/مقاومت: {:.2f}R".format(item.get("structure_room_r", 0.0)),
+            ]
+        ),
         "RSI 15m: {:.1f} | حجم: {:.2f}x".format(item["m15"]["rsi"], item["m15"]["volume_ratio"]),
         "محرک: {} | قدرت بدنه: {:.0f}%".format(item["trigger"], item["body_ratio"] * 100),
         "امتیاز شروع حرکت: {}".format(item["score"]),
@@ -1453,7 +1500,7 @@ def early_entry_message(item):
         "",
         ("✅ کندل دوم برگشت را تأیید کرده؛ قبل از ورود فاصله قیمت تا ورود و حدضرر را بررسی کن."
          if str(item.get("trigger", "")).startswith("SECOND_CANDLE_")
-         else "⚠️ این فقط هشدار کندل اول است؛ تا تأیید کندل دوم وارد نشو."),
+         else "⚠️ فقط WATCH؛ ورود/حدسود صادر نشده است. تا بسته‌شدن و تأیید کندل دوم وارد نشو."),
         "حرکت قبلی: {:.2f}% | نسبت حجم: {:.2f}x".format(item.get("pump_dump_pct", 0.0), item.get("pump_dump_volume", 0.0)),
         "زمان: " + now_text(),
     ]
@@ -2051,10 +2098,22 @@ def main():
                 early_context = smart_money_context(candles15_early, early["direction"])
                 early["institutional"] = early_context
                 if early_context.get("ready") and early_context.get("score", 0) >= 2:
-                    early_alerts.append(early)
-                    log("V7 EARLY PASS: {} {} SCORE {} | CONFLUENCE {}".format(
-                        item["symbol"], early["direction"], early["score"], early_context["score"]
-                    ))
+                    risk_ok, risk_reason, net_rr, room_r = early_risk_quality(
+                        candles15_early, early["direction"], early["entry"],
+                        early["sl"], early["tp"][0]
+                    )
+                    early["net_rr"] = net_rr
+                    early["structure_room_r"] = room_r
+                    if risk_ok:
+                        early_alerts.append(early)
+                        log("V7 EARLY PASS: {} {} SCORE {} | CONFLUENCE {} | NET_RR {:.2f} | ROOM {:.2f}R".format(
+                            item["symbol"], early["direction"], early["score"],
+                            early_context["score"], net_rr, room_r
+                        ))
+                    else:
+                        log("V7 EARLY BLOCK: {} {} | {}".format(
+                            item["symbol"], early["direction"], risk_reason
+                        ))
                 else:
                     log("V7 EARLY BLOCK: {} {} | insufficient institutional confluence".format(
                         item["symbol"], early["direction"]
