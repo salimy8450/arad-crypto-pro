@@ -303,6 +303,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ALT_USDT|SHORT|EARLY|1794289552",
+      "symbol": "ALT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.005307,
+      "sl": 0.00531663995986445,
+      "tp": [
+        0.00529736004013555,
+        0.005292540060203325
+      ],
+      "created_at": 1794289552,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1319,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
