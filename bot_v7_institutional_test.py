@@ -18,10 +18,11 @@ from datetime import datetime, timezone
 BASE_URL = "https://futures.ourbit.io"
 TELEGRAM_API = "https://api.telegram.org"
 
-MAX_STAGE1_SYMBOLS = 350  # liquidity-ranked universe cap for reliable 5m scheduling
-MAX_STAGE2_SYMBOLS = 80
-MAX_STAGE3_SYMBOLS = 60
-MAX_TELEGRAM_WATCH_ALERTS = 5  # cap WATCH messages per test run to prevent Telegram flooding
+MAX_STAGE1_SYMBOLS = 120  # smaller universe to keep scheduled runs below the interval
+MAX_STAGE2_SYMBOLS = 35
+MAX_STAGE3_SYMBOLS = 25
+MAX_TELEGRAM_WATCH_ALERTS = 3
+MAX_EARLY_ALERTS = 5
 
 TIMEFRAMES = {
     "5m": ("Min5", 300),
@@ -75,10 +76,16 @@ CANDLE_CACHE = {}
 
 EXCLUDED_BASES = {
     "USDC", "USDE", "DAI", "FDUSD", "TUSD", "USDP",
-    "EUR", "GBP", "AUD", "JPY", "BRL", "TRY",
-    "INDEX", "TEST",
+    "EUR", "GBP", "AUD", "JPY", "BRL", "TRY", "INDEX", "TEST",
+    # Exchange-listed synthetic equities, ETFs and commodity references.
+    "MSFT", "GOOGL", "GOOG", "AAPL", "AMZN", "NVDA", "META", "TSLA",
+    "AVGO", "AMD", "NFLX", "COIN", "MSTR", "TQQQ", "SQQQ",
+    "PAXG", "XAUT", "XPT", "XPD", "XAU", "XAG", "GOLD", "SILVER",
 }
-METAL_KEYWORDS = ("GOLD", "XAU", "SILVER", "XAG")
+NON_CRYPTO_CLASS_WORDS = (
+    "STOCK", "EQUITY", "ETF", "COMMODITY", "METAL", "FOREX",
+    "INDEX", "SHARE", "TOKENIZED STOCK", "PRECIOUS",
+)
 PRINT_ALL_STAGES = True
 
 
@@ -164,13 +171,26 @@ def contract_is_enabled(contract):
     return state in ("0", "ENABLED", "ONLINE", "TRADING", "ACTIVE", "OPEN")
 
 
-def is_target_symbol(symbol):
-    symbol = str(symbol).upper()
+def is_target_symbol(symbol, contract=None):
+    """Conservative crypto-perpetual filter; reject explicit non-crypto metadata."""
+    symbol = str(symbol).upper().strip()
     if not symbol.endswith("_USDT"):
         return False
     base = symbol[:-5]
     if base in EXCLUDED_BASES or len(base) < 2:
         return False
+    if any(word in base for word in ("GOLD", "SILVER", "XAU", "XAG", "OIL", "BRENT", "WTI")):
+        return False
+    if isinstance(contract, dict):
+        # Field names vary between exchange contract-detail versions.
+        for key in ("category", "assetClass", "asset_class", "typeName", "displayName", "underlyingType"):
+            value = str(contract.get(key, "")).upper()
+            if value and any(word in value for word in NON_CRYPTO_CLASS_WORDS):
+                return False
+        for key in ("isStock", "isCommodity", "isEtf", "isIndex"):
+            value = contract.get(key)
+            if value is True or str(value).lower() in ("1", "true", "yes"):
+                return False
     return True
 
 
@@ -1073,6 +1093,79 @@ def analyze_stage3(candidate):
     return candidate
 
 
+def detect_second_candle_pump_dump(candles, live_price):
+    """
+    Confirm a pump/dump reversal only on the SECOND closed 15m candle.
+    The first reversal candle must sweep an extreme after an abnormal impulse;
+    the second candle must close beyond the first candle's high/low.
+    """
+    if len(candles) < 35 or live_price <= 0:
+        return None
+    first, second = candles[-2], candles[-1]
+    prior = candles[-14:-2]
+    if len(prior) < 10:
+        return None
+    m = market_metrics(candles)
+    if m["atr"] <= 0:
+        return None
+
+    impulse_high = max(c["high"] for c in prior)
+    impulse_low = min(c["low"] for c in prior)
+    impulse_pct = (prior[-1]["close"] - prior[0]["open"]) / max(prior[0]["open"], 1e-12) * 100.0
+    impulse_atr = abs(prior[-1]["close"] - prior[0]["open"]) / m["atr"]
+    recent_vol = sum(c["volume"] for c in prior[-3:]) / 3.0
+    base_vol = sum(c["volume"] for c in candles[-23:-3]) / 20.0
+    vol_multiple = recent_vol / base_vol if base_vol > 0 else 0.0
+    abnormal_up = impulse_pct >= 3.0 or impulse_atr >= 3.5
+    abnormal_down = impulse_pct <= -3.0 or impulse_atr >= 3.5
+    abnormal_volume = vol_multiple >= 1.60
+
+    first_range = max(first["high"] - first["low"], 1e-12)
+    second_range = max(second["high"] - second["low"], 1e-12)
+    second_body = abs(second["close"] - second["open"]) / second_range
+    second_close_pos = (second["close"] - second["low"]) / second_range
+    live_gap = abs(live_price - second["close"]) / m["atr"]
+    if live_gap > 0.60 or second_range / m["atr"] > 2.20:
+        return None
+
+    # Pump top: sweep the local high, bearish first candle, then second candle
+    # closes below the first candle low with a decisive body.
+    top_sweep = first["high"] >= impulse_high and first["close"] < first["open"]
+    short_confirm = (
+        abnormal_up and abnormal_volume and top_sweep
+        and second["close"] < second["open"]
+        and second["close"] < first["low"]
+        and second_body >= 0.35 and second_close_pos <= 0.35
+    )
+    # Dump bottom: sweep the local low, bullish first candle, then second candle
+    # closes above the first candle high with a decisive body.
+    bottom_sweep = first["low"] <= impulse_low and first["close"] > first["open"]
+    long_confirm = (
+        abnormal_down and abnormal_volume and bottom_sweep
+        and second["close"] > second["open"]
+        and second["close"] > first["high"]
+        and second_body >= 0.35 and second_close_pos >= 0.65
+    )
+    if not (short_confirm or long_confirm):
+        return None
+
+    direction = "SHORT" if short_confirm else "LONG"
+    entry = live_price
+    buffer = max(m["atr"] * 0.18, entry * 0.0006)
+    stop = max(first["high"], second["high"]) + buffer if direction == "SHORT" else min(first["low"], second["low"]) - buffer
+    risk = abs(stop - entry)
+    if risk <= 0 or risk / m["atr"] > 1.80:
+        return None
+    targets = [entry - risk, entry - risk * 1.5] if direction == "SHORT" else [entry + risk, entry + risk * 1.5]
+    return {
+        "symbol": "", "direction": direction, "price": entry, "entry": entry,
+        "sl": stop, "tp": targets, "score": 9,
+        "m15": m, "body_ratio": second_body,
+        "breakout": True, "trigger": "SECOND_CANDLE_CONFIRMATION",
+        "pump_dump_pct": abs(impulse_pct), "pump_dump_volume": vol_multiple,
+    }
+
+
 def detect_early_15m(candles, live_price):
     """
     Detect early continuation OR a confirmed 15m swing-rejection reversal.
@@ -1081,6 +1174,10 @@ def detect_early_15m(candles, live_price):
     """
     if len(candles) < 30 or live_price <= 0:
         return None
+    # A pump/dump reversal is promoted only after its second closed candle confirms.
+    second_confirmation = detect_second_candle_pump_dump(candles, live_price)
+    if second_confirmation:
+        return second_confirmation
     m = market_metrics(candles)
     if not m["atr"] or not m["ema9"] or not m["ema21"]:
         return None
@@ -1219,7 +1316,8 @@ def early_entry_message(item):
     direction_fa = "فروش SHORT" if item["direction"] == "SHORT" else "خرید LONG"
     lines = [
         "🟠 ARAD CRYPTO PRO | EARLY 15M ENTRY",
-        "هشدار شروع حرکت بر اساس کندل بسته ۱۵ دقیقه؛ شامل اولین کندل صعودی/نزولی، شکست یا برگشت از سقف/کف",
+        ("تأیید کندل دوم پس از پامپ/دامپ غیرعادی؛ بررسی ورود با حدضرر" if item.get("trigger") == "SECOND_CANDLE_CONFIRMATION"
+         else "هشدار کندل اول ۱۵ دقیقه؛ هنوز ورود قطعی نیست و باید کندل دوم تأیید کند"),
         "",
         "نماد: {}".format(item["symbol"]),
         "جهت: {}".format(direction_fa),
@@ -1234,7 +1332,10 @@ def early_entry_message(item):
         "VWAP: {}".format(format_price(item["institutional"]["vwap"]) if item.get("institutional", {}).get("vwap") else "N/A"),
         "POC: {}".format(format_price(item["institutional"]["profile"]["poc"]) if item.get("institutional", {}).get("profile") else "N/A"),
         "",
-        "⚠️ هشدار زودهنگام است؛ منتظر مدیریت ریسک باش. سفارش خودکار ثبت نمی‌شود.",
+        ("✅ کندل دوم شکست تأیید را انجام داده؛ قبل از ورود فاصله قیمت تا ورود و حدضرر را بررسی کن."
+         if item.get("trigger") == "SECOND_CANDLE_CONFIRMATION"
+         else "⚠️ این فقط هشدار کندل اول است؛ تا تأیید کندل دوم وارد نشو."),
+        "پامپ/دامپ: {:.2f}% | حجم موج: {:.2f}x".format(item.get("pump_dump_pct", 0.0), item.get("pump_dump_volume", 0.0)),
         "زمان: " + now_text(),
     ]
     return "\n".join(lines)
@@ -1357,8 +1458,11 @@ def should_send_alert(state, item, alert_type):
     # Avoid repeating an early entry if another alert type for the same
     # symbol/direction was sent moments earlier.
     if alert_type == "EARLY" and previous.get("type") in ("EARLY", "WATCH", "CONFIRMED"):
-        if now - int(previous.get("sent_at", 0)) < EARLY_COOLDOWN_MIN * 60:
-            return False
+        is_second_candle = item.get("trigger") == "SECOND_CANDLE_CONFIRMATION"
+        prior_was_first_candle = previous.get("type") == "EARLY" and previous.get("trigger") != "SECOND_CANDLE_CONFIRMATION"
+        if not (is_second_candle and prior_was_first_candle):
+            if now - int(previous.get("sent_at", 0)) < EARLY_COOLDOWN_MIN * 60:
+                return False
     if previous.get("type") == alert_type and now - int(previous.get("sent_at", 0)) < cooldown * 60:
         return False
     return True
@@ -1366,7 +1470,7 @@ def should_send_alert(state, item, alert_type):
 
 def mark_alert_sent(state, item, alert_type):
     key = item["symbol"] + "|" + item["direction"]
-    state[key] = {"type": alert_type, "sent_at": int(time.time())}
+    state[key] = {"type": alert_type, "sent_at": int(time.time()), "trigger": item.get("trigger", "")}
     # Keep the state file small.
     cutoff = int(time.time()) - 7 * 24 * 60 * 60
     return {k: v for k, v in state.items() if int(v.get("sent_at", 0)) >= cutoff}
@@ -1443,8 +1547,11 @@ def dispatch_alerts(early_items, watch_items, confirmed_items):
     for item in early_items:
         if should_send_alert(state, item, "EARLY"):
             if telegram_send(early_entry_message(item)):
-                journal_ok = save_outcome_signal(item, "EARLY")
-                log("EARLY OUTCOME TRACKING: {}".format("ON" if journal_ok else "FAILED"))
+                if item.get("trigger") == "SECOND_CANDLE_CONFIRMATION":
+                    journal_ok = save_outcome_signal(item, "EARLY")
+                    log("SECOND-CANDLE OUTCOME TRACKING: {}".format("ON" if journal_ok else "FAILED"))
+                else:
+                    log("FIRST-CANDLE ALERT: heads-up only; no trade outcome recorded")
                 state = mark_alert_sent(state, item, "EARLY")
                 sent_any = True
         else:
@@ -1478,6 +1585,10 @@ def dispatch_alerts(early_items, watch_items, confirmed_items):
 def save_outcome_signal(item, alert_type):
     """Persist actionable alerts for later TP1/SL-first evaluation."""
     if alert_type == "EARLY":
+        # First-candle heads-up is not an entry and must not pollute trade outcomes.
+        if item.get("trigger") != "SECOND_CANDLE_CONFIRMATION":
+            log("OUTCOME JOURNAL SKIP: first-candle heads-up is not an entry")
+            return False
         entry = as_float(item.get("entry"))
         stop = as_float(item.get("sl"))
         targets = item.get("tp", [])
@@ -1621,11 +1732,11 @@ def print_result(item):
 def main():
     started = time.time()
     log("")
-    log("ARAD CRYPTO PRO V7.0 INSTITUTIONAL CONFLUENCE TEST OURBIT")
+    log("ARAD CRYPTO PRO V7.1 INSTITUTIONAL REVERSAL TEST OURBIT")
     log("START: " + now_text())
     log("MODE: V7 TEST ONLY | institutional confluence filters | no orders")
     log("BASE URL: " + BASE_URL)
-    log("V7 PATCH: SMC + FVG + OB + liquidity + VWAP + volume profile + candle delta proxy + strict confluence gate")
+    log("V7.1 PATCH: crypto classification filter + pump/dump second-candle confirmation + capped alerts + smaller scan universe")
 
     if os.getenv("ARAD_SELF_TEST", "0") == "1":
         institutional_self_test()
@@ -1650,7 +1761,7 @@ def main():
         if not isinstance(contract, dict):
             continue
         symbol = str(contract.get("symbol", "")).upper()
-        if not symbol or not is_target_symbol(symbol) or not contract_is_enabled(contract):
+        if not symbol or not is_target_symbol(symbol, contract) or not contract_is_enabled(contract):
             continue
         ticker = tickers.get(symbol, {})
         price = ticker_price(ticker)
@@ -1659,17 +1770,11 @@ def main():
         universe.append({"symbol": symbol, "ticker": ticker, "turnover": ticker_turnover(ticker)})
 
     universe.sort(key=lambda x: x["turnover"], reverse=True)
-    pinned = [x for x in universe if any(word in x["symbol"] for word in METAL_KEYWORDS)]
     selected = universe[:MAX_STAGE1_SYMBOLS]
-    selected_symbols = {x["symbol"] for x in selected}
-    for item in pinned:
-        if item["symbol"] not in selected_symbols:
-            selected.append(item)
-            selected_symbols.add(item["symbol"])
 
     log("ELIGIBLE CONTRACTS: {}".format(len(universe)))
     log("STAGE 1 SCAN COUNT: {}".format(len(selected)))
-    log("METAL CONTRACTS PINNED: {}".format(len(pinned)))
+    log("NON-CRYPTO CLASS FILTER: active | synthetic equities/ETFs/commodities excluded where metadata is available")
 
     # Independent 15m early-entry scan across the FULL eligible universe, not only Stage 2 candidates.
     early_alerts = []
@@ -1695,7 +1800,8 @@ def main():
         time.sleep(REQUEST_PAUSE)
 
     early_alerts.sort(key=lambda x: (x["score"], x["m15"]["volume_ratio"]), reverse=True)
-    log("EARLY 15M SIGNALS FOUND: {}".format(len(early_alerts)))
+    early_alerts = early_alerts[:MAX_EARLY_ALERTS]
+    log("EARLY 15M SIGNALS FOUND (TOP {}): {}".format(MAX_EARLY_ALERTS, len(early_alerts)))
 
     stage1 = []
     for i, item in enumerate(selected, 1):
