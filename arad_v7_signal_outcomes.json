@@ -56,6 +56,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MERL_USDT|SHORT|EARLY|1794289529",
+      "symbol": "MERL_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.03205,
+      "sl": 0.03214473186936225,
+      "tp": [
+        0.03195526813063775,
+        0.03190790219595663
+      ],
+      "created_at": 1794289529,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1306,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
