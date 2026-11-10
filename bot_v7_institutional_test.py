@@ -667,7 +667,7 @@ def institutional_self_test():
     for synthetic in ("SPY_USDT", "QQQ_USDT", "SOXL_USDT", "NATGAS_USDT", "MRNA_USDT", "INTC_USDT"):
         assert is_target_symbol(synthetic) is False
     assert is_target_symbol("SOL_USDT") is True
-    log("V7.2 SELF-TEST: PASS (VWAP / VOLUME PROFILE / SMC / SYNTHETIC FILTER)")
+    log("V7.3 SELF-TEST: PASS (VWAP / VOLUME PROFILE / SMC / SYNTHETIC FILTER)")
 
 def micro_breakout_signal(candles, direction, min_volume_ratio=MIN_VOLUME_RATIO):
     """A directional break of the prior 4 completed candles; volume is checked separately."""
@@ -1112,6 +1112,101 @@ def analyze_stage3(candidate):
     return candidate
 
 
+def detect_second_candle_reversal(candles, live_price):
+    """
+    Confirm a general 15m swing-reversal on the SECOND closed candle.
+    Candle -2 must sweep and reclaim a recent extreme; candle -1 must
+    close decisively beyond the first candle. No intrabar candle is used.
+    """
+    if len(candles) < 35 or live_price <= 0:
+        return None
+
+    first, second = candles[-2], candles[-1]
+    prior = candles[-14:-2]
+    if len(prior) < 10:
+        return None
+
+    m = market_metrics(candles)
+    if m["atr"] <= 0:
+        return None
+
+    prior_high = max(c["high"] for c in prior)
+    prior_low = min(c["low"] for c in prior)
+    first_range = max(first["high"] - first["low"], 1e-12)
+    second_range = max(second["high"] - second["low"], 1e-12)
+    first_body = abs(first["close"] - first["open"]) / first_range
+    first_close_pos = (first["close"] - first["low"]) / first_range
+    first_upper_wick = (first["high"] - max(first["open"], first["close"])) / first_range
+    first_lower_wick = (min(first["open"], first["close"]) - first["low"]) / first_range
+    second_body = abs(second["close"] - second["open"]) / second_range
+    second_close_pos = (second["close"] - second["low"]) / second_range
+
+    # First candle must sweep and reclaim a local extreme with a rejection.
+    short_first = (
+        first["high"] > prior_high
+        and first["close"] < prior_high
+        and first["close"] < first["open"]
+        and (first_upper_wick >= 0.25 or first_body >= 0.45)
+    )
+    long_first = (
+        first["low"] < prior_low
+        and first["close"] > prior_low
+        and first["close"] > first["open"]
+        and (first_lower_wick >= 0.25 or first_body >= 0.45)
+    )
+
+    # Second candle must close beyond the first candle's extreme, not merely
+    # turn green/red. This is the actual confirmation event.
+    short_second = (
+        second["close"] < second["open"]
+        and second["close"] < first["low"]
+        and second_body >= 0.35
+        and second_close_pos <= 0.35
+    )
+    long_second = (
+        second["close"] > second["open"]
+        and second["close"] > first["high"]
+        and second_body >= 0.35
+        and second_close_pos >= 0.65
+    )
+
+    live_gap_atr = abs(live_price - second["close"]) / m["atr"]
+    second_range_atr = second_range / m["atr"]
+    if live_gap_atr > 0.60 or second_range_atr > 2.20:
+        return None
+    if m["volume_ratio"] < 0.75:
+        return None
+
+    direction = None
+    trigger = None
+    if short_first and short_second and 35.0 <= m["rsi"] <= 76.0:
+        direction, trigger = "SHORT", "SECOND_CANDLE_SWING_HIGH_CONFIRMATION"
+    elif long_first and long_second and 24.0 <= m["rsi"] <= 65.0:
+        direction, trigger = "LONG", "SECOND_CANDLE_SWING_LOW_CONFIRMATION"
+    if not direction:
+        return None
+
+    entry = live_price
+    buffer = max(m["atr"] * 0.15, entry * 0.0005)
+    stop = max(first["high"], second["high"]) + buffer if direction == "SHORT" else min(first["low"], second["low"]) - buffer
+    risk = abs(stop - entry)
+    if risk <= 0 or risk / m["atr"] > 1.80:
+        return None
+
+    targets = (
+        [entry - risk, entry - risk * 1.5]
+        if direction == "SHORT"
+        else [entry + risk, entry + risk * 1.5]
+    )
+    return {
+        "symbol": "", "direction": direction, "price": entry, "entry": entry,
+        "sl": stop, "tp": targets, "score": 9, "m15": m,
+        "body_ratio": second_body, "breakout": True,
+        "trigger": trigger, "reversal_type": "SWING_REVERSAL_SECOND_CANDLE",
+        "pump_dump_pct": 0.0, "pump_dump_volume": m["volume_ratio"],
+    }
+
+
 def detect_second_candle_pump_dump(candles, live_price):
     """
     Confirm a pump/dump reversal only on the SECOND closed 15m candle.
@@ -1199,6 +1294,9 @@ def detect_early_15m(candles, live_price):
     second_confirmation = detect_second_candle_pump_dump(candles, live_price)
     if second_confirmation:
         return second_confirmation
+    swing_confirmation = detect_second_candle_reversal(candles, live_price)
+    if swing_confirmation:
+        return swing_confirmation
     m = market_metrics(candles)
     if not m["atr"] or not m["ema9"] or not m["ema21"]:
         return None
@@ -1337,7 +1435,7 @@ def early_entry_message(item):
     direction_fa = "فروش SHORT" if item["direction"] == "SHORT" else "خرید LONG"
     lines = [
         "🟠 ARAD CRYPTO PRO | EARLY 15M ENTRY",
-        ("تأیید کندل دوم پس از پامپ/دامپ غیرعادی؛ بررسی ورود با حدضرر" if item.get("trigger") == "SECOND_CANDLE_CONFIRMATION"
+        ("تأیید کندل دوم برگشت؛ شکست سقف/کف کندل اول ثبت شده است" if str(item.get("trigger", "")).startswith("SECOND_CANDLE_")
          else "هشدار کندل اول ۱۵ دقیقه؛ هنوز ورود قطعی نیست و باید کندل دوم تأیید کند"),
         "",
         "نماد: {}".format(item["symbol"]),
@@ -1353,8 +1451,8 @@ def early_entry_message(item):
         "VWAP: {}".format(format_price(item["institutional"]["vwap"]) if item.get("institutional", {}).get("vwap") else "N/A"),
         "POC: {}".format(format_price(item["institutional"]["profile"]["poc"]) if item.get("institutional", {}).get("profile") else "N/A"),
         "",
-        ("✅ کندل دوم شکست تأیید را انجام داده؛ قبل از ورود فاصله قیمت تا ورود و حدضرر را بررسی کن."
-         if item.get("trigger") == "SECOND_CANDLE_CONFIRMATION"
+        ("✅ کندل دوم برگشت را تأیید کرده؛ قبل از ورود فاصله قیمت تا ورود و حدضرر را بررسی کن."
+         if str(item.get("trigger", "")).startswith("SECOND_CANDLE_")
          else "⚠️ این فقط هشدار کندل اول است؛ تا تأیید کندل دوم وارد نشو."),
         "پامپ/دامپ: {:.2f}% | حجم موج: {:.2f}x".format(item.get("pump_dump_pct", 0.0), item.get("pump_dump_volume", 0.0)),
         "زمان: " + now_text(),
@@ -1758,11 +1856,11 @@ def print_result(item):
 def main():
     started = time.time()
     log("")
-    log("ARAD CRYPTO PRO V7.1 INSTITUTIONAL REVERSAL TEST OURBIT")
+    log("ARAD CRYPTO PRO V7.3 SECOND-CANDLE REVERSAL TEST OURBIT")
     log("START: " + now_text())
     log("MODE: V7 TEST ONLY | institutional confluence filters | no orders")
     log("BASE URL: " + BASE_URL)
-    log("V7.1 PATCH: crypto classification filter + pump/dump second-candle confirmation + capped alerts + smaller scan universe")
+    log("V7.3 PATCH: general swing-reversal second-candle confirmation + pump/dump confirmation + preserved HTF/structure/volume/risk gates")
 
     if os.getenv("ARAD_SELF_TEST", "0") == "1":
         institutional_self_test()
