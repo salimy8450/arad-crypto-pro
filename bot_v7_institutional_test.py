@@ -1228,6 +1228,9 @@ def early_entry_message(item):
         "RSI 15m: {:.1f} | حجم: {:.2f}x".format(item["m15"]["rsi"], item["m15"]["volume_ratio"]),
         "محرک: {} | قدرت بدنه: {:.0f}%".format(item["trigger"], item["body_ratio"] * 100),
         "امتیاز شروع حرکت: {}".format(item["score"]),
+        "همگرایی V7: {}".format(", ".join(item.get("institutional", {}).get("reasons", [])) or "ندارد"),
+        "VWAP: {}".format(format_price(item["institutional"]["vwap"]) if item.get("institutional", {}).get("vwap") else "N/A"),
+        "POC: {}".format(format_price(item["institutional"]["profile"]["poc"]) if item.get("institutional", {}).get("profile") else "N/A"),
         "",
         "⚠️ هشدار زودهنگام است؛ منتظر مدیریت ریسک باش. سفارش خودکار ثبت نمی‌شود.",
         "زمان: " + now_text(),
@@ -1409,6 +1412,8 @@ def confirmed_message(item):
         "همگرایی نهادی V7: {}".format(", ".join(item.get("institutional", {}).get("reasons", [])) or "ندارد"),
         "VWAP: {}".format(format_price(item["institutional"]["vwap"]) if item.get("institutional", {}).get("vwap") else "N/A"),
         "POC / Value Area: {}".format(format_price(item["institutional"]["profile"]["poc"]) if item.get("institutional", {}).get("profile") else "N/A"),
+        "Open Interest: {}".format(item["institutional"]["orderflow"].get("open_interest") if item["institutional"]["orderflow"].get("open_interest") is not None else "N/A"),
+        "Funding Rate: {}".format(item["institutional"]["orderflow"].get("funding_rate") if item["institutional"]["orderflow"].get("funding_rate") is not None else "N/A"),
         "امتیاز تحلیلی: {} امتیاز".format(item["score"]),
         "",
         "⚠️ این پیام تحلیل است، نه دستور معامله. سفارش خودکار ثبت نشده است.",
@@ -1660,8 +1665,17 @@ def main():
             early = detect_early_15m(candles15_early, ticker_price(item["ticker"]))
             if early:
                 early["symbol"] = item["symbol"]
-                early_alerts.append(early)
-                log("EARLY 15M SIGNAL: {} {} SCORE {}".format(item["symbol"], early["direction"], early["score"]))
+                early_context = smart_money_context(candles15_early, early["direction"])
+                early["institutional"] = early_context
+                if early_context.get("ready") and early_context.get("score", 0) >= 2:
+                    early_alerts.append(early)
+                    log("V7 EARLY PASS: {} {} SCORE {} | CONFLUENCE {}".format(
+                        item["symbol"], early["direction"], early["score"], early_context["score"]
+                    ))
+                else:
+                    log("V7 EARLY BLOCK: {} {} | insufficient institutional confluence".format(
+                        item["symbol"], early["direction"]
+                    ))
         time.sleep(REQUEST_PAUSE)
 
     early_alerts.sort(key=lambda x: (x["score"], x["m15"]["volume_ratio"]), reverse=True)
