@@ -1794,6 +1794,142 @@ def save_outcome_signal(item, alert_type):
         return False
 
 
+
+def update_outcome_journal():
+    """Evaluate saved EARLY second-candle and CONFIRMED signals against later closed 15m candles."""
+    token = os.getenv("GITHUB_TOKEN", "").strip()
+    repo = os.getenv("GITHUB_REPOSITORY", "").strip()
+    branch = os.getenv("GITHUB_REF_NAME", "main").strip()
+    if not token or not repo:
+        log("OUTCOME EVALUATION SKIP: GitHub token/repository missing")
+        return
+
+    url = "https://api.github.com/repos/{}/contents/{}".format(repo, urllib.parse.quote(OUTCOME_FILE))
+    headers = {
+        "Authorization": "Bearer " + token,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    try:
+        response = http_json(url + "?ref=" + urllib.parse.quote(branch), headers=headers)
+        sha = response.get("sha")
+        raw = base64.b64decode(response.get("content", "")).decode("utf-8")
+        journal = json.loads(raw) if raw.strip() else {"signals": []}
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            log("OUTCOME EVALUATION: no journal yet")
+            return
+        log("OUTCOME EVALUATION READ ERROR: HTTP {}".format(exc.code))
+        return
+    except Exception as exc:
+        log("OUTCOME EVALUATION READ ERROR: {}".format(str(exc)[:160]))
+        return
+
+    signals = journal.get("signals", []) if isinstance(journal, dict) else []
+    if not isinstance(signals, list) or not signals:
+        log("OUTCOME EVALUATION: journal empty")
+        return
+
+    now = int(time.time())
+    changed = False
+    evaluated = 0
+    for signal in signals:
+        if not isinstance(signal, dict) or signal.get("status") != "OPEN":
+            continue
+        symbol = str(signal.get("symbol", "")).upper()
+        direction = str(signal.get("direction", "")).upper()
+        entry = as_float(signal.get("entry"))
+        stop = as_float(signal.get("sl"))
+        targets = [as_float(x) for x in signal.get("tp", []) if as_float(x) > 0]
+        created = int(as_float(signal.get("created_at")))
+        if not symbol or direction not in ("LONG", "SHORT") or entry <= 0 or stop <= 0 or not targets or created <= 0:
+            signal["status"] = "INVALID_RECORD"
+            signal["result"] = "INVALID_RECORD"
+            signal["evaluated_at"] = now
+            changed = True
+            continue
+
+        # Keep a bounded 48-hour evaluation window using closed 15m candles.
+        if now - created > 48 * 60 * 60:
+            signal["status"] = "EXPIRED"
+            signal["result"] = "NO_TP1_OR_SL_WITHIN_48H"
+            signal["evaluated_at"] = now
+            changed = True
+            continue
+
+        candles = get_candles(symbol, "15m")
+        time.sleep(REQUEST_PAUSE)
+        if not candles:
+            continue
+        last_eval = int(as_float(signal.get("evaluated_through", created)))
+        later = [c for c in candles if c["time"] + 900 > max(created, last_eval)]
+        if not later:
+            continue
+
+        for candle in later:
+            if direction == "LONG":
+                hit_sl = candle["low"] <= stop
+                hit_tp1 = candle["high"] >= targets[0]
+                hit_targets = [i + 1 for i, target in enumerate(targets) if candle["high"] >= target]
+            else:
+                hit_sl = candle["high"] >= stop
+                hit_tp1 = candle["low"] <= targets[0]
+                hit_targets = [i + 1 for i, target in enumerate(targets) if candle["low"] <= target]
+
+            if hit_targets:
+                signal["max_tp"] = max(int(as_float(signal.get("max_tp"))), max(hit_targets))
+
+            if hit_sl and hit_tp1:
+                signal["status"] = "AMBIGUOUS_SAME_CANDLE"
+                signal["result"] = "TP1_AND_SL_IN_SAME_15M_CANDLE"
+                signal["closed_at"] = int(candle["time"] + 900)
+                signal["evaluated_through"] = int(candle["time"] + 900)
+                changed = True
+                break
+            if hit_sl:
+                signal["status"] = "CLOSED_SL"
+                signal["result"] = "SL_FIRST"
+                signal["closed_at"] = int(candle["time"] + 900)
+                signal["evaluated_through"] = int(candle["time"] + 900)
+                changed = True
+                break
+            if hit_tp1:
+                signal["status"] = "CLOSED_TP1"
+                signal["result"] = "TP1_FIRST"
+                signal["closed_at"] = int(candle["time"] + 900)
+                signal["evaluated_through"] = int(candle["time"] + 900)
+                changed = True
+                break
+
+            signal["evaluated_through"] = int(candle["time"] + 900)
+            changed = True
+        if signal.get("evaluated_through"):
+            signal["evaluated_at"] = now
+            evaluated += 1
+
+    if not changed:
+        log("OUTCOME EVALUATION: no new closed-candle outcomes")
+        return
+
+    body = {
+        "message": "Evaluate ARAD signal outcomes from closed 15m candles",
+        "content": base64.b64encode(json.dumps({"signals": signals[-500:]}, ensure_ascii=False, indent=2).encode("utf-8")).decode("ascii"),
+        "branch": branch,
+        "sha": sha,
+    }
+    try:
+        saved = http_json(url, method="PUT", payload=body, headers=headers, timeout=25)
+        ok = isinstance(saved, dict) and bool(saved.get("content"))
+        log("OUTCOME EVALUATION SAVED: {} records checked | {}".format(evaluated, "OK" if ok else "FAILED"))
+        if ok:
+            counts = {}
+            for item in signals:
+                result = str(item.get("result") or "OPEN")
+                counts[result] = counts.get(result, 0) + 1
+            log("OUTCOME JOURNAL SUMMARY: {}".format(" | ".join("{}={}".format(k, v) for k, v in sorted(counts.items()))))
+    except Exception as exc:
+        log("OUTCOME EVALUATION SAVE ERROR: {}".format(str(exc)[:180]))
+
 def print_result(item):
     log("")
     log("=" * 58)
@@ -1871,6 +2007,8 @@ def main():
         log("PING: FAILED")
         return
     log("PING: OK")
+
+    update_outcome_journal()
 
     contracts = get_contracts()
     if not contracts:
