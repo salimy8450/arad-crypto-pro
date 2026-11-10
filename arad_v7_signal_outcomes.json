@@ -569,6 +569,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ESPORTS_USDT|SHORT|EARLY|1794289579",
+      "symbol": "ESPORTS_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.008917,
+      "sl": 0.009024451152983145,
+      "tp": [
+        0.008809548847016855,
+        0.008755823270525282
+      ],
+      "created_at": 1794289579,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1333,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
