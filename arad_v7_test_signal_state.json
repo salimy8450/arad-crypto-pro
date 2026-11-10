@@ -303,5 +303,25 @@
     "type": "WATCH",
     "sent_at": 1794320232,
     "trigger": ""
+  },
+  "APR_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794344012,
+    "trigger": "15M_EMA9_CROSS"
+  },
+  "UNI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794344012,
+    "trigger": ""
+  },
+  "HOT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794344013,
+    "trigger": ""
+  },
+  "DOT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794344013,
+    "trigger": ""
   }
 }
