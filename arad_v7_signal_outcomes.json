@@ -151,6 +151,25 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MSFT_USDT|LONG|EARLY|1794289538",
+      "symbol": "MSFT_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 547.04,
+      "sl": 546.38648,
+      "tp": [
+        547.6935199999999,
+        548.02028
+      ],
+      "created_at": 1794289538,
+      "first_candle_time": 1794289800,
+      "delivery_status": "TELEGRAM_API_ACCEPTED",
+      "telegram_message_id": 1311,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
