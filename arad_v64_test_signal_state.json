@@ -57,7 +57,7 @@
   },
   "ADA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794177083
+    "sent_at": 1794353515
   },
   "NEAR_USDT|SHORT": {
     "type": "WATCH",
@@ -170,5 +170,21 @@
   "BIO_USDT|SHORT": {
     "type": "CONFIRMED",
     "sent_at": 1794334590
+  },
+  "UNI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794353513
+  },
+  "SQQQ_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794353514
+  },
+  "TRX_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794353514
+  },
+  "XAU_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794353515
   }
 }
