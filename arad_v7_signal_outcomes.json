@@ -173,9 +173,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1311,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794291900
     },
     {
       "id": "SAFE_USDT|SHORT|EARLY|1794289540",
@@ -192,9 +193,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1312,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794292200
     },
     {
       "id": "PAXG_USDT|LONG|EARLY|1794289542",
@@ -230,9 +232,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1314,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794292800
     },
     {
       "id": "QNT_USDT|SHORT|EARLY|1794289545",
@@ -368,9 +371,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1321,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794292200
     },
     {
       "id": "NANYA_USDT|LONG|EARLY|1794289558",
@@ -465,9 +469,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1326,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794291000
     },
     {
       "id": "GOOGL_USDT|LONG|EARLY|1794289567",
@@ -503,9 +508,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1328,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794291300
     },
     {
       "id": "CARV_USDT|SHORT|EARLY|1794289571",
@@ -542,9 +548,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1330,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794291300
     },
     {
       "id": "MELANIA_USDT|SHORT|EARLY|1794289575",
@@ -581,9 +588,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1332,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794292800
     },
     {
       "id": "ESPORTS_USDT|SHORT|EARLY|1794289579",
@@ -600,9 +608,10 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1333,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794292500
     },
     {
       "id": "PUMPFUN_USDT|SHORT|EARLY|1794289581",
