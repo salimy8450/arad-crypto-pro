@@ -587,6 +587,8 @@ def smart_money_context(candles, direction):
     if vwap_aligned: reasons.append("VWAP_SIDE_OK")
     if profile_aligned: reasons.append("POC_SIDE_OK")
     if delta_aligned: reasons.append("CANDLE_DELTA_PROXY_OK")
+    if direction == "SHORT" and equal_highs: reasons.append("EQUAL_HIGHS_LIQUIDITY")
+    if direction == "LONG" and equal_lows: reasons.append("EQUAL_LOWS_LIQUIDITY")
     return {
         "ready": True, "score": score, "reasons": reasons,
         "bos": bos_up if direction == "LONG" else bos_down,
@@ -1411,10 +1413,18 @@ def confirmed_message(item):
         "نسبت سود به زیان تا TP6: {:.2f}".format(plan["rr"]),
         "همگرایی نهادی V7: {}".format(", ".join(item.get("institutional", {}).get("reasons", [])) or "ندارد"),
         "VWAP: {}".format(format_price(item["institutional"]["vwap"]) if item.get("institutional", {}).get("vwap") else "N/A"),
-        "POC / Value Area: {}".format(format_price(item["institutional"]["profile"]["poc"]) if item.get("institutional", {}).get("profile") else "N/A"),
+        "POC / Value Area: {}".format(
+            "{} | VAL {} | VAH {}".format(
+                format_price(item["institutional"]["profile"]["poc"]),
+                format_price(item["institutional"]["profile"]["val"]),
+                format_price(item["institutional"]["profile"]["vah"])
+            ) if item.get("institutional", {}).get("profile") else "N/A"
+        ),
         "Open Interest: {}".format(item["institutional"]["orderflow"].get("open_interest") if item["institutional"]["orderflow"].get("open_interest") is not None else "N/A"),
         "Funding Rate: {}".format(item["institutional"]["orderflow"].get("funding_rate") if item["institutional"]["orderflow"].get("funding_rate") is not None else "N/A"),
         "امتیاز تحلیلی: {} امتیاز".format(item["score"]),
+        "مدیریت پیشنهادی: بعد از تثبیت TP1 حدضرر به ورود با احتساب کارمزد منتقل شود؛ بعد از TP2 تریلینگ پشت آخرین سوئینگ 5m/EMA21.",
+        "TP3/TP4 فقط با حفظ ساختار و مومنتوم دنبال شود؛ در برگشت ساختار، خروج مقدم است.",
         "",
         "⚠️ این پیام تحلیل است، نه دستور معامله. سفارش خودکار ثبت نشده است.",
         "زمان: " + now_text(),
@@ -1569,6 +1579,13 @@ def print_result(item):
     log("15M BOS: {} | SWEEP: {} | MICRO BREAK: {}".format(
         item.get("bos15", False), item.get("sweep", False), item.get("micro15", False)
     ))
+    if item.get("institutional"):
+        inst = item["institutional"]
+        log("V7 CONFLUENCE: {} | SCORE {}".format(", ".join(inst.get("reasons", [])), inst.get("score", 0)))
+        log("VWAP: {} | POC: {}".format(
+            format_price(inst["vwap"]) if inst.get("vwap") else "N/A",
+            format_price(inst["profile"]["poc"]) if inst.get("profile") else "N/A"
+        ))
     log("STRUCTURE SOURCE: {}".format(
         "BOS" if item.get("bos15") else "SWEEP" if item.get("sweep") else
         "MICRO_BREAKOUT" if item.get("micro15") else
