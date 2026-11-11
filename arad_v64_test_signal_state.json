@@ -186,5 +186,25 @@
   "XAU_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794353515
+  },
+  "SECZ_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794366251
+  },
+  "CHZ_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794366251
+  },
+  "ZEC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794366252
+  },
+  "IDOL_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794366252
+  },
+  "GRAM_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794366252
   }
 }
