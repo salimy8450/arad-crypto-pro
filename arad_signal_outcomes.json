@@ -1450,6 +1450,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ONDS_USDT|LONG|EARLY|1794413761",
+      "symbol": "ONDS_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 5.876,
+      "sl": 5.82457183566811,
+      "tp": [
+        5.92742816433189,
+        5.953142246497835
+      ],
+      "created_at": 1794413761,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
