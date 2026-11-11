@@ -1195,6 +1195,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "VST_USDT|LONG|EARLY|1794413730",
+      "symbol": "VST_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 135.75,
+      "sl": 135.11403416904443,
+      "tp": [
+        136.38596583095557,
+        136.70394874643335
+      ],
+      "created_at": 1794413730,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
