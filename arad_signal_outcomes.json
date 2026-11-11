@@ -1331,6 +1331,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "PORTAL_USDT|LONG|EARLY|1794413747",
+      "symbol": "PORTAL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.01272,
+      "sl": 0.012564222484162373,
+      "tp": [
+        0.012875777515837628,
+        0.01295366627375644
+      ],
+      "created_at": 1794413747,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
