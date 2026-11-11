@@ -1161,6 +1161,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BLACKBERRY_USDT|LONG|EARLY|1794413725",
+      "symbol": "BLACKBERRY_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 9.54,
+      "sl": 9.414935224380669,
+      "tp": [
+        9.66506477561933,
+        9.727597163428996
+      ],
+      "created_at": 1794413725,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
