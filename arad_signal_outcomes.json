@@ -1467,6 +1467,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ANTHROPIC_USDT|LONG|EARLY|1794413763",
+      "symbol": "ANTHROPIC_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 1410.9,
+      "sl": 1395.1715591837392,
+      "tp": [
+        1426.628440816261,
+        1434.4926612243914
+      ],
+      "created_at": 1794413763,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
