@@ -1229,6 +1229,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BEAM_USDT|LONG|EARLY|1794413735",
+      "symbol": "BEAM_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.004435,
+      "sl": 0.004395969131484149,
+      "tp": [
+        0.004474030868515851,
+        0.004493546302773776
+      ],
+      "created_at": 1794413735,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
