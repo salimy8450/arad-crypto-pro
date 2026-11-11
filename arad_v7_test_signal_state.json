@@ -320,9 +320,9 @@
     "trigger": ""
   },
   "DOT_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794344013,
-    "trigger": ""
+    "type": "EARLY",
+    "sent_at": 1794411205,
+    "trigger": "FIRST_BEARISH_15M_CANDLE"
   },
   "POL_USDT|SHORT": {
     "type": "EARLY",
@@ -347,6 +347,21 @@
   "SXT_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794358750,
+    "trigger": ""
+  },
+  "SECZ_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794411206,
+    "trigger": ""
+  },
+  "ZHIPU_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794411206,
+    "trigger": ""
+  },
+  "YAGEO_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794411206,
     "trigger": ""
   }
 }
