@@ -9,7 +9,7 @@ import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================================
-# ARAD CRYPTO PRO V5.9 OURBIT — 15M DECISION / 5M ENTRY
+# ARAD CRYPTO PRO V5.9.1 OURBIT — QUALITY FIX
 # 15M PRIMARY ANALYSIS | 5M EARLY ENTRY | 1H CONTEXT ONLY
 # EARLY REVERSAL WATCH + CONFIRMED TELEGRAM ALERTS
 # MTF | BOS | SWEEP | STRUCTURE-BASED TARGETS | RISK FILTERS
@@ -36,7 +36,7 @@ REQUEST_PAUSE = 0.12
 
 MIN_VOLUME_RATIO = 0.80
 MIN_SCORE_WATCH = 5
-MIN_SCORE_TRADE = 7
+MIN_SCORE_TRADE = 9
 MIN_RR = 1.30
 MAX_STOP_ATR = 2.00
 MAX_LIVE_DIFF = 0.50
@@ -53,6 +53,9 @@ EXCLUDED_BASES = {
     "USDC", "USDE", "DAI", "FDUSD", "TUSD", "USDP",
     "EUR", "GBP", "AUD", "JPY", "BRL", "TRY",
     "INDEX", "TEST",
+    "MSFT", "AAPL", "AMZN", "NVDA", "TSLA", "META", "GOOG", "GOOGL",
+    "AVGO", "NFLX", "AMD", "INTC", "COIN", "MSTR", "PLTR", "ORCL",
+    "CRM", "ADBE", "QCOM", "JPM", "BAC", "WMT", "COST", "DIS",
 }
 METAL_KEYWORDS = ("GOLD", "XAU", "SILVER", "XAG")
 PRINT_ALL_STAGES = True
@@ -78,7 +81,7 @@ def as_float(value, default=0.0):
 
 def http_json(url, method="GET", payload=None, headers=None, timeout=REQUEST_TIMEOUT):
     body = None
-    request_headers = {"User-Agent": "ARAD-CRYPTO-PRO/5.9", "Accept": "application/json"}
+    request_headers = {"User-Agent": "ARAD-CRYPTO-PRO/5.9.1", "Accept": "application/json"}
     if headers:
         request_headers.update(headers)
     if payload is not None:
@@ -140,13 +143,27 @@ def contract_is_enabled(contract):
     return state in ("0", "ENABLED", "ONLINE", "TRADING", "ACTIVE", "OPEN")
 
 
-def is_target_symbol(symbol):
+def is_target_symbol(symbol, contract=None):
+    """Accept USDT-margined crypto contracts only; reject known non-crypto assets."""
     symbol = str(symbol).upper()
     if not symbol.endswith("_USDT"):
         return False
     base = symbol[:-5]
     if base in EXCLUDED_BASES or len(base) < 2:
         return False
+    if isinstance(contract, dict):
+        metadata = " ".join(
+            str(contract.get(key, "")) for key in (
+                "type", "category", "assetType", "underlyingType",
+                "productType", "displayName", "name"
+            )
+        ).lower()
+        non_crypto_terms = (
+            "stock", "equity", "share", "forex", "currency pair",
+            "commodity", "index", "tokenized stock", "precious metal"
+        )
+        if any(term in metadata for term in non_crypto_terms):
+            return False
     return True
 
 
@@ -574,14 +591,16 @@ def analyze_stage3(candidate):
     score += 1 if structure5 == direction else 0
     score += int(sweep5) + int(m5["trend"] == direction) + int(pullback_ok(m5, direction))
     candidate.update({"m5": m5, "score": score, "bos5": bos5})
-    # The 1h trend is the only higher-timeframe gate.
-    # Neutral 1h does not veto a 15m setup; an explicitly opposite 1h trend still blocks it.
-    higher_aligned = candidate["m1"]["trend"] in (direction, "NEUTRAL")
+    # 1h is context only: an opposite 1h trend may reduce the score,
+    # but must never veto a valid 15m decision plus 5m entry.
+    if candidate["m1"]["trend"] not in (direction, "NEUTRAL"):
+        score = max(0, score - 1)
+        candidate["score"] = score
     volume_ok = candidate["m15"]["volume_ratio"] >= MIN_VOLUME_RATIO or m5["volume_ratio"] >= MIN_VOLUME_RATIO
     live_diff = abs(candidate["price"] - m5["price"]) / m5["price"] * 100 if m5["price"] > 0 else 999
     live_ok = live_diff <= MAX_LIVE_DIFF
     confirmed = (
-        score >= MIN_SCORE_TRADE and higher_aligned and candidate["bos15"]
+        score >= MIN_SCORE_TRADE and candidate["bos15"]
         and (bos5 or structure5 == direction) and pullback_ok(m5, direction)
         and volume_ok and live_ok
     )
@@ -735,7 +754,7 @@ def forecast_hours_message_line(forecast):
     if not forecast:
         return "داده کافی برای برآورد چندساعته وجود ندارد."
     direction = {"LONG": "صعودی", "SHORT": "نزولی", "NEUTRAL": "نامشخص"}[forecast["direction"]]
-    return "{} ساعت: {} | اطمینان تخمینی {}٪ | محدوده {} تا {}".format(
+    return "{} ساعت: {} | قدرت سناریوی الگوریتمی {} از 100 | محدوده برآوردی {} تا {}".format(
         forecast["hours"], direction, forecast["confidence"],
         format_price(forecast["low"]), format_price(forecast["high"])
     )
@@ -751,16 +770,16 @@ def watch_message(item):
         "جهت احتمالی: {}".format("خرید LONG" if item["direction"] == "LONG" else "فروش SHORT"),
         "قیمت فعلی: {}".format(format_price(item["price"])),
         "امتیاز تحلیلی: {} امتیاز".format(item["score"]),
-        "1H: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]),
+        "1H (context only): {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]),
         "15M: {} | RSI {:.1f} | حجم {:.2f}x".format(m15["trend"], m15["rsi"], m15["volume_ratio"]),
         "BOS 15m: {}".format("بله" if item["bos15"] else "خیر"),
         "Sweep: {}".format("بله" if item["sweep"] else "خیر"),
         "",
-        "🔮 پیش‌بینی کندل بعدی:",
+        "🔮 برآورد سناریوی کندل بعدی (غیرقطعی):",
         forecast_message_line(item.get("forecast5")),
         forecast_message_line(item.get("forecast15")),
         "",
-        "🔭 سناریوی ۳ ساعت آینده:",
+        "🔭 سناریوی احتمالی ۳ ساعت آینده (غیرقطعی):",
         forecast_hours_message_line(item.get("forecast_hours")),
         "",
         "⚠️ پیش‌بینی‌ها تخمینی‌اند؛ تضمین جهت یا سود نیستند.",
@@ -857,7 +876,7 @@ def main():
     log("")
     log("ARAD CRYPTO PRO V5.9 OURBIT — 15M DECISION / 5M ENTRY")
     log("START: " + now_text())
-    log("MODE: 15M PRIMARY / 5M ENTRY / 1H CONTEXT | WATCH + CONFIRMED | NO ORDERS")
+    log("MODE: 15M PRIMARY / 5M ENTRY / 1H CONTEXT ONLY | MIN CONFIRMED SCORE 9 | NO ORDERS")
     log("BASE URL: " + BASE_URL)
 
     ping = api_get("/api/v1/contract/ping")
@@ -879,7 +898,7 @@ def main():
         if not isinstance(contract, dict):
             continue
         symbol = str(contract.get("symbol", "")).upper()
-        if not symbol or not is_target_symbol(symbol) or not contract_is_enabled(contract):
+        if not symbol or not is_target_symbol(symbol, contract) or not contract_is_enabled(contract):
             continue
         ticker = tickers.get(symbol, {})
         price = ticker_price(ticker)
