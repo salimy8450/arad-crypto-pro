@@ -1382,6 +1382,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SMR_USDT|LONG|EARLY|1794413752",
+      "symbol": "SMR_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 5.388,
+      "sl": 5.329283209656269,
+      "tp": [
+        5.446716790343731,
+        5.476075185515597
+      ],
+      "created_at": 1794413752,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
