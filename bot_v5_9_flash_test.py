@@ -1,0 +1,1068 @@
+import os
+import json
+import time
+import math
+import base64
+import urllib.request
+import urllib.parse
+import urllib.error
+from datetime import datetime, timezone
+
+# ==========================================================
+# ARAD CRYPTO PRO V5.9.2 OURBIT — FLASH MOVE TEST
+# 15M PRIMARY ANALYSIS | 5M EARLY ENTRY | 1H CONTEXT ONLY
+# FLASH MOVE WATCH + EARLY REVERSAL + CONFIRMED TELEGRAM ALERTS
+# MTF | BOS | SWEEP | STRUCTURE-BASED TARGETS | RISK FILTERS
+# ANALYSIS ONLY - NO ORDERS
+# ==========================================================
+
+BASE_URL = "https://futures.ourbit.io"
+TELEGRAM_API = "https://api.telegram.org"
+
+MAX_STAGE1_SYMBOLS = 120
+MAX_STAGE2_SYMBOLS = 35
+MAX_STAGE3_SYMBOLS = 18
+
+TIMEFRAMES = {
+    "1m": ("Min1", 60),
+    "5m": ("Min5", 300),
+    "15m": ("Min15", 900),
+    "1h": ("Min60", 3600),
+    }
+
+CANDLE_LIMIT = 220
+MIN_CANDLES = 80
+REQUEST_TIMEOUT = 18
+REQUEST_PAUSE = 0.12
+
+MIN_VOLUME_RATIO = 0.80
+MIN_SCORE_WATCH = 5
+MIN_SCORE_TRADE = 9
+MIN_RR = 1.30
+MAX_STOP_ATR = 2.00
+MAX_LIVE_DIFF = 0.50
+ATR_SL_MULTIPLIER = 1.20
+PIVOT_LOOKBACK = 12
+PULLBACK_MAX_ATR = 1.50
+
+# Persistent anti-duplicate settings
+WATCH_COOLDOWN_MIN = 45
+CONFIRMED_COOLDOWN_MIN = 60
+STATE_FILE = "arad_signal_state_v59_flash_test.json"
+
+EXCLUDED_BASES = {
+    "USDC", "USDE", "DAI", "FDUSD", "TUSD", "USDP",
+    "EUR", "GBP", "AUD", "JPY", "BRL", "TRY",
+    "INDEX", "TEST",
+    "MSFT", "AAPL", "AMZN", "NVDA", "TSLA", "META", "GOOG", "GOOGL",
+    "AVGO", "NFLX", "AMD", "INTC", "COIN", "MSTR", "PLTR", "ORCL",
+    "CRM", "ADBE", "QCOM", "JPM", "BAC", "WMT", "COST", "DIS",
+}
+METAL_KEYWORDS = ("GOLD", "XAU", "SILVER", "XAG")
+PRINT_ALL_STAGES = True
+
+
+def log(message):
+    print(message, flush=True)
+
+
+def now_text():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+
+def as_float(value, default=0.0):
+    try:
+        if value is None or value == "":
+            return default
+        result = float(value)
+        return result if math.isfinite(result) else default
+    except (TypeError, ValueError):
+        return default
+
+
+def http_json(url, method="GET", payload=None, headers=None, timeout=REQUEST_TIMEOUT):
+    body = None
+    request_headers = {"User-Agent": "ARAD-CRYPTO-PRO/5.9.2", "Accept": "application/json"}
+    if headers:
+        request_headers.update(headers)
+    if payload is not None:
+        body = json.dumps(payload).encode("utf-8")
+        request_headers["Content-Type"] = "application/json"
+    request = urllib.request.Request(url, data=body, headers=request_headers, method=method)
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        raw = response.read().decode("utf-8", errors="replace")
+    return json.loads(raw)
+
+
+def api_get(path, params=None):
+    url = BASE_URL + path
+    if params:
+        url += "?" + urllib.parse.urlencode(params)
+    try:
+        data = http_json(url)
+        if isinstance(data, dict):
+            if data.get("success") is False:
+                return None
+            if data.get("code") not in (None, 0, "0"):
+                return None
+        return data
+    except Exception as exc:
+        log("API ERROR {}: {}".format(path, str(exc)[:160]))
+        return None
+
+
+def extract_data(payload):
+    return payload.get("data", payload) if isinstance(payload, dict) else payload
+
+
+def get_contracts():
+    data = extract_data(api_get("/api/v1/contract/detail"))
+    if isinstance(data, dict):
+        for key in ("contracts", "list", "rows", "data"):
+            if isinstance(data.get(key), list):
+                return data[key]
+    return data if isinstance(data, list) else []
+
+
+def get_tickers():
+    data = extract_data(api_get("/api/v1/contract/ticker"))
+    if isinstance(data, dict):
+        for key in ("list", "rows", "tickers"):
+            if isinstance(data.get(key), list):
+                data = data[key]
+                break
+    result = {}
+    if isinstance(data, list):
+        for item in data:
+            if isinstance(item, dict) and item.get("symbol"):
+                result[str(item["symbol"]).upper()] = item
+    return result
+
+
+def contract_is_enabled(contract):
+    state = str(contract.get("state", contract.get("status", "0"))).upper()
+    return state in ("0", "ENABLED", "ONLINE", "TRADING", "ACTIVE", "OPEN")
+
+
+def is_target_symbol(symbol, contract=None):
+    """Accept USDT-margined crypto contracts only; reject known non-crypto assets."""
+    symbol = str(symbol).upper()
+    if not symbol.endswith("_USDT"):
+        return False
+    base = symbol[:-5]
+    if base in EXCLUDED_BASES or len(base) < 2:
+        return False
+    if isinstance(contract, dict):
+        metadata = " ".join(
+            str(contract.get(key, "")) for key in (
+                "type", "category", "assetType", "underlyingType",
+                "productType", "displayName", "name"
+            )
+        ).lower()
+        non_crypto_terms = (
+            "stock", "equity", "share", "forex", "currency pair",
+            "commodity", "index", "tokenized stock", "precious metal"
+        )
+        if any(term in metadata for term in non_crypto_terms):
+            return False
+    return True
+
+
+def ticker_turnover(ticker):
+    return max(
+        as_float(ticker.get("amount24")),
+        as_float(ticker.get("turnover24")),
+        as_float(ticker.get("quoteVolume")),
+        as_float(ticker.get("volume24")),
+    )
+
+
+def ticker_price(ticker):
+    return as_float(ticker.get("lastPrice", ticker.get("last", ticker.get("close"))))
+
+
+def parse_candles(payload, interval_seconds):
+    data = extract_data(payload)
+    if not isinstance(data, dict):
+        return []
+    times = data.get("time") or data.get("timestamp") or []
+    opens, highs, lows = data.get("open") or [], data.get("high") or [], data.get("low") or []
+    closes = data.get("close") or []
+    volumes = data.get("vol") or data.get("volume") or []
+    candles = []
+
+    if all(isinstance(x, list) for x in (times, opens, highs, lows, closes)):
+        count = min(len(times), len(opens), len(highs), len(lows), len(closes))
+        for i in range(count):
+            ts = as_float(times[i])
+            if ts > 10**12:
+                ts /= 1000.0
+            c = {
+                "time": ts, "open": as_float(opens[i]), "high": as_float(highs[i]),
+                "low": as_float(lows[i]), "close": as_float(closes[i]),
+                "volume": as_float(volumes[i]) if i < len(volumes) else 0.0,
+            }
+            if ts > 0 and min(c["open"], c["high"], c["low"], c["close"]) > 0:
+                candles.append(c)
+    elif isinstance(data, list):
+        for row in data:
+            if isinstance(row, dict):
+                ts = as_float(row.get("time", row.get("timestamp", row.get("t"))))
+                c = {
+                    "time": ts, "open": as_float(row.get("open", row.get("o"))),
+                    "high": as_float(row.get("high", row.get("h"))),
+                    "low": as_float(row.get("low", row.get("l"))),
+                    "close": as_float(row.get("close", row.get("c"))),
+                    "volume": as_float(row.get("vol", row.get("volume", row.get("v")))),
+                }
+            elif isinstance(row, (list, tuple)) and len(row) >= 5:
+                ts = as_float(row[0])
+                c = {
+                    "time": ts, "open": as_float(row[1]), "high": as_float(row[2]),
+                    "low": as_float(row[3]), "close": as_float(row[4]),
+                    "volume": as_float(row[5]) if len(row) > 5 else 0.0,
+                }
+            else:
+                continue
+            if c["time"] > 10**12:
+                c["time"] /= 1000.0
+            if c["time"] > 0 and min(c["open"], c["high"], c["low"], c["close"]) > 0:
+                candles.append(c)
+
+    candles.sort(key=lambda x: x["time"])
+    unique = {c["time"]: c for c in candles}
+    now = time.time()
+    return [c for c in unique.values() if c["time"] + interval_seconds <= now]
+
+
+def get_candles(symbol, timeframe):
+    interval, seconds = TIMEFRAMES[timeframe]
+    end_time = int(time.time())
+    start_time = end_time - seconds * CANDLE_LIMIT
+    payload = api_get(
+        "/api/v1/contract/kline/" + urllib.parse.quote(symbol, safe=""),
+        {"interval": interval, "start": start_time, "end": end_time},
+    )
+    candles = parse_candles(payload, seconds)
+    return candles if len(candles) >= MIN_CANDLES else []
+
+
+def ema(values, period):
+    if len(values) < period:
+        return None
+    multiplier = 2.0 / (period + 1.0)
+    result = sum(values[:period]) / period
+    for value in values[period:]:
+        result = value * multiplier + result * (1.0 - multiplier)
+    return result
+
+
+def rsi(values, period=14):
+    if len(values) < period + 1:
+        return 50.0
+    changes = [values[i] - values[i - 1] for i in range(1, len(values))]
+    gains = [max(x, 0.0) for x in changes]
+    losses = [max(-x, 0.0) for x in changes]
+    avg_gain = sum(gains[:period]) / period
+    avg_loss = sum(losses[:period]) / period
+    for i in range(period, len(gains)):
+        avg_gain = (avg_gain * (period - 1) + gains[i]) / period
+        avg_loss = (avg_loss * (period - 1) + losses[i]) / period
+    if avg_loss == 0:
+        return 100.0
+    rs = avg_gain / avg_loss
+    return 100.0 - 100.0 / (1.0 + rs)
+
+
+def atr(candles, period=14):
+    if len(candles) < period + 1:
+        return 0.0
+    trs = []
+    for i in range(1, len(candles)):
+        cur, prev = candles[i], candles[i - 1]["close"]
+        trs.append(max(cur["high"] - cur["low"], abs(cur["high"] - prev), abs(cur["low"] - prev)))
+    value = sum(trs[:period]) / period
+    for tr in trs[period:]:
+        value = (value * (period - 1) + tr) / period
+    return value
+
+
+def volume_ratio(candles, period=20):
+    if len(candles) < period + 1:
+        return 0.0
+    old = [c["volume"] for c in candles[-period - 1:-1]]
+    average = sum(old) / len(old)
+    return candles[-1]["volume"] / average if average > 0 else 0.0
+
+
+def market_metrics(candles):
+    closes = [c["close"] for c in candles]
+    e9, e21, e50, e200 = (ema(closes, p) for p in (9, 21, 50, 200))
+    if e200 is None:
+        e200 = e50
+    last = closes[-1]
+    trend = "NEUTRAL"
+    if e9 and e21 and e50 and last > e9 > e21 > e50 and last > e200:
+        trend = "LONG"
+    elif e9 and e21 and e50 and last < e9 < e21 < e50 and last < e200:
+        trend = "SHORT"
+    return {
+        "price": last, "ema9": e9, "ema21": e21, "ema50": e50, "ema200": e200,
+        "rsi": rsi(closes), "atr": atr(candles),
+        "volume_ratio": volume_ratio(candles), "trend": trend,
+    }
+
+
+
+def forecast_next_candle(candles, label):
+    """Heuristic forecast from closed candles only; not a guaranteed prediction."""
+    if len(candles) < 30:
+        return None
+    closes = [c["close"] for c in candles]
+    last = candles[-1]
+    current = closes[-1]
+    current_atr = atr(candles[-60:], 14)
+    if current <= 0 or current_atr <= 0:
+        return None
+    e9, e21, e50 = ema(closes, 9), ema(closes, 21), ema(closes, 50)
+    r = rsi(closes, 14)
+    vr = volume_ratio(candles, 20)
+    momentum = (closes[-1] - closes[-4]) / current_atr
+    body = (last["close"] - last["open"]) / max(last["high"] - last["low"], current_atr * 0.05)
+    structure, sweep, bos = structure_signal(candles)
+    score = 0.0
+    score += 1.5 if e9 and e21 and e9 > e21 else -1.5 if e9 and e21 and e9 < e21 else 0
+    score += 1.0 if e21 and current > e21 else -1.0 if e21 and current < e21 else 0
+    score += 0.75 if e50 and current > e50 else -0.75 if e50 and current < e50 else 0
+    score += 1.0 if r >= 55 else -1.0 if r <= 45 else 0
+    score += max(-1.25, min(1.25, momentum * 0.55))
+    score += max(-0.75, min(0.75, body * 0.60))
+    score += 0.75 if structure == "LONG" else -0.75 if structure == "SHORT" else 0
+    score += 0.25 if sweep and structure == "LONG" else -0.25 if sweep and structure == "SHORT" else 0
+    if vr < 0.65:
+        score *= 0.80
+    direction = "LONG" if score >= 1.0 else "SHORT" if score <= -1.0 else "NEUTRAL"
+    confidence = min(85, 50 + int(abs(score) * 4.5))
+    if direction == "NEUTRAL":
+        confidence = min(confidence, 59)
+    strength = min(1.0, abs(score) / 5.0)
+    sign = 1 if direction == "LONG" else -1 if direction == "SHORT" else 0
+    drift = sign * current_atr * 0.22 * strength
+    band = current_atr * 0.55
+    center = current + drift
+    return {
+        "timeframe": label, "direction": direction, "confidence": confidence,
+        "reference": current,
+        # Keep the scenario close band on the forecast side of its own reference.
+        # The reference may differ slightly from the live ticker price.
+        "close_low": (
+            max(current * 0.000001, center - current_atr * 0.18, current)
+            if direction == "LONG" else
+            max(current * 0.000001, min(center - current_atr * 0.18, current))
+        ),
+        "close_high": (
+            max(center + current_atr * 0.18, current)
+            if direction == "LONG" else
+            min(center + current_atr * 0.18, current)
+        ),
+        "low": max(current * 0.000001, current - band),
+        "high": current + band,
+        "atr_pct": current_atr / current * 100,
+        "volume_ratio": vr, "score": round(score, 2),
+    }
+
+
+def forecast_next_hours(candles1h, hours=3):
+    """Broad multi-hour scenario using closed 1h candles only."""
+    if len(candles1h) < 50:
+        return None
+    m1 = market_metrics(candles1h)
+    current = candles1h[-1]["close"]
+    current_atr = atr(candles1h[-60:], 14)
+    if current <= 0 or current_atr <= 0:
+        return None
+    closes = [c["close"] for c in candles1h]
+    e9, e21 = ema(closes, 9), ema(closes, 21)
+    momentum = (closes[-1] - closes[-4]) / current_atr
+    score = 0.0
+    score += 1.5 if m1["trend"] == "LONG" else -1.5 if m1["trend"] == "SHORT" else 0
+    score += 0.75 if e9 and e21 and e9 > e21 else -0.75 if e9 and e21 and e9 < e21 else 0
+    score += max(-1.0, min(1.0, momentum * 0.4))
+    score += 0.5 if m1["rsi"] >= 55 else -0.5 if m1["rsi"] <= 45 else 0
+    direction = "LONG" if score >= 1.0 else "SHORT" if score <= -1.0 else "NEUTRAL"
+    confidence = min(85, 50 + int(abs(score) * 5))
+    if direction == "NEUTRAL":
+        confidence = min(confidence, 59)
+    strength = min(1.0, abs(score) / 4.0)
+    sign = 1 if direction == "LONG" else -1 if direction == "SHORT" else 0
+    scale = math.sqrt(max(1, hours))
+    drift = sign * current_atr * 0.30 * strength * scale
+    band = current_atr * 0.90 * scale
+    center = current + drift
+    return {
+        "hours": hours, "direction": direction, "confidence": confidence,
+        "reference": current,
+        "low": max(current * 0.000001, center - band), "high": center + band,
+        "close_low": max(current * 0.000001, center - current_atr * 0.35 * scale),
+        "close_high": center + current_atr * 0.35 * scale,
+        "atr_pct": current_atr / current * 100, "score": round(score, 2),
+    }
+
+
+def structure_signal(candles):
+    if len(candles) < PIVOT_LOOKBACK + 5:
+        return "NONE", False, False
+    last, previous = candles[-1], candles[-2]
+    window = candles[-PIVOT_LOOKBACK - 1:-1]
+    resistance = max(c["high"] for c in window)
+    support = min(c["low"] for c in window)
+    bullish_bos = last["close"] > resistance and previous["close"] <= resistance
+    bearish_bos = last["close"] < support and previous["close"] >= support
+    recent = candles[-5:-1]
+    recent_low = min(c["low"] for c in recent)
+    recent_high = max(c["high"] for c in recent)
+    bullish_sweep = last["low"] < recent_low and last["close"] > recent_low
+    bearish_sweep = last["high"] > recent_high and last["close"] < recent_high
+    if bullish_bos:
+        return "LONG", bullish_sweep, True
+    if bearish_bos:
+        return "SHORT", bearish_sweep, True
+    if bullish_sweep:
+        return "LONG", True, False
+    if bearish_sweep:
+        return "SHORT", True, False
+    return "NONE", False, False
+
+
+
+def detect_flash_move(candles):
+    """
+    Detect an early 1m impulse using CLOSED candles only.
+    This is a WATCH filter, never a trade-entry confirmation.
+    """
+    if len(candles) < 30:
+        return None
+
+    last3 = candles[-3:]
+    previous = candles[-23:-3]
+    if len(previous) < 20:
+        return None
+
+    current = last3[-1]["close"]
+    if current <= 0:
+        return None
+
+    baseline_volume = sum(c["volume"] for c in previous) / len(previous)
+    recent_volume = sum(c["volume"] for c in last3) / len(last3)
+    vol_ratio = recent_volume / baseline_volume if baseline_volume > 0 else 0.0
+
+    move_pct_3m = (last3[-1]["close"] / last3[0]["open"] - 1.0) * 100.0
+    move_pct_1m = (last3[-1]["close"] / last3[-1]["open"] - 1.0) * 100.0
+    atr_pct = atr(candles[-60:], 14) / current * 100.0
+
+    prior_high = max(c["high"] for c in previous)
+    prior_low = min(c["low"] for c in previous)
+    bullish_bos = last3[-1]["close"] > prior_high
+    bearish_bos = last3[-1]["close"] < prior_low
+
+    direction = "LONG" if move_pct_3m > 0 else "SHORT" if move_pct_3m < 0 else "NONE"
+    if direction == "NONE":
+        return None
+
+    aligned = sum(
+        1 for c in last3
+        if (c["close"] > c["open"] if direction == "LONG" else c["close"] < c["open"])
+    )
+    bos = bullish_bos if direction == "LONG" else bearish_bos
+    threshold_3m = max(0.55, atr_pct * 1.60)
+    threshold_1m = max(0.30, atr_pct * 0.90)
+    momentum_ok = abs(move_pct_3m) >= threshold_3m or abs(move_pct_1m) >= threshold_1m
+    volume_ok = vol_ratio >= 1.35
+    alignment_ok = aligned >= 2
+
+    score = (
+        (40 if momentum_ok else 0)
+        + (25 if volume_ok else 0)
+        + (20 if bos else 0)
+        + (15 if alignment_ok else 0)
+    )
+    if not momentum_ok or score < 65:
+        return None
+
+    extended = abs(move_pct_3m) >= max(4.0, atr_pct * 5.0)
+    return {
+        "direction": direction,
+        "score": score,
+        "move_pct_1m": move_pct_1m,
+        "move_pct_3m": move_pct_3m,
+        "volume_ratio": vol_ratio,
+        "atr_pct": atr_pct,
+        "bos": bos,
+        "aligned_candles": aligned,
+        "extended": extended,
+    }
+
+def pullback_ok(metrics, direction):
+    price, e21, current_atr = metrics["price"], metrics["ema21"], metrics["atr"]
+    if not e21 or current_atr <= 0 or abs(price - e21) / current_atr > PULLBACK_MAX_ATR:
+        return False
+    return price >= e21 * 0.997 if direction == "LONG" else price <= e21 * 1.003
+
+
+def analyze_higher_timeframes(c1):
+    """Use 1h as the primary trend context."""
+    m1 = market_metrics(c1)
+    long_score = 4 * (m1["trend"] == "LONG") + 2 * (m1["rsi"] > 50)
+    short_score = 4 * (m1["trend"] == "SHORT") + 2 * (m1["rsi"] < 50)
+    direction = "LONG" if long_score > short_score else "SHORT" if short_score > long_score else "NONE"
+    return direction, long_score, short_score, m1
+
+
+def score_stage2(long_score, short_score, candles, higher_metrics):
+    """15m chooses the trade direction; 1h contributes context but never vetoes it."""
+    metrics = market_metrics(candles)
+    structure, sweep, bos = structure_signal(candles)
+    closes = [c["close"] for c in candles]
+    e9, e21, e50 = metrics["ema9"], metrics["ema21"], metrics["ema50"]
+    long_score_15 = 0
+    short_score_15 = 0
+
+    long_score_15 += 2 if e9 and e21 and e9 > e21 else 0
+    short_score_15 += 2 if e9 and e21 and e9 < e21 else 0
+    long_score_15 += 1 if e21 and metrics["price"] > e21 else 0
+    short_score_15 += 1 if e21 and metrics["price"] < e21 else 0
+    long_score_15 += 1 if e21 and e50 and e21 > e50 else 0
+    short_score_15 += 1 if e21 and e50 and e21 < e50 else 0
+    long_score_15 += 1 if metrics["rsi"] >= 52 else 0
+    short_score_15 += 1 if metrics["rsi"] <= 48 else 0
+    long_score_15 += 2 if structure == "LONG" else 0
+    short_score_15 += 2 if structure == "SHORT" else 0
+    long_score_15 += 2 if sweep and structure == "LONG" else 0
+    short_score_15 += 2 if sweep and structure == "SHORT" else 0
+    long_score_15 += 1 if bos and structure == "LONG" else 0
+    short_score_15 += 1 if bos and structure == "SHORT" else 0
+    long_score_15 += 1 if metrics["volume_ratio"] >= 1.20 and closes[-1] >= candles[-1]["open"] else 0
+    short_score_15 += 1 if metrics["volume_ratio"] >= 1.20 and closes[-1] <= candles[-1]["open"] else 0
+
+    # Small 1h context bonus; opposite/neutral 1h cannot overrule a valid 15m setup.
+    if higher_metrics["trend"] == "LONG":
+        long_score_15 += 1
+    elif higher_metrics["trend"] == "SHORT":
+        short_score_15 += 1
+
+    direction = "LONG" if long_score_15 > short_score_15 else "SHORT" if short_score_15 > long_score_15 else "NONE"
+    return max(long_score_15, short_score_15), metrics, structure, sweep, bos, direction
+
+
+def make_trade_plan(direction, entry, current_atr, recent_candles, target_candles=None):
+    if entry <= 0 or current_atr <= 0:
+        return None
+    risk_distance = current_atr * ATR_SL_MULTIPLIER
+    if direction == "LONG":
+        recent_low = min(c["low"] for c in recent_candles[-8:])
+        stop = min(entry - risk_distance, recent_low - current_atr * 0.10)
+        risk = entry - stop
+        targets = [entry + risk * x for x in (1.0, 1.5, 2.0, 2.5)]
+        # Prefer actual 15m resistance pivots for exits when they are usable.
+        if target_candles and len(target_candles) >= 10:
+            highs = [c["high"] for c in target_candles]
+            levels = []
+            for i in range(2, len(highs) - 2):
+                if highs[i] > entry and highs[i] >= max(highs[i-2:i] + highs[i+1:i+3]):
+                    levels.append(highs[i])
+            levels = sorted(set(levels))
+            if len(levels) >= 2:
+                selected = []
+                for level in levels:
+                    if not selected or level > selected[-1] * 1.001:
+                        selected.append(level)
+                    if len(selected) == 4:
+                        break
+                if len(selected) >= 2:
+                    targets = selected[:4]
+                    while len(targets) < 4:
+                        targets.append(targets[-1] + risk * 0.5)
+    else:
+        recent_high = max(c["high"] for c in recent_candles[-8:])
+        stop = max(entry + risk_distance, recent_high + current_atr * 0.10)
+        risk = stop - entry
+        targets = [entry - risk * x for x in (1.0, 1.5, 2.0, 2.5)]
+        # Prefer actual 15m support pivots for exits when they are usable.
+        if target_candles and len(target_candles) >= 10:
+            lows = [c["low"] for c in target_candles]
+            levels = []
+            for i in range(2, len(lows) - 2):
+                if lows[i] < entry and lows[i] <= min(lows[i-2:i] + lows[i+1:i+3]):
+                    levels.append(lows[i])
+            levels = sorted(set(levels), reverse=True)
+            if len(levels) >= 2:
+                selected = []
+                for level in levels:
+                    if not selected or level < selected[-1] * 0.999:
+                        selected.append(level)
+                    if len(selected) == 4:
+                        break
+                if len(selected) >= 2:
+                    targets = selected[:4]
+                    while len(targets) < 4:
+                        targets.append(targets[-1] - risk * 0.5)
+    if risk <= 0:
+        return None
+    stop_atr = risk / current_atr
+    rr = abs(targets[-1] - entry) / risk
+    if stop_atr > MAX_STOP_ATR or rr < MIN_RR:
+        return None
+    return {"entry": entry, "sl": stop, "tp": targets, "risk_atr": stop_atr, "rr": rr}
+
+
+def analyze_symbol(symbol, ticker):
+    price = ticker_price(ticker)
+    if price <= 0:
+        return None
+    c1 = get_candles(symbol, "1h")
+    time.sleep(REQUEST_PAUSE)
+    if not c1:
+        return None
+    _, ls, ss, m1 = analyze_higher_timeframes(c1)
+    # 1h is context only. The actual direction is selected from 15m in stage 2.
+    # Keep candidates even when 1h is neutral or temporarily opposite.
+    score = max(ls, ss)
+    return {
+        "symbol": symbol, "direction": "NONE", "price": price,
+        "long_score": ls, "short_score": ss, "score": score, "m1": m1, "candles1": c1,
+    }
+
+
+def analyze_stage2(candidate):
+    candles = get_candles(candidate["symbol"], "15m")
+    time.sleep(REQUEST_PAUSE)
+    if not candles:
+        return None
+    score, metrics, structure, sweep, bos, direction = score_stage2(
+        candidate["long_score"], candidate["short_score"], candles, candidate["m1"]
+    )
+    # 15m is the decision timeframe. Keep a lower-threshold early-watch path
+    # when a reversal structure/sweep is forming, but do not call it confirmed.
+    early_reversal = sweep or structure in ("LONG", "SHORT")
+    if direction == "NONE" or (score < MIN_SCORE_WATCH and not early_reversal):
+        return None
+    candidate.update({
+        "direction": direction, "score": score, "m15": metrics,
+        "structure": structure, "sweep": sweep, "bos15": bos, "candles15": candles,
+    })
+    return candidate
+
+
+def analyze_stage3(candidate):
+    direction = candidate["direction"]
+    candles = get_candles(candidate["symbol"], "5m")
+    time.sleep(REQUEST_PAUSE)
+    if not candles:
+        candidate["status"] = "WATCH"
+        return candidate
+    m5 = market_metrics(candles)
+    structure5, sweep5, bos5 = structure_signal(candles)
+    candles1m = get_candles(candidate["symbol"], "1m")
+    time.sleep(REQUEST_PAUSE)
+    flash = detect_flash_move(candles1m) if candles1m else None
+    forecast5 = forecast_next_candle(candles, "5m")
+    forecast15 = forecast_next_candle(candidate.get("candles15", []), "15m")
+    forecast_hours = forecast_next_hours(candidate.get("candles1", []), 3)
+    candidate.update({"forecast5": forecast5, "forecast15": forecast15, "forecast_hours": forecast_hours, "flash": flash})
+    score = candidate["score"]
+    score += 1 if structure5 == direction else 0
+    score += int(sweep5) + int(m5["trend"] == direction) + int(pullback_ok(m5, direction))
+    candidate.update({"m5": m5, "score": score, "bos5": bos5})
+    # 1h is context only: an opposite 1h trend may reduce the score,
+    # but must never veto a valid 15m decision plus 5m entry.
+    if candidate["m1"]["trend"] not in (direction, "NEUTRAL"):
+        score = max(0, score - 1)
+        candidate["score"] = score
+    volume_ok = candidate["m15"]["volume_ratio"] >= MIN_VOLUME_RATIO or m5["volume_ratio"] >= MIN_VOLUME_RATIO
+    live_diff = abs(candidate["price"] - m5["price"]) / m5["price"] * 100 if m5["price"] > 0 else 999
+    live_ok = live_diff <= MAX_LIVE_DIFF
+    confirmed = (
+        score >= MIN_SCORE_TRADE and candidate["bos15"]
+        and (bos5 or structure5 == direction) and pullback_ok(m5, direction)
+        and volume_ok and live_ok
+    )
+    if confirmed:
+        plan = make_trade_plan(
+            direction, m5["price"], m5["atr"], candles, candidate.get("candles15")
+        )
+        if plan:
+            candidate["status"] = "CONFIRMED"
+            candidate["plan"] = plan
+            return candidate
+    candidate["status"] = "WATCH"
+    candidate["live_diff"] = live_diff
+    return candidate
+
+
+def format_price(value):
+    if value >= 1000:
+        return "{:,.4f}".format(value)
+    if value >= 1:
+        return "{:.5f}".format(value)
+    if value >= 0.01:
+        return "{:.7f}".format(value)
+    return "{:.10f}".format(value)
+
+
+# ---------------- TELEGRAM ----------------
+
+def telegram_send(message):
+    token = os.getenv("BOT_TOKEN", "").strip()
+    chat_id = os.getenv("CHAT_ID", "").strip()
+    if not token or not chat_id:
+        log("TELEGRAM SKIP: BOT_TOKEN or CHAT_ID secret is missing")
+        return False
+    url = "{}/bot{}/sendMessage".format(TELEGRAM_API, token)
+    payload = {
+        "chat_id": chat_id,
+        "text": message,
+        "disable_web_page_preview": True,
+    }
+    try:
+        result = http_json(url, method="POST", payload=payload, timeout=20)
+        if isinstance(result, dict) and result.get("ok") is True:
+            log("TELEGRAM SENT")
+            return True
+        log("TELEGRAM ERROR: {}".format(str(result)[:220]))
+    except Exception as exc:
+        log("TELEGRAM ERROR: {}".format(str(exc)[:180]))
+    return False
+
+
+# Store deduplication state in the repository using the Actions GITHUB_TOKEN.
+# The workflow must grant contents: write and pass GITHUB_TOKEN to this script.
+def github_state_request(method, payload=None, sha=None):
+    token = os.getenv("GITHUB_TOKEN", "").strip()
+    repo = os.getenv("GITHUB_REPOSITORY", "").strip()
+    branch = os.getenv("GITHUB_REF_NAME", "main").strip()
+    if not token or not repo:
+        return None
+    url = "https://api.github.com/repos/{}/contents/{}".format(
+        repo, urllib.parse.quote(STATE_FILE)
+    )
+    headers = {
+        "Authorization": "Bearer " + token,
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if method == "GET":
+        try:
+            data = http_json(url + "?ref=" + urllib.parse.quote(branch), headers=headers)
+            content = base64.b64decode(data.get("content", "")).decode("utf-8")
+            return {"state": json.loads(content), "sha": data.get("sha")}
+        except urllib.error.HTTPError as exc:
+            if exc.code == 404:
+                return {"state": {}, "sha": None}
+            log("STATE READ ERROR: HTTP {}".format(exc.code))
+            return None
+        except Exception as exc:
+            log("STATE READ ERROR: {}".format(str(exc)[:150]))
+            return None
+    if method == "PUT":
+        content = base64.b64encode(json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")).decode("ascii")
+        body = {
+            "message": "Update ARAD signal deduplication state",
+            "content": content,
+            "branch": branch,
+        }
+        if sha:
+            body["sha"] = sha
+        try:
+            result = http_json(url, method="PUT", payload=body, headers=headers)
+            return bool(isinstance(result, dict) and result.get("content"))
+        except Exception as exc:
+            log("STATE SAVE ERROR: {}".format(str(exc)[:180]))
+            return False
+    return None
+
+
+def load_signal_state():
+    result = github_state_request("GET")
+    if result is None:
+        log("WARNING: persistent anti-duplicate state unavailable")
+        return {}, None, False
+    return result["state"], result.get("sha"), True
+
+
+def save_signal_state(state, sha):
+    saved = github_state_request("PUT", payload=state, sha=sha)
+    if not saved:
+        log("WARNING: signal state was not saved; duplicate alerts may occur next run")
+    return saved
+
+
+def should_send_alert(state, item, alert_type):
+    symbol = item["symbol"]
+    direction = item["direction"]
+    key = symbol + "|" + direction
+    now = int(time.time())
+    previous = state.get(key, {})
+    cooldown = WATCH_COOLDOWN_MIN if alert_type == "WATCH" else CONFIRMED_COOLDOWN_MIN
+
+    # A confirmed alert is allowed immediately after a WATCH alert.
+    if alert_type == "CONFIRMED" and previous.get("type") == "WATCH":
+        return True
+    if previous.get("type") == alert_type and now - int(previous.get("sent_at", 0)) < cooldown * 60:
+        return False
+    return True
+
+
+def mark_alert_sent(state, item, alert_type):
+    key = item["symbol"] + "|" + item["direction"]
+    state[key] = {"type": alert_type, "sent_at": int(time.time())}
+    # Keep the state file small.
+    cutoff = int(time.time()) - 7 * 24 * 60 * 60
+    return {k: v for k, v in state.items() if int(v.get("sent_at", 0)) >= cutoff}
+
+
+
+def forecast_message_line(forecast):
+    if not forecast:
+        return "داده کافی برای پیش‌بینی وجود ندارد."
+    direction = {"LONG": "صعودی", "SHORT": "نزولی", "NEUTRAL": "نامشخص"}[forecast["direction"]]
+    return "{}: {} | اطمینان تخمینی {}٪ | بسته‌شدن احتمالی {} تا {} | دامنه {} تا {}".format(
+        forecast["timeframe"], direction, forecast["confidence"],
+        format_price(forecast["close_low"]), format_price(forecast["close_high"]),
+        format_price(forecast["low"]), format_price(forecast["high"])
+    )
+
+
+def forecast_hours_message_line(forecast):
+    if not forecast:
+        return "داده کافی برای برآورد چندساعته وجود ندارد."
+    direction = {"LONG": "صعودی", "SHORT": "نزولی", "NEUTRAL": "نامشخص"}[forecast["direction"]]
+    return "{} ساعت: {} | قدرت سناریوی الگوریتمی {} از 100 | محدوده برآوردی {} تا {}".format(
+        forecast["hours"], direction, forecast["confidence"],
+        format_price(forecast["low"]), format_price(forecast["high"])
+    )
+
+
+def watch_message(item):
+    m15 = item["m15"]
+    lines = [
+        "🟡 ARAD CRYPTO PRO | WATCH",
+        "هشدار زودهنگام - هنوز نقطه ورود قطعی نیست",
+        "",
+        "نماد: {}".format(item["symbol"]),
+        "جهت احتمالی: {}".format("خرید LONG" if item["direction"] == "LONG" else "فروش SHORT"),
+        "قیمت فعلی: {}".format(format_price(item["price"])),
+        "امتیاز تحلیلی: {} امتیاز".format(item["score"]),
+        "1H (context only): {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]),
+        "15M: {} | RSI {:.1f} | حجم {:.2f}x".format(m15["trend"], m15["rsi"], m15["volume_ratio"]),
+        "BOS 15m: {}".format("بله" if item["bos15"] else "خیر"),
+        "Sweep: {}".format("بله" if item["sweep"] else "خیر"),
+        (
+            "⚡ FLASH MOVE: {} | امتیاز {} | تغییر 1m: {:.2f}% | تغییر 3m: {:.2f}% | حجم 1m: {:.2f}x{}".format(
+                "صعودی" if item["flash"]["direction"] == "LONG" else "نزولی",
+                item["flash"]["score"], item["flash"]["move_pct_1m"],
+                item["flash"]["move_pct_3m"], item["flash"]["volume_ratio"],
+                " | حرکت کش‌آمده؛ تعقیب ورود ممنوع" if item["flash"]["extended"] else " | هشدار زودهنگام"
+            ) if item.get("flash") else "FLASH MOVE: تأیید نشد"
+        ),
+        "",
+        "🔮 برآورد سناریوی کندل بعدی (غیرقطعی):",
+        forecast_message_line(item.get("forecast5")),
+        forecast_message_line(item.get("forecast15")),
+        "",
+        "🔭 سناریوی احتمالی ۳ ساعت آینده (غیرقطعی):",
+        forecast_hours_message_line(item.get("forecast_hours")),
+        "",
+        "⚠️ پیش‌بینی‌ها تخمینی‌اند؛ تضمین جهت یا سود نیستند.",
+        "⚠️ فقط تحت نظر بگیر؛ ورود بدون تأیید نهایی توصیه نمی‌شود.",
+        "زمان: " + now_text(),
+    ]
+    return "\n".join(lines)
+
+
+def confirmed_message(item):
+    plan = item["plan"]
+    lines = [
+        "🟢 ARAD CRYPTO PRO | CONFIRMED",
+        "سیگنال تأییدشده - بررسی ورود با مدیریت ریسک",
+        "",
+        "نماد: {}".format(item["symbol"]),
+        "جهت: {}".format("LONG خرید" if item["direction"] == "LONG" else "SHORT فروش"),
+        "قیمت لحظه تحلیل: {}".format(format_price(item["price"])),
+        "ورود پیشنهادی: {}".format(format_price(plan["entry"])),
+        "حد ضرر: {}".format(format_price(plan["sl"])),
+    ]
+    for i, target in enumerate(plan["tp"], 1):
+        lines.append("TP{}: {}".format(i, format_price(target)))
+    lines += [
+        "فاصله حد ضرر: {:.2f} ATR".format(plan["risk_atr"]),
+        "نسبت سود به زیان تا TP4: {:.2f}".format(plan["rr"]),
+        "امتیاز تحلیلی: {} امتیاز".format(item["score"]),
+        "",
+        "⚠️ این پیام تحلیل است، نه دستور معامله. سفارش خودکار ثبت نشده است.",
+        "زمان: " + now_text(),
+    ]
+    return "\n".join(lines)
+
+
+def dispatch_alerts(watch_items, confirmed_items):
+    state, sha, state_ok = load_signal_state()
+    if not state_ok:
+        # Fail closed: avoid flooding Telegram if deduplication cannot be checked.
+        log("ALERTS PAUSED: cannot verify duplicate-alert state")
+        return
+
+    sent_any = False
+    for item in watch_items:
+        if should_send_alert(state, item, "WATCH"):
+            if telegram_send(watch_message(item)):
+                state = mark_alert_sent(state, item, "WATCH")
+                sent_any = True
+        else:
+            log("WATCH DUPLICATE SKIPPED: {}".format(item["symbol"]))
+
+    for item in confirmed_items:
+        if should_send_alert(state, item, "CONFIRMED"):
+            if telegram_send(confirmed_message(item)):
+                state = mark_alert_sent(state, item, "CONFIRMED")
+                sent_any = True
+        else:
+            log("CONFIRMED DUPLICATE SKIPPED: {}".format(item["symbol"]))
+
+    if sent_any:
+        save_signal_state(state, sha)
+    else:
+        log("TELEGRAM: no new alerts to send")
+
+
+def print_result(item):
+    log("")
+    log("=" * 58)
+    log("{} | {} | SCORE {} POINTS".format(item["symbol"], item["direction"], item["score"]))
+    log("STATUS: {}".format(item.get("status", "WATCH")))
+    log("PRICE: {}".format(format_price(item["price"])))
+    log("1H: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]))
+    log("15M: {} | RSI {:.1f} | VOL {:.2f}x".format(
+        item["m15"]["trend"], item["m15"]["rsi"], item["m15"]["volume_ratio"]
+    ))
+    if "m5" in item:
+        log("5M: {} | RSI {:.1f} | VOL {:.2f}x".format(
+            item["m5"]["trend"], item["m5"]["rsi"], item["m5"]["volume_ratio"]
+        ))
+    log("15M BOS: {} | SWEEP: {}".format(item.get("bos15", False), item.get("sweep", False)))
+    if item.get("status") == "CONFIRMED" and "plan" in item:
+        plan = item["plan"]
+        log("ENTRY: {}".format(format_price(plan["entry"])))
+        log("STOP LOSS: {}".format(format_price(plan["sl"])))
+        for i, target in enumerate(plan["tp"], 1):
+            log("TP{}: {}".format(i, format_price(target)))
+        log("STOP DISTANCE: {:.2f} ATR | R/R: {:.2f}".format(plan["risk_atr"], plan["rr"]))
+    else:
+        log("WATCH ONLY - WAIT FOR CONFIRMATION")
+    log("=" * 58)
+
+
+def main():
+    started = time.time()
+    log("")
+    log("ARAD CRYPTO PRO V5.9.2 OURBIT — FLASH MOVE TEST")
+    log("START: " + now_text())
+    log("MODE: 15M DECISION / 5M ENTRY / 1M FLASH WATCH / 1H CONTEXT | NO ORDERS | TEST BRANCH")
+    log("BASE URL: " + BASE_URL)
+
+    ping = api_get("/api/v1/contract/ping")
+    if ping is None:
+        log("PING: FAILED")
+        return
+    log("PING: OK")
+
+    contracts = get_contracts()
+    if not contracts:
+        log("ERROR: CONTRACT DETAIL EMPTY")
+        return
+    tickers = get_tickers()
+    log("CONTRACTS RECEIVED: {}".format(len(contracts)))
+    log("TICKERS RECEIVED: {}".format(len(tickers)))
+
+    universe = []
+    for contract in contracts:
+        if not isinstance(contract, dict):
+            continue
+        symbol = str(contract.get("symbol", "")).upper()
+        if not symbol or not is_target_symbol(symbol, contract) or not contract_is_enabled(contract):
+            continue
+        ticker = tickers.get(symbol, {})
+        price = ticker_price(ticker)
+        if price <= 0:
+            continue
+        universe.append({"symbol": symbol, "ticker": ticker, "turnover": ticker_turnover(ticker)})
+
+    universe.sort(key=lambda x: x["turnover"], reverse=True)
+    pinned = [x for x in universe if any(word in x["symbol"] for word in METAL_KEYWORDS)]
+    selected = universe[:MAX_STAGE1_SYMBOLS]
+    selected_symbols = {x["symbol"] for x in selected}
+    for item in pinned:
+        if item["symbol"] not in selected_symbols:
+            selected.append(item)
+            selected_symbols.add(item["symbol"])
+
+    log("ELIGIBLE CONTRACTS: {}".format(len(universe)))
+    log("STAGE 1 SCAN COUNT: {}".format(len(selected)))
+    log("METAL CONTRACTS PINNED: {}".format(len(pinned)))
+
+    stage1 = []
+    for i, item in enumerate(selected, 1):
+        if PRINT_ALL_STAGES:
+            log("STAGE 1: {} / {} {}".format(i, len(selected), item["symbol"]))
+        result = analyze_symbol(item["symbol"], item["ticker"])
+        if result:
+            stage1.append(result)
+            log("PROMISING: {} {} SCORE {}".format(result["symbol"], result["direction"], result["score"]))
+
+    stage1.sort(key=lambda x: x["score"], reverse=True)
+    stage1 = stage1[:MAX_STAGE2_SYMBOLS]
+    log("STAGE 1 COMPLETE: {}".format(len(stage1)))
+
+    stage2 = []
+    for i, candidate in enumerate(stage1, 1):
+        log("STAGE 2: {} / {} {}".format(i, len(stage1), candidate["symbol"]))
+        result = analyze_stage2(candidate)
+        if result:
+            stage2.append(result)
+            log("STAGE 2 PASS: {} {} SCORE {}".format(
+                result["symbol"], result["direction"], result["score"]
+            ))
+
+    stage2.sort(key=lambda x: x["score"], reverse=True)
+    stage2 = stage2[:MAX_STAGE3_SYMBOLS]
+    log("STAGE 2 COMPLETE: {}".format(len(stage2)))
+
+    final_results = []
+    for i, candidate in enumerate(stage2, 1):
+        log("STAGE 3: {} / {} {}".format(i, len(stage2), candidate["symbol"]))
+        result = analyze_stage3(candidate)
+        if result:
+            final_results.append(result)
+            print_result(result)
+
+    confirmed = [x for x in final_results if x.get("status") == "CONFIRMED"]
+    watch = [x for x in final_results if x.get("status") == "WATCH"]
+
+    # Send WATCH after forecast fields have been attached.
+    dispatch_alerts(watch, confirmed)
+
+    elapsed = time.time() - started
+    log("")
+    log("=" * 58)
+    log("SCAN FINISHED")
+    log("TIME: " + now_text())
+    log("STAGE 1 PROMISING: {}".format(len(stage1)))
+    log("STAGE 2 PASSED / WATCH CANDIDATES: {}".format(len(stage2)))
+    log("CONFIRMED SETUPS: {}".format(len(confirmed)))
+    log("WATCH SETUPS: {}".format(len(watch)))
+    log("ELAPSED: {:.1f} seconds".format(elapsed))
+    log("NO ORDERS WERE PLACED")
+    log("=" * 58)
+
+
+if __name__ == "__main__":
+    main()
