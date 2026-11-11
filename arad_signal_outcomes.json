@@ -1144,6 +1144,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SNPS_USDT|LONG|EARLY|1794413724",
+      "symbol": "SNPS_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 467.97,
+      "sl": 465.4726022540907,
+      "tp": [
+        470.46739774590935,
+        471.716096618864
+      ],
+      "created_at": 1794413724,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
