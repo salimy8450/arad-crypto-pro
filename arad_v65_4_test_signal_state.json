@@ -1028,8 +1028,8 @@
     "sent_at": 1794384856
   },
   "MU_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794297021
+    "type": "WATCH",
+    "sent_at": 1794414013
   },
   "1000LUNC_USDT|LONG": {
     "type": "EARLY",
@@ -1281,7 +1281,7 @@
   },
   "POPMART_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326463
+    "sent_at": 1794414011
   },
   "ZHONGJI_USDT|SHORT": {
     "type": "EARLY",
@@ -1673,7 +1673,7 @@
   },
   "ESPORTS_USDT|LONG": {
     "type": "EARLY",
-    "sent_at": 1794384860
+    "sent_at": 1794414012
   },
   "PUNDIX_USDT|LONG": {
     "type": "EARLY",
@@ -2025,7 +2025,7 @@
   },
   "RENDER_USDT|LONG": {
     "type": "EARLY",
-    "sent_at": 1794384864
+    "sent_at": 1794414012
   },
   "ADA_USDT|LONG": {
     "type": "EARLY",
@@ -2174,5 +2174,13 @@
   "ICP_USDT|LONG": {
     "type": "CONFIRMED",
     "sent_at": 1794413777
+  },
+  "SOXL_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794414013
+  },
+  "GLW_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794414013
   }
 }
