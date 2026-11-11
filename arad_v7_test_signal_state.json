@@ -145,9 +145,9 @@
     "sent_at": 1794289584
   },
   "ADA_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794290569,
-    "trigger": "15M_SWING_HIGH_REJECTION"
+    "type": "WATCH",
+    "sent_at": 1794382221,
+    "trigger": ""
   },
   "USUAL_USDT|SHORT": {
     "type": "EARLY",
@@ -236,7 +236,7 @@
   },
   "ZIL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794293533,
+    "sent_at": 1794382220,
     "trigger": ""
   },
   "LUMIA_USDT|SHORT": {
@@ -256,7 +256,7 @@
   },
   "FOGO_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794294219,
+    "sent_at": 1794382220,
     "trigger": ""
   },
   "SQD_USDT|SHORT": {
