@@ -1127,6 +1127,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "PLTR_USDT|LONG|EARLY|1794413722",
+      "symbol": "PLTR_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 173.66,
+      "sl": 172.37807768905498,
+      "tp": [
+        174.94192231094502,
+        175.5828834664175
+      ],
+      "created_at": 1794413722,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
