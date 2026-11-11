@@ -1093,6 +1093,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TUT_USDT|LONG|EARLY|1794413719",
+      "symbol": "TUT_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.0168,
+      "sl": 0.016590492262509717,
+      "tp": [
+        0.01700950773749028,
+        0.01711426160623542
+      ],
+      "created_at": 1794413719,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
