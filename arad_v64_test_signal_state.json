@@ -149,7 +149,7 @@
   },
   "SXT_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794306987
+    "sent_at": 1794393448
   },
   "CFX_USDT|SHORT": {
     "type": "WATCH",
@@ -205,6 +205,18 @@
   },
   "GRAM_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794366252
+    "sent_at": 1794393449
+  },
+  "USUAL_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794393447
+  },
+  "INTC_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794393448
+  },
+  "AVAX_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794393449
   }
 }
