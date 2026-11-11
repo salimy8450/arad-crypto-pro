@@ -323,5 +323,30 @@
     "type": "WATCH",
     "sent_at": 1794344013,
     "trigger": ""
+  },
+  "POL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794358748,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "MEGA_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794358748,
+    "trigger": "15M_SWING_LOW_RECLAIM"
+  },
+  "JCT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794358749,
+    "trigger": ""
+  },
+  "CT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794358749,
+    "trigger": ""
+  },
+  "SXT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794358750,
+    "trigger": ""
   }
 }
