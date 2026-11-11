@@ -15,8 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Checkout selected test branch
+      - name: Checkout isolated V5.9.2 test branch
         uses: actions/checkout@v4
+        with:
+          ref: test/v5.9.2-flash-move
 
       - name: Setup Python
         uses: actions/setup-python@v5
