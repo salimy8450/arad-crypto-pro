@@ -1263,6 +1263,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CTR_USDT|SHORT|EARLY|1794413740",
+      "symbol": "CTR_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.014102,
+      "sl": 0.014144536284213449,
+      "tp": [
+        0.014059463715786551,
+        0.014038195573679826
+      ],
+      "created_at": 1794413740,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
