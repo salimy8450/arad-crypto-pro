@@ -1297,6 +1297,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "IREN_USDT|LONG|EARLY|1794413743",
+      "symbol": "IREN_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 21.43,
+      "sl": 21.015644206479614,
+      "tp": [
+        21.844355793520386,
+        22.05153369028058
+      ],
+      "created_at": 1794413743,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
