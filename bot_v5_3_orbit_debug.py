@@ -469,7 +469,8 @@ def analyze_symbol(symbol, ticker):
     if direction == "NONE":
         return None
     score = max(ls, ss)
-    if score < 4:
+    # Keep early 15m opportunities when 1h is neutral; stage 2/3 must still validate them.
+    if score < 2:
         return None
     return {
         "symbol": symbol, "direction": direction, "price": price,
@@ -512,7 +513,8 @@ def analyze_stage3(candidate):
     score += int(sweep5) + int(m5["trend"] == direction) + int(pullback_ok(m5, direction))
     candidate.update({"m5": m5, "score": score, "bos5": bos5})
     # The 1h trend is the only higher-timeframe gate.
-    higher_aligned = candidate["m1"]["trend"] == direction
+    # Neutral 1h does not veto a 15m setup; an explicitly opposite 1h trend still blocks it.
+    higher_aligned = candidate["m1"]["trend"] in (direction, "NEUTRAL")
     volume_ok = candidate["m15"]["volume_ratio"] >= MIN_VOLUME_RATIO or m5["volume_ratio"] >= MIN_VOLUME_RATIO
     live_diff = abs(candidate["price"] - m5["price"]) / m5["price"] * 100 if m5["price"] > 0 else 999
     live_ok = live_diff <= MAX_LIVE_DIFF
