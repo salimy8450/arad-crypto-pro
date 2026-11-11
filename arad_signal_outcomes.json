@@ -1552,6 +1552,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ICP_USDT|LONG|CONFIRMED|1794413776",
+      "symbol": "ICP_USDT",
+      "direction": "LONG",
+      "alert_type": "CONFIRMED",
+      "entry": 2.557,
+      "sl": 2.5408514789926437,
+      "tp": [
+        2.573148521007356,
+        2.581222781511034,
+        2.5892970420147123,
+        2.5973713025183907,
+        2.6054455630220685,
+        2.6215940840294247
+      ],
+      "created_at": 1794413776,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
