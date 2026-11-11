@@ -9,9 +9,10 @@ import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================================
-# ARAD CRYPTO PRO V5.8 OURBIT — 5M/15M/1H ONLY
-# EARLY WATCH + CONFIRMED TELEGRAM ALERTS
-# MTF | BOS | SWEEP | PULLBACK | RISK FILTERS
+# ARAD CRYPTO PRO V5.9 OURBIT — 15M DECISION / 5M ENTRY
+# 15M PRIMARY ANALYSIS | 5M EARLY ENTRY | 1H CONTEXT ONLY
+# EARLY REVERSAL WATCH + CONFIRMED TELEGRAM ALERTS
+# MTF | BOS | SWEEP | STRUCTURE-BASED TARGETS | RISK FILTERS
 # ANALYSIS ONLY - NO ORDERS
 # ==========================================================
 
@@ -77,7 +78,7 @@ def as_float(value, default=0.0):
 
 def http_json(url, method="GET", payload=None, headers=None, timeout=REQUEST_TIMEOUT):
     body = None
-    request_headers = {"User-Agent": "ARAD-CRYPTO-PRO/5.8", "Accept": "application/json"}
+    request_headers = {"User-Agent": "ARAD-CRYPTO-PRO/5.9", "Accept": "application/json"}
     if headers:
         request_headers.update(headers)
     if payload is not None:
@@ -421,20 +422,43 @@ def analyze_higher_timeframes(c1):
     return direction, long_score, short_score, m1
 
 
-def score_stage2(direction, long_score, short_score, candles):
+def score_stage2(long_score, short_score, candles, higher_metrics):
+    """15m chooses the trade direction; 1h contributes context but never vetoes it."""
     metrics = market_metrics(candles)
     structure, sweep, bos = structure_signal(candles)
-    score = long_score if direction == "LONG" else short_score
-    score += 2 if structure == direction else 0
-    score += int(sweep) + int(metrics["trend"] == direction)
-    if direction == "LONG" and metrics["rsi"] >= 48:
-        score += 1
-    elif direction == "SHORT" and metrics["rsi"] <= 52:
-        score += 1
-    return score, metrics, structure, sweep, bos
+    closes = [c["close"] for c in candles]
+    e9, e21, e50 = metrics["ema9"], metrics["ema21"], metrics["ema50"]
+    long_score_15 = 0
+    short_score_15 = 0
+
+    long_score_15 += 2 if e9 and e21 and e9 > e21 else 0
+    short_score_15 += 2 if e9 and e21 and e9 < e21 else 0
+    long_score_15 += 1 if e21 and metrics["price"] > e21 else 0
+    short_score_15 += 1 if e21 and metrics["price"] < e21 else 0
+    long_score_15 += 1 if e21 and e50 and e21 > e50 else 0
+    short_score_15 += 1 if e21 and e50 and e21 < e50 else 0
+    long_score_15 += 1 if metrics["rsi"] >= 52 else 0
+    short_score_15 += 1 if metrics["rsi"] <= 48 else 0
+    long_score_15 += 2 if structure == "LONG" else 0
+    short_score_15 += 2 if structure == "SHORT" else 0
+    long_score_15 += 2 if sweep and structure == "LONG" else 0
+    short_score_15 += 2 if sweep and structure == "SHORT" else 0
+    long_score_15 += 1 if bos and structure == "LONG" else 0
+    short_score_15 += 1 if bos and structure == "SHORT" else 0
+    long_score_15 += 1 if metrics["volume_ratio"] >= 1.20 and closes[-1] >= candles[-1]["open"] else 0
+    short_score_15 += 1 if metrics["volume_ratio"] >= 1.20 and closes[-1] <= candles[-1]["open"] else 0
+
+    # Small 1h context bonus; opposite/neutral 1h cannot overrule a valid 15m setup.
+    if higher_metrics["trend"] == "LONG":
+        long_score_15 += 1
+    elif higher_metrics["trend"] == "SHORT":
+        short_score_15 += 1
+
+    direction = "LONG" if long_score_15 > short_score_15 else "SHORT" if short_score_15 > long_score_15 else "NONE"
+    return max(long_score_15, short_score_15), metrics, structure, sweep, bos, direction
 
 
-def make_trade_plan(direction, entry, current_atr, recent_candles):
+def make_trade_plan(direction, entry, current_atr, recent_candles, target_candles=None):
     if entry <= 0 or current_atr <= 0:
         return None
     risk_distance = current_atr * ATR_SL_MULTIPLIER
@@ -443,11 +467,49 @@ def make_trade_plan(direction, entry, current_atr, recent_candles):
         stop = min(entry - risk_distance, recent_low - current_atr * 0.10)
         risk = entry - stop
         targets = [entry + risk * x for x in (1.0, 1.5, 2.0, 2.5)]
+        # Prefer actual 15m resistance pivots for exits when they are usable.
+        if target_candles and len(target_candles) >= 10:
+            highs = [c["high"] for c in target_candles]
+            levels = []
+            for i in range(2, len(highs) - 2):
+                if highs[i] > entry and highs[i] >= max(highs[i-2:i] + highs[i+1:i+3]):
+                    levels.append(highs[i])
+            levels = sorted(set(levels))
+            if len(levels) >= 2:
+                selected = []
+                for level in levels:
+                    if not selected or level > selected[-1] * 1.001:
+                        selected.append(level)
+                    if len(selected) == 4:
+                        break
+                if len(selected) >= 2:
+                    targets = selected[:4]
+                    while len(targets) < 4:
+                        targets.append(targets[-1] + risk * 0.5)
     else:
         recent_high = max(c["high"] for c in recent_candles[-8:])
         stop = max(entry + risk_distance, recent_high + current_atr * 0.10)
         risk = stop - entry
         targets = [entry - risk * x for x in (1.0, 1.5, 2.0, 2.5)]
+        # Prefer actual 15m support pivots for exits when they are usable.
+        if target_candles and len(target_candles) >= 10:
+            lows = [c["low"] for c in target_candles]
+            levels = []
+            for i in range(2, len(lows) - 2):
+                if lows[i] < entry and lows[i] <= min(lows[i-2:i] + lows[i+1:i+3]):
+                    levels.append(lows[i])
+            levels = sorted(set(levels), reverse=True)
+            if len(levels) >= 2:
+                selected = []
+                for level in levels:
+                    if not selected or level < selected[-1] * 0.999:
+                        selected.append(level)
+                    if len(selected) == 4:
+                        break
+                if len(selected) >= 2:
+                    targets = selected[:4]
+                    while len(targets) < 4:
+                        targets.append(targets[-1] - risk * 0.5)
     if risk <= 0:
         return None
     stop_atr = risk / current_atr
@@ -465,15 +527,12 @@ def analyze_symbol(symbol, ticker):
     time.sleep(REQUEST_PAUSE)
     if not c1:
         return None
-    direction, ls, ss, m1 = analyze_higher_timeframes(c1)
-    if direction == "NONE":
-        return None
+    _, ls, ss, m1 = analyze_higher_timeframes(c1)
+    # 1h is context only. The actual direction is selected from 15m in stage 2.
+    # Keep candidates even when 1h is neutral or temporarily opposite.
     score = max(ls, ss)
-    # Keep early 15m opportunities when 1h is neutral; stage 2/3 must still validate them.
-    if score < 2:
-        return None
     return {
-        "symbol": symbol, "direction": direction, "price": price,
+        "symbol": symbol, "direction": "NONE", "price": price,
         "long_score": ls, "short_score": ss, "score": score, "m1": m1, "candles1": c1,
     }
 
@@ -483,14 +542,17 @@ def analyze_stage2(candidate):
     time.sleep(REQUEST_PAUSE)
     if not candles:
         return None
-    score, metrics, structure, sweep, bos = score_stage2(
-        candidate["direction"], candidate["long_score"], candidate["short_score"], candles
+    score, metrics, structure, sweep, bos, direction = score_stage2(
+        candidate["long_score"], candidate["short_score"], candles, candidate["m1"]
     )
-    if score < MIN_SCORE_WATCH:
+    # 15m is the decision timeframe. Keep a lower-threshold early-watch path
+    # when a reversal structure/sweep is forming, but do not call it confirmed.
+    early_reversal = sweep or structure in ("LONG", "SHORT")
+    if direction == "NONE" or (score < MIN_SCORE_WATCH and not early_reversal):
         return None
     candidate.update({
-        "score": score, "m15": metrics, "structure": structure, "sweep": sweep,
-        "bos15": bos, "candles15": candles,
+        "direction": direction, "score": score, "m15": metrics,
+        "structure": structure, "sweep": sweep, "bos15": bos, "candles15": candles,
     })
     return candidate
 
@@ -524,7 +586,9 @@ def analyze_stage3(candidate):
         and volume_ok and live_ok
     )
     if confirmed:
-        plan = make_trade_plan(direction, m5["price"], m5["atr"], candles)
+        plan = make_trade_plan(
+            direction, m5["price"], m5["atr"], candles, candidate.get("candles15")
+        )
         if plan:
             candidate["status"] = "CONFIRMED"
             candidate["plan"] = plan
@@ -791,9 +855,9 @@ def print_result(item):
 def main():
     started = time.time()
     log("")
-    log("ARAD CRYPTO PRO V5.8 OURBIT")
+    log("ARAD CRYPTO PRO V5.9 OURBIT — 15M DECISION / 5M ENTRY")
     log("START: " + now_text())
-    log("MODE: WATCH + CONFIRMED TELEGRAM ALERTS | NO ORDERS")
+    log("MODE: 15M PRIMARY / 5M ENTRY / 1H CONTEXT | WATCH + CONFIRMED | NO ORDERS")
     log("BASE URL: " + BASE_URL)
 
     ping = api_get("/api/v1/contract/ping")
