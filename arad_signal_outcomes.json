@@ -1246,6 +1246,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BX_USDT|LONG|EARLY|1794413738",
+      "symbol": "BX_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 123.11,
+      "sl": 122.77530512139707,
+      "tp": [
+        123.44469487860293,
+        123.6120423179044
+      ],
+      "created_at": 1794413738,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
