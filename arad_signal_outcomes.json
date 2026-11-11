@@ -1212,6 +1212,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "NAVER_USDT|LONG|EARLY|1794413732",
+      "symbol": "NAVER_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 147.54,
+      "sl": 147.21623,
+      "tp": [
+        147.86377,
+        148.02565499999997
+      ],
+      "created_at": 1794413732,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
