@@ -1042,6 +1042,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "GOOGL_USDT|SHORT|EARLY|1794413712",
+      "symbol": "GOOGL_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 292.11,
+      "sl": 292.60605499999997,
+      "tp": [
+        291.61394500000006,
+        291.3659175000001
+      ],
+      "created_at": 1794413712,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
