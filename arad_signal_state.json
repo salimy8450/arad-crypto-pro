@@ -209,7 +209,7 @@
   },
   "ZEC_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1793995052
+    "sent_at": 1794414835
   },
   "1000PEPE_USDT|LONG": {
     "type": "WATCH",
@@ -473,7 +473,7 @@
   },
   "OPG_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794411641
+    "sent_at": 1794414834
   },
   "CLO_USDT|SHORT": {
     "type": "WATCH",
@@ -542,5 +542,25 @@
   "NBIS_USDT|LONG": {
     "type": "CONFIRMED",
     "sent_at": 1794413472
+  },
+  "UAI_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794414835
+  },
+  "XAU_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794414835
+  },
+  "MINIMAX_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794414836
+  },
+  "FET_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794414836
+  },
+  "PAXG_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794414836
   }
 }
