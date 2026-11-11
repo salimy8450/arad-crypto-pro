@@ -361,11 +361,12 @@
       "first_candle_time": 1794289800,
       "delivery_status": "TELEGRAM_API_ACCEPTED",
       "telegram_message_id": 1320,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0,
-      "evaluated_through": 1794357900,
-      "evaluated_at": 1794358635
+      "status": "CLOSED_TP1",
+      "result": "TP1_FIRST",
+      "max_tp": 1,
+      "evaluated_through": 1794358800,
+      "evaluated_at": 1794382095,
+      "closed_at": 1794358800
     },
     {
       "id": "XPT_USDT|LONG|EARLY|1794289556",
