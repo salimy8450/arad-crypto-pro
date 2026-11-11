@@ -845,7 +845,7 @@ def forecast_hours_message_line(forecast):
 def watch_message(item):
     m15 = item["m15"]
     lines = [
-        "🟡 ARAD CRYPTO PRO | WATCH",
+        "🧪 ARAD CRYPTO PRO | FLASH TEST WATCH",
         "هشدار زودهنگام - هنوز نقطه ورود قطعی نیست",
         "",
         "نماد: {}".format(item["symbol"]),
@@ -882,7 +882,7 @@ def watch_message(item):
 def confirmed_message(item):
     plan = item["plan"]
     lines = [
-        "🟢 ARAD CRYPTO PRO | CONFIRMED",
+        "🧪 ARAD CRYPTO PRO | TEST CONFIRMED",
         "سیگنال تأییدشده - بررسی ورود با مدیریت ریسک",
         "",
         "نماد: {}".format(item["symbol"]),
