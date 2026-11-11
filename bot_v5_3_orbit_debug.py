@@ -9,7 +9,7 @@ import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================================
-# ARAD CRYPTO PRO V5.7 OURBIT — NEXT CANDLE + MULTI-HOUR FORECAST
+# ARAD CRYPTO PRO V5.8 OURBIT — 5M/15M/1H ONLY
 # EARLY WATCH + CONFIRMED TELEGRAM ALERTS
 # MTF | BOS | SWEEP | PULLBACK | RISK FILTERS
 # ANALYSIS ONLY - NO ORDERS
@@ -26,8 +26,7 @@ TIMEFRAMES = {
     "5m": ("Min5", 300),
     "15m": ("Min15", 900),
     "1h": ("Min60", 3600),
-    "4h": ("Hour4", 14400),
-}
+    }
 
 CANDLE_LIMIT = 220
 MIN_CANDLES = 80
@@ -78,7 +77,7 @@ def as_float(value, default=0.0):
 
 def http_json(url, method="GET", payload=None, headers=None, timeout=REQUEST_TIMEOUT):
     body = None
-    request_headers = {"User-Agent": "ARAD-CRYPTO-PRO/5.6", "Accept": "application/json"}
+    request_headers = {"User-Agent": "ARAD-CRYPTO-PRO/5.8", "Accept": "application/json"}
     if headers:
         request_headers.update(headers)
     if payload is not None:
@@ -344,11 +343,11 @@ def forecast_next_candle(candles, label):
     }
 
 
-def forecast_next_hours(candles1h, candles4h, hours=3):
-    """Broad multi-hour scenario using closed 1h/4h candles."""
-    if len(candles1h) < 50 or len(candles4h) < 50:
+def forecast_next_hours(candles1h, hours=3):
+    """Broad multi-hour scenario using closed 1h candles only."""
+    if len(candles1h) < 50:
         return None
-    m1, m4 = market_metrics(candles1h), market_metrics(candles4h)
+    m1 = market_metrics(candles1h)
     current = candles1h[-1]["close"]
     current_atr = atr(candles1h[-60:], 14)
     if current <= 0 or current_atr <= 0:
@@ -358,7 +357,6 @@ def forecast_next_hours(candles1h, candles4h, hours=3):
     momentum = (closes[-1] - closes[-4]) / current_atr
     score = 0.0
     score += 1.5 if m1["trend"] == "LONG" else -1.5 if m1["trend"] == "SHORT" else 0
-    score += 1.0 if m4["trend"] == "LONG" else -1.0 if m4["trend"] == "SHORT" else 0
     score += 0.75 if e9 and e21 and e9 > e21 else -0.75 if e9 and e21 and e9 < e21 else 0
     score += max(-1.0, min(1.0, momentum * 0.4))
     score += 0.5 if m1["rsi"] >= 55 else -0.5 if m1["rsi"] <= 45 else 0
@@ -414,14 +412,13 @@ def pullback_ok(metrics, direction):
     return price >= e21 * 0.997 if direction == "LONG" else price <= e21 * 1.003
 
 
-def analyze_higher_timeframes(c4, c1):
-    m4, m1 = market_metrics(c4), market_metrics(c1)
-    long_score = 3 * (m4["trend"] == "LONG") + 3 * (m1["trend"] == "LONG")
-    short_score = 3 * (m4["trend"] == "SHORT") + 3 * (m1["trend"] == "SHORT")
-    long_score += int(m4["rsi"] > 50) + int(m1["rsi"] > 50)
-    short_score += int(m4["rsi"] < 50) + int(m1["rsi"] < 50)
+def analyze_higher_timeframes(c1):
+    """Use 1h as the primary trend context."""
+    m1 = market_metrics(c1)
+    long_score = 4 * (m1["trend"] == "LONG") + 2 * (m1["rsi"] > 50)
+    short_score = 4 * (m1["trend"] == "SHORT") + 2 * (m1["rsi"] < 50)
     direction = "LONG" if long_score > short_score else "SHORT" if short_score > long_score else "NONE"
-    return direction, long_score, short_score, m4, m1
+    return direction, long_score, short_score, m1
 
 
 def score_stage2(direction, long_score, short_score, candles):
@@ -464,13 +461,11 @@ def analyze_symbol(symbol, ticker):
     price = ticker_price(ticker)
     if price <= 0:
         return None
-    c4 = get_candles(symbol, "4h")
-    time.sleep(REQUEST_PAUSE)
     c1 = get_candles(symbol, "1h")
     time.sleep(REQUEST_PAUSE)
-    if not c4 or not c1:
+    if not c1:
         return None
-    direction, ls, ss, m4, m1 = analyze_higher_timeframes(c4, c1)
+    direction, ls, ss, m1 = analyze_higher_timeframes(c1)
     if direction == "NONE":
         return None
     score = max(ls, ss)
@@ -478,7 +473,7 @@ def analyze_symbol(symbol, ticker):
         return None
     return {
         "symbol": symbol, "direction": direction, "price": price,
-        "long_score": ls, "short_score": ss, "score": score, "m4": m4, "m1": m1, "candles4": c4, "candles1": c1,
+        "long_score": ls, "short_score": ss, "score": score, "m1": m1, "candles1": c1,
     }
 
 
@@ -510,13 +505,14 @@ def analyze_stage3(candidate):
     structure5, sweep5, bos5 = structure_signal(candles)
     forecast5 = forecast_next_candle(candles, "5m")
     forecast15 = forecast_next_candle(candidate.get("candles15", []), "15m")
-    forecast_hours = forecast_next_hours(candidate.get("candles1", []), candidate.get("candles4", []), 3)
+    forecast_hours = forecast_next_hours(candidate.get("candles1", []), 3)
     candidate.update({"forecast5": forecast5, "forecast15": forecast15, "forecast_hours": forecast_hours})
     score = candidate["score"]
     score += 1 if structure5 == direction else 0
     score += int(sweep5) + int(m5["trend"] == direction) + int(pullback_ok(m5, direction))
     candidate.update({"m5": m5, "score": score, "bos5": bos5})
-    higher_aligned = candidate["m4"]["trend"] == direction and candidate["m1"]["trend"] == direction
+    # The 1h trend is the only higher-timeframe gate.
+    higher_aligned = candidate["m1"]["trend"] == direction
     volume_ok = candidate["m15"]["volume_ratio"] >= MIN_VOLUME_RATIO or m5["volume_ratio"] >= MIN_VOLUME_RATIO
     live_diff = abs(candidate["price"] - m5["price"]) / m5["price"] * 100 if m5["price"] > 0 else 999
     live_ok = live_diff <= MAX_LIVE_DIFF
@@ -689,7 +685,6 @@ def watch_message(item):
         "جهت احتمالی: {}".format("خرید LONG" if item["direction"] == "LONG" else "فروش SHORT"),
         "قیمت فعلی: {}".format(format_price(item["price"])),
         "امتیاز تحلیلی: {} امتیاز".format(item["score"]),
-        "4H: {} | RSI {:.1f}".format(item["m4"]["trend"], item["m4"]["rsi"]),
         "1H: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]),
         "15M: {} | RSI {:.1f} | حجم {:.2f}x".format(m15["trend"], m15["rsi"], m15["volume_ratio"]),
         "BOS 15m: {}".format("بله" if item["bos15"] else "خیر"),
@@ -770,7 +765,6 @@ def print_result(item):
     log("{} | {} | SCORE {} POINTS".format(item["symbol"], item["direction"], item["score"]))
     log("STATUS: {}".format(item.get("status", "WATCH")))
     log("PRICE: {}".format(format_price(item["price"])))
-    log("4H: {} | RSI {:.1f}".format(item["m4"]["trend"], item["m4"]["rsi"]))
     log("1H: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]))
     log("15M: {} | RSI {:.1f} | VOL {:.2f}x".format(
         item["m15"]["trend"], item["m15"]["rsi"], item["m15"]["volume_ratio"]
@@ -795,7 +789,7 @@ def print_result(item):
 def main():
     started = time.time()
     log("")
-    log("ARAD CRYPTO PRO V5.7 OURBIT")
+    log("ARAD CRYPTO PRO V5.8 OURBIT")
     log("START: " + now_text())
     log("MODE: WATCH + CONFIRMED TELEGRAM ALERTS | NO ORDERS")
     log("BASE URL: " + BASE_URL)
