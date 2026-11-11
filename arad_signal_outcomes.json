@@ -1076,6 +1076,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TWT_USDT|SHORT|EARLY|1794413717",
+      "symbol": "TWT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.3862,
+      "sl": 0.3898331249745464,
+      "tp": [
+        0.38256687502545356,
+        0.38075031253818037
+      ],
+      "created_at": 1794413717,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
