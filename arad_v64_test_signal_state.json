@@ -73,7 +73,7 @@
   },
   "CYBER_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794189586
+    "sent_at": 1794420535
   },
   "APR_USDT|SHORT": {
     "type": "WATCH",
@@ -117,7 +117,7 @@
   },
   "IRYS_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794254845
+    "sent_at": 1794420532
   },
   "BEAT_USDT|SHORT": {
     "type": "WATCH",
@@ -149,7 +149,7 @@
   },
   "SXT_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794393448
+    "sent_at": 1794420532
   },
   "CFX_USDT|SHORT": {
     "type": "WATCH",
@@ -218,5 +218,17 @@
   "AVAX_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794393449
+  },
+  "ICP_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794420534
+  },
+  "JCT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794420535
+  },
+  "MSFT_USDT|SHORT": {
+    "type": "CONFIRMED",
+    "sent_at": 1794420536
   }
 }
