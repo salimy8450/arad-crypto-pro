@@ -1518,6 +1518,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BLUAI_USDT|SHORT|EARLY|1794413769",
+      "symbol": "BLUAI_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.00734,
+      "sl": 0.007538221173334061,
+      "tp": [
+        0.007141778826665939,
+        0.007042668239998909
+      ],
+      "created_at": 1794413769,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
