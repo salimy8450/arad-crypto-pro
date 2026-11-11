@@ -9,7 +9,7 @@ import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================================
-# ARAD CRYPTO PRO V5.6 OURBIT
+# ARAD CRYPTO PRO V5.7 OURBIT — NEXT CANDLE + MULTI-HOUR FORECAST
 # EARLY WATCH + CONFIRMED TELEGRAM ALERTS
 # MTF | BOS | SWEEP | PULLBACK | RISK FILTERS
 # ANALYSIS ONLY - NO ORDERS
@@ -295,6 +295,93 @@ def market_metrics(candles):
     }
 
 
+
+def forecast_next_candle(candles, label):
+    """Heuristic forecast from closed candles only; not a guaranteed prediction."""
+    if len(candles) < 30:
+        return None
+    closes = [c["close"] for c in candles]
+    last = candles[-1]
+    current = closes[-1]
+    current_atr = atr(candles[-60:], 14)
+    if current <= 0 or current_atr <= 0:
+        return None
+    e9, e21, e50 = ema(closes, 9), ema(closes, 21), ema(closes, 50)
+    r = rsi(closes, 14)
+    vr = volume_ratio(candles, 20)
+    momentum = (closes[-1] - closes[-4]) / current_atr
+    body = (last["close"] - last["open"]) / max(last["high"] - last["low"], current_atr * 0.05)
+    structure, sweep, bos = structure_signal(candles)
+    score = 0.0
+    score += 1.5 if e9 and e21 and e9 > e21 else -1.5 if e9 and e21 and e9 < e21 else 0
+    score += 1.0 if e21 and current > e21 else -1.0 if e21 and current < e21 else 0
+    score += 0.75 if e50 and current > e50 else -0.75 if e50 and current < e50 else 0
+    score += 1.0 if r >= 55 else -1.0 if r <= 45 else 0
+    score += max(-1.25, min(1.25, momentum * 0.55))
+    score += max(-0.75, min(0.75, body * 0.60))
+    score += 0.75 if structure == "LONG" else -0.75 if structure == "SHORT" else 0
+    score += 0.25 if sweep and structure == "LONG" else -0.25 if sweep and structure == "SHORT" else 0
+    if vr < 0.65:
+        score *= 0.80
+    direction = "LONG" if score >= 1.0 else "SHORT" if score <= -1.0 else "NEUTRAL"
+    confidence = min(85, 50 + int(abs(score) * 4.5))
+    if direction == "NEUTRAL":
+        confidence = min(confidence, 59)
+    strength = min(1.0, abs(score) / 5.0)
+    sign = 1 if direction == "LONG" else -1 if direction == "SHORT" else 0
+    drift = sign * current_atr * 0.22 * strength
+    band = current_atr * 0.55
+    center = current + drift
+    return {
+        "timeframe": label, "direction": direction, "confidence": confidence,
+        "reference": current,
+        "close_low": max(current * 0.000001, center - current_atr * 0.18),
+        "close_high": center + current_atr * 0.18,
+        "low": max(current * 0.000001, current - band),
+        "high": current + band,
+        "atr_pct": current_atr / current * 100,
+        "volume_ratio": vr, "score": round(score, 2),
+    }
+
+
+def forecast_next_hours(candles1h, candles4h, hours=3):
+    """Broad multi-hour scenario using closed 1h/4h candles."""
+    if len(candles1h) < 50 or len(candles4h) < 50:
+        return None
+    m1, m4 = market_metrics(candles1h), market_metrics(candles4h)
+    current = candles1h[-1]["close"]
+    current_atr = atr(candles1h[-60:], 14)
+    if current <= 0 or current_atr <= 0:
+        return None
+    closes = [c["close"] for c in candles1h]
+    e9, e21 = ema(closes, 9), ema(closes, 21)
+    momentum = (closes[-1] - closes[-4]) / current_atr
+    score = 0.0
+    score += 1.5 if m1["trend"] == "LONG" else -1.5 if m1["trend"] == "SHORT" else 0
+    score += 1.0 if m4["trend"] == "LONG" else -1.0 if m4["trend"] == "SHORT" else 0
+    score += 0.75 if e9 and e21 and e9 > e21 else -0.75 if e9 and e21 and e9 < e21 else 0
+    score += max(-1.0, min(1.0, momentum * 0.4))
+    score += 0.5 if m1["rsi"] >= 55 else -0.5 if m1["rsi"] <= 45 else 0
+    direction = "LONG" if score >= 1.0 else "SHORT" if score <= -1.0 else "NEUTRAL"
+    confidence = min(85, 50 + int(abs(score) * 5))
+    if direction == "NEUTRAL":
+        confidence = min(confidence, 59)
+    strength = min(1.0, abs(score) / 4.0)
+    sign = 1 if direction == "LONG" else -1 if direction == "SHORT" else 0
+    scale = math.sqrt(max(1, hours))
+    drift = sign * current_atr * 0.30 * strength * scale
+    band = current_atr * 0.90 * scale
+    center = current + drift
+    return {
+        "hours": hours, "direction": direction, "confidence": confidence,
+        "reference": current,
+        "low": max(current * 0.000001, center - band), "high": center + band,
+        "close_low": max(current * 0.000001, center - current_atr * 0.35 * scale),
+        "close_high": center + current_atr * 0.35 * scale,
+        "atr_pct": current_atr / current * 100, "score": round(score, 2),
+    }
+
+
 def structure_signal(candles):
     if len(candles) < PIVOT_LOOKBACK + 5:
         return "NONE", False, False
@@ -391,7 +478,7 @@ def analyze_symbol(symbol, ticker):
         return None
     return {
         "symbol": symbol, "direction": direction, "price": price,
-        "long_score": ls, "short_score": ss, "score": score, "m4": m4, "m1": m1,
+        "long_score": ls, "short_score": ss, "score": score, "m4": m4, "m1": m1, "candles4": c4, "candles1": c1,
     }
 
 
@@ -421,6 +508,10 @@ def analyze_stage3(candidate):
         return candidate
     m5 = market_metrics(candles)
     structure5, sweep5, bos5 = structure_signal(candles)
+    forecast5 = forecast_next_candle(candles, "5m")
+    forecast15 = forecast_next_candle(candidate.get("candles15", []), "15m")
+    forecast_hours = forecast_next_hours(candidate.get("candles1", []), candidate.get("candles4", []), 3)
+    candidate.update({"forecast5": forecast5, "forecast15": forecast15, "forecast_hours": forecast_hours})
     score = candidate["score"]
     score += 1 if structure5 == direction else 0
     score += int(sweep5) + int(m5["trend"] == direction) + int(pullback_ok(m5, direction))
@@ -566,6 +657,28 @@ def mark_alert_sent(state, item, alert_type):
     return {k: v for k, v in state.items() if int(v.get("sent_at", 0)) >= cutoff}
 
 
+
+def forecast_message_line(forecast):
+    if not forecast:
+        return "داده کافی برای پیش‌بینی وجود ندارد."
+    direction = {"LONG": "صعودی", "SHORT": "نزولی", "NEUTRAL": "نامشخص"}[forecast["direction"]]
+    return "{}: {} | اطمینان تخمینی {}٪ | بسته‌شدن احتمالی {} تا {} | دامنه {} تا {}".format(
+        forecast["timeframe"], direction, forecast["confidence"],
+        format_price(forecast["close_low"]), format_price(forecast["close_high"]),
+        format_price(forecast["low"]), format_price(forecast["high"])
+    )
+
+
+def forecast_hours_message_line(forecast):
+    if not forecast:
+        return "داده کافی برای برآورد چندساعته وجود ندارد."
+    direction = {"LONG": "صعودی", "SHORT": "نزولی", "NEUTRAL": "نامشخص"}[forecast["direction"]]
+    return "{} ساعت: {} | اطمینان تخمینی {}٪ | محدوده {} تا {}".format(
+        forecast["hours"], direction, forecast["confidence"],
+        format_price(forecast["low"]), format_price(forecast["high"])
+    )
+
+
 def watch_message(item):
     m15 = item["m15"]
     lines = [
@@ -582,6 +695,14 @@ def watch_message(item):
         "BOS 15m: {}".format("بله" if item["bos15"] else "خیر"),
         "Sweep: {}".format("بله" if item["sweep"] else "خیر"),
         "",
+        "🔮 پیش‌بینی کندل بعدی:",
+        forecast_message_line(item.get("forecast5")),
+        forecast_message_line(item.get("forecast15")),
+        "",
+        "🔭 سناریوی ۳ ساعت آینده:",
+        forecast_hours_message_line(item.get("forecast_hours")),
+        "",
+        "⚠️ پیش‌بینی‌ها تخمینی‌اند؛ تضمین جهت یا سود نیستند.",
         "⚠️ فقط تحت نظر بگیر؛ ورود بدون تأیید نهایی توصیه نمی‌شود.",
         "زمان: " + now_text(),
     ]
@@ -674,7 +795,7 @@ def print_result(item):
 def main():
     started = time.time()
     log("")
-    log("ARAD CRYPTO PRO V5.6 OURBIT")
+    log("ARAD CRYPTO PRO V5.7 OURBIT")
     log("START: " + now_text())
     log("MODE: WATCH + CONFIRMED TELEGRAM ALERTS | NO ORDERS")
     log("BASE URL: " + BASE_URL)
@@ -746,10 +867,6 @@ def main():
     stage2 = stage2[:MAX_STAGE3_SYMBOLS]
     log("STAGE 2 COMPLETE: {}".format(len(stage2)))
 
-    # Send early WATCH alerts as soon as 15m analysis passes.
-    # A later CONFIRMED message upgrades the WATCH if 5m checks pass.
-    dispatch_alerts(stage2, [])
-
     final_results = []
     for i, candidate in enumerate(stage2, 1):
         log("STAGE 3: {} / {} {}".format(i, len(stage2), candidate["symbol"]))
@@ -761,8 +878,8 @@ def main():
     confirmed = [x for x in final_results if x.get("status") == "CONFIRMED"]
     watch = [x for x in final_results if x.get("status") == "WATCH"]
 
-    # Send only confirmed here; WATCH was already sent at stage 2.
-    dispatch_alerts([], confirmed)
+    # Send WATCH after forecast fields have been attached.
+    dispatch_alerts(watch, confirmed)
 
     elapsed = time.time() - started
     log("")
