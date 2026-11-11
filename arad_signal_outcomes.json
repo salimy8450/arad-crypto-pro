@@ -1025,6 +1025,23 @@
       "result": "LOSS_SL",
       "max_tp": 0,
       "exit_candle": 1794264900
+    },
+    {
+      "id": "BTW_USDT|LONG|EARLY|1794413710",
+      "symbol": "BTW_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 1.0481,
+      "sl": 0.9947966245793143,
+      "tp": [
+        1.1014033754206858,
+        1.1280550631310287
+      ],
+      "created_at": 1794413710,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
