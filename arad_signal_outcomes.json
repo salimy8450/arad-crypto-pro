@@ -1535,6 +1535,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "DOT_USDT|LONG|EARLY|1794413770",
+      "symbol": "DOT_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.8663,
+      "sl": 0.8603853585486172,
+      "tp": [
+        0.8722146414513827,
+        0.8751719621770742
+      ],
+      "created_at": 1794413770,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
