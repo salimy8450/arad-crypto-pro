@@ -1433,6 +1433,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CYBER_USDT|LONG|EARLY|1794413759",
+      "symbol": "CYBER_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.2633,
+      "sl": 0.26199387279718733,
+      "tp": [
+        0.2646061272028126,
+        0.26525919080421895
+      ],
+      "created_at": 1794413759,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
