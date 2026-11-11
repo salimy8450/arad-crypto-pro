@@ -197,7 +197,7 @@
   },
   "TA_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794360259
+    "sent_at": 1794412409
   },
   "FET_USDT|SHORT": {
     "type": "WATCH",
@@ -301,7 +301,7 @@
   },
   "HOT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794083703
+    "sent_at": 1794412410
   },
   "ACT_USDT|LONG": {
     "type": "WATCH",
@@ -482,5 +482,17 @@
   "GOLDCIR_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794411642
+  },
+  "1000PEPE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794412409
+  },
+  "KORU_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794412410
+  },
+  "SECZ_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794412411
   }
 }
