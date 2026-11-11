@@ -1416,6 +1416,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "GRVT_USDT|SHORT|EARLY|1794413757",
+      "symbol": "GRVT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.19025,
+      "sl": 0.19111450110031883,
+      "tp": [
+        0.18938549889968118,
+        0.18895324834952176
+      ],
+      "created_at": 1794413757,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
