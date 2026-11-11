@@ -385,11 +385,11 @@
   },
   "COHR_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794241853
+    "sent_at": 1794413470
   },
   "INTC_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794241853
+    "sent_at": 1794413465
   },
   "SQQQ_USDT|SHORT": {
     "type": "WATCH",
@@ -494,5 +494,53 @@
   "SECZ_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794412411
+  },
+  "SOXL_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794413464
+  },
+  "MU_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794413465
+  },
+  "SOXSX_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794413466
+  },
+  "SKHY_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794413467
+  },
+  "SNXX_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794413467
+  },
+  "SKHYNIX_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794413468
+  },
+  "SNDK_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794413468
+  },
+  "ZHIPU_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794413468
+  },
+  "COOKIE_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794413469
+  },
+  "AMD_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794413471
+  },
+  "GOOGL_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794413472
+  },
+  "NBIS_USDT|LONG": {
+    "type": "CONFIRMED",
+    "sent_at": 1794413472
   }
 }
