@@ -236,7 +236,7 @@
   },
   "ZIL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794382220,
+    "sent_at": 1794435399,
     "trigger": ""
   },
   "LUMIA_USDT|SHORT": {
@@ -306,8 +306,8 @@
   },
   "APR_USDT|LONG": {
     "type": "EARLY",
-    "sent_at": 1794344012,
-    "trigger": "15M_EMA9_CROSS"
+    "sent_at": 1794435398,
+    "trigger": "15M_SWING_LOW_RECLAIM"
   },
   "UNI_USDT|SHORT": {
     "type": "WATCH",
@@ -362,6 +362,26 @@
   "YAGEO_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794411206,
+    "trigger": ""
+  },
+  "ONE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794435398,
+    "trigger": "15M_SWING_LOW_RECLAIM"
+  },
+  "GRAM_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794435398,
+    "trigger": "FIRST_BULLISH_15M_CANDLE"
+  },
+  "ENA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794435399,
+    "trigger": ""
+  },
+  "MAV_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794435400,
     "trigger": ""
   }
 }
