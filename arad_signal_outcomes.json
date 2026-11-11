@@ -1484,6 +1484,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BIANRENSHENG_USDT|LONG|EARLY|1794413765",
+      "symbol": "BIANRENSHENG_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.4999,
+      "sl": 0.4978853558274218,
+      "tp": [
+        0.5019146441725781,
+        0.5029219662588673
+      ],
+      "created_at": 1794413765,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
