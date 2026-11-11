@@ -1178,6 +1178,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "NVO_USDT|LONG|EARLY|1794413728",
+      "symbol": "NVO_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 40.48,
+      "sl": 40.279759999999996,
+      "tp": [
+        40.68024,
+        40.78036
+      ],
+      "created_at": 1794413728,
+      "first_candle_time": 1794414000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
