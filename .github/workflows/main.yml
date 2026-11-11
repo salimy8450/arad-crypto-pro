@@ -32,7 +32,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Run ARAD CRYPTO PRO V5.8 OURBIT — 5M/15M/1H
+      - name: Run ARAD CRYPTO PRO V5.9 OURBIT — 15M DECISION / 5M ENTRY
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
