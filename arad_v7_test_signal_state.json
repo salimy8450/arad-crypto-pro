@@ -398,5 +398,35 @@
     "type": "WATCH",
     "sent_at": 1794452678,
     "trigger": ""
+  },
+  "PARTI_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794481032,
+    "trigger": "15M_SWING_LOW_RECLAIM"
+  },
+  "BE_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794481032,
+    "trigger": "15M_RANGE_BREAK"
+  },
+  "USELESS_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794481032,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "PENGU_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794481033,
+    "trigger": ""
+  },
+  "LINK_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794481033,
+    "trigger": ""
+  },
+  "PRL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794481033,
+    "trigger": ""
   }
 }
