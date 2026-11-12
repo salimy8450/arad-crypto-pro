@@ -2825,6 +2825,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "WOO_USDT|LONG|EARLY|1794477427",
+      "symbol": "WOO_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.01054,
+      "sl": 0.01049575471546349,
+      "tp": [
+        0.010584245284536511,
+        0.010606367926804767,
+        0.010628490569073022,
+        0.010650613211341278,
+        0.010672735853609533,
+        0.010716981138146044
+      ],
+      "created_at": 1794477427,
+      "first_candle_time": 1794477600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
