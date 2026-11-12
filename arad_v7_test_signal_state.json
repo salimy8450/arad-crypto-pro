@@ -396,7 +396,7 @@
   },
   "HOT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794452678,
+    "sent_at": 1794508899,
     "trigger": ""
   },
   "PARTI_USDT|LONG": {
@@ -427,6 +427,26 @@
   "PRL_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794481033,
+    "trigger": ""
+  },
+  "COOKIE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794508897,
+    "trigger": "15M_SWING_LOW_RECLAIM"
+  },
+  "CORE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794508898,
+    "trigger": "15M_SWING_LOW_RECLAIM"
+  },
+  "ZEC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794508898,
+    "trigger": ""
+  },
+  "IDOL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794508899,
     "trigger": ""
   }
 }
