@@ -925,6 +925,78 @@ def classify_early_move(direction, m15):
     }
 
 
+def first_impulse_quality(candles, direction, min_volume_ratio=0.90):
+    """
+    Early first-wave detector: impulse candle + fresh micro structure/sweep +
+    participation + improving momentum. It scores the first closed candle,
+    instead of waiting for several same-direction candles.
+    """
+    if len(candles) < 35:
+        return None
+    metrics = market_metrics(candles)
+    previous_metrics = market_metrics(candles[:-1])
+    if metrics["atr"] <= 0 or not metrics["ema9"]:
+        return None
+
+    last = candles[-1]
+    candle_range = max(last["high"] - last["low"], 1e-12)
+    body_ratio = abs(last["close"] - last["open"]) / candle_range
+    close_position = (last["close"] - last["low"]) / candle_range
+    prior = candles[-7:-1]
+    prior3 = candles[-4:-1]
+    if len(prior) < 6:
+        return None
+
+    prior_high = max(c["high"] for c in prior)
+    prior_low = min(c["low"] for c in prior)
+    if direction == "LONG":
+        impulse = last["close"] > last["open"] and body_ratio >= 0.38 and close_position >= 0.64
+        micro_break = last["close"] > max(c["high"] for c in prior3)
+        sweep_reclaim = last["low"] < prior_low and last["close"] > prior_low
+        rsi_improving = metrics["rsi"] >= 48 and metrics["rsi"] >= previous_metrics["rsi"] + 1.0
+        macd_improving = metrics["macd_hist"] > previous_metrics["macd_hist"]
+        ema_turn = metrics["ema9"] > previous_metrics["ema9"] and last["close"] > metrics["ema9"]
+    else:
+        impulse = last["close"] < last["open"] and body_ratio >= 0.38 and close_position <= 0.36
+        micro_break = last["close"] < min(c["low"] for c in prior3)
+        sweep_reclaim = last["high"] > prior_high and last["close"] < prior_high
+        rsi_improving = metrics["rsi"] <= 52 and metrics["rsi"] <= previous_metrics["rsi"] - 1.0
+        macd_improving = metrics["macd_hist"] < previous_metrics["macd_hist"]
+        ema_turn = metrics["ema9"] < previous_metrics["ema9"] and last["close"] < metrics["ema9"]
+
+    if not impulse or not (micro_break or sweep_reclaim):
+        return None
+
+    volume_ok = metrics["volume_ratio"] >= min_volume_ratio or impulse_volume_ok(candles, direction)
+    if not volume_ok:
+        return None
+
+    recent_ranges = [c["high"] - c["low"] for c in candles[-4:-1]]
+    base_ranges = [c["high"] - c["low"] for c in candles[-14:-4]]
+    recent_avg = sum(recent_ranges) / max(len(recent_ranges), 1)
+    base_avg = sum(base_ranges) / max(len(base_ranges), 1)
+    compression = base_avg > 0 and recent_avg <= base_avg * 0.95
+
+    score = 0
+    score += 1 if body_ratio >= 0.48 else 0
+    score += 1 if (micro_break or sweep_reclaim) else 0
+    score += 1 if metrics["volume_ratio"] >= 1.15 or impulse_volume_ok(candles, direction) else 0
+    score += 1 if rsi_improving else 0
+    score += 1 if macd_improving else 0
+    score += 1 if ema_turn else 0
+    score += 1 if compression else 0
+    if score < 4:
+        return None
+
+    return {
+        "score": score, "body_ratio": body_ratio,
+        "volume_ratio": metrics["volume_ratio"],
+        "micro_break": micro_break, "sweep_reclaim": sweep_reclaim,
+        "compression": compression, "rsi_improving": rsi_improving,
+        "macd_improving": macd_improving, "ema_turn": ema_turn,
+    }
+
+
 def detect_early_5m(candles5, candles15, live_price):
     """Detect a genuinely early 5m move with volume, micro-structure and exhaustion checks."""
     if len(candles5) < 35 or live_price <= 0:
@@ -983,18 +1055,29 @@ def detect_early_5m(candles5, candles15, live_price):
         and close_position >= 0.55
     )
 
+    # Predict the first directional impulse candle using 7 evidence points.
+    # This is evaluated before legacy triggers so the alert can fire on the first
+    # closed impulse candle, not after a multi-candle trend is already mature.
+    early_short = first_impulse_quality(candles5, "SHORT")
+    early_long = first_impulse_quality(candles5, "LONG")
     direction = trigger = None
-    if short_rejection:
+    predictive = None
+    if early_short and (not early_long or early_short["score"] >= early_long["score"]):
+        direction, trigger, predictive = "SHORT", "FIRST_IMPULSE_5M_PREDICTIVE", early_short
+    elif early_long:
+        direction, trigger, predictive = "LONG", "FIRST_IMPULSE_5M_PREDICTIVE", early_long
+
+    if not direction and short_rejection:
         direction, trigger = "SHORT", "5M_RESISTANCE_REJECTION"
-    elif long_rejection:
+    elif not direction and long_rejection:
         direction, trigger = "LONG", "5M_SUPPORT_RECLAIM"
-    elif first_bearish:
+    elif not direction and first_bearish:
         direction, trigger = "SHORT", "FIRST_BEARISH_5M_CANDLE"
-    elif first_bullish:
+    elif not direction and first_bullish:
         direction, trigger = "LONG", "FIRST_BULLISH_5M_CANDLE"
-    elif micro_short_break and last["close"] < last["open"] and body_ratio >= 0.45 and close_position <= 0.38:
+    elif not direction and micro_short_break and last["close"] < last["open"] and body_ratio >= 0.45 and close_position <= 0.38:
         direction, trigger = "SHORT", "5M_MICRO_BOS"
-    elif micro_long_break and last["close"] > last["open"] and body_ratio >= 0.45 and close_position >= 0.62:
+    elif not direction and micro_long_break and last["close"] > last["open"] and body_ratio >= 0.45 and close_position >= 0.62:
         direction, trigger = "LONG", "5M_MICRO_BOS"
 
     if not direction:
@@ -1058,6 +1141,8 @@ def detect_early_5m(candles5, candles15, live_price):
     r_multiples = (1.0, 1.5, 2.0, 2.5, 3.0, 4.0)
     targets = [entry - risk * r if direction == "SHORT" else entry + risk * r for r in r_multiples]
     score = 5
+    if predictive:
+        score = max(score, predictive["score"] + 3)
     score += 2 if trigger in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM") else 0
     score += 1 if body_ratio >= 0.55 else 0
     score += 1 if m5["volume_ratio"] >= 1.50 else 0
@@ -1070,6 +1155,8 @@ def detect_early_5m(candles5, candles15, live_price):
         "setup_type": setup["setup_type"], "setup_label": setup["setup_label"],
         "context_note": setup["context_note"], "entry_confirmation": entry_confirmation,
         "micro_bos": fresh_bos, "volume_confirmed": volume_ok,
+        "predictive_score": predictive["score"] if predictive else 0,
+        "first_impulse_evidence": predictive or {},
     }
 
 def early_entry_message(item):
@@ -1089,6 +1176,7 @@ def early_entry_message(item):
         "ریسک: {:.2f} ATR | نسبت TP6 به ریسک: 4.00R".format(item["risk_atr"]),
         "RSI 5m: {:.1f} | حجم: {:.2f}x".format(item["m5"]["rsi"], item["m5"]["volume_ratio"]),
         "ساختار خرد: {} | تأیید حجم: {}".format("شکست تأیید شد" if item.get("micro_bos") else "رد شد", "بله" if item.get("volume_confirmed") else "خیر"),
+        "قدرت پیش‌بینی کندل اول: {}/7".format(item.get("predictive_score", 0)),
         "روند زمینه 15m: {} | RSI: {:.1f}".format(item["m15"]["trend"], item["m15"]["rsi"]),
         "نوع حرکت: {}".format(item.get("setup_label", "نامشخص")),
         "تفسیر: {}".format(item.get("context_note", "زمینه حرکت نیازمند بررسی است.")),
