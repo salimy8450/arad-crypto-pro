@@ -1004,6 +1004,20 @@ def detect_early_5m(candles5, candles15, live_price):
     if not direction:
         return None
 
+    # In a weak/opposite 15m context, a lone first-color candle is only a
+    # counter-trend correction candidate. Do not send it as an entry until
+    # the 5m candle also breaks nearby micro structure in the signal direction.
+    setup = classify_early_move(direction, m15)
+    entry_confirmation = "FIRST_5M_TRIGGER"
+    if setup["setup_type"] in ("CORRECTIVE_LONG", "CORRECTIVE_SHORT"):
+        structure_direction, _sweep, structure_bos = structure_signal(candles5)
+        micro_bos = micro_breakout_signal(candles5, direction)
+        if not (micro_bos or (structure_direction == direction and structure_bos)):
+            return None
+        entry_confirmation = "CORRECTIVE_MICRO_BOS_CONFIRMED"
+    elif setup["setup_type"].startswith("EARLY_REVERSAL_"):
+        entry_confirmation = "EARLY_REVERSAL_TRIGGER"
+
     entry = live_price
     swing = max(c["high"] for c in candles5[-4:]) if direction == "SHORT" else min(c["low"] for c in candles5[-4:])
     buffer = max(m5["atr"] * 0.15, entry * 0.0003)
@@ -1016,7 +1030,6 @@ def detect_early_5m(candles5, candles15, live_price):
 
     r_multiples = (1.0, 1.5, 2.0, 2.5, 3.0, 4.0)
     targets = [entry - risk * r if direction == "SHORT" else entry + risk * r for r in r_multiples]
-    setup = classify_early_move(direction, m15)
     score = 5
     score += 2 if trigger in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM") else 0
     score += 1 if body_ratio >= 0.55 else 0
@@ -1028,7 +1041,7 @@ def detect_early_5m(candles5, candles15, live_price):
         "sl": stop, "tp": targets, "score": score, "m5": m5, "m15": m15,
         "body_ratio": body_ratio, "trigger": trigger, "risk_atr": risk / m5["atr"],
         "setup_type": setup["setup_type"], "setup_label": setup["setup_label"],
-        "context_note": setup["context_note"],
+        "context_note": setup["context_note"], "entry_confirmation": entry_confirmation,
     }
 
 
@@ -1051,6 +1064,10 @@ def early_entry_message(item):
         "روند زمینه 15m: {} | RSI: {:.1f}".format(item["m15"]["trend"], item["m15"]["rsi"]),
         "نوع حرکت: {}".format(item.get("setup_label", "نامشخص")),
         "تفسیر: {}".format(item.get("context_note", "زمینه حرکت نیازمند بررسی است.")),
+        "تأیید ورود: {}".format(
+            "شکست ساختار خرد ۵ دقیقه تأیید شد" if item.get("entry_confirmation") == "CORRECTIVE_MICRO_BOS_CONFIRMED"
+            else "محرک اولیه ۵ دقیقه؛ هنوز برگشت روند قطعی نیست"
+        ),
         "محرک: {} | قدرت بدنه: {:.0f}%".format(item["trigger"], item["body_ratio"] * 100),
         "امتیاز شروع حرکت: {}".format(item["score"]),
         "",
