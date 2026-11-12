@@ -2783,6 +2783,27 @@
       "result": "WIN_TP1",
       "max_tp": 3,
       "exit_candle": 1794466500
+    },
+    {
+      "id": "FLR_USDT|LONG|EARLY|1794477424",
+      "symbol": "FLR_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.005336,
+      "sl": 0.0053243992,
+      "tp": [
+        0.0053476007999999995,
+        0.0053534012,
+        0.005359201599999999,
+        0.005365001999999999,
+        0.005370802399999999,
+        0.005382403199999999
+      ],
+      "created_at": 1794477424,
+      "first_candle_time": 1794477600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
