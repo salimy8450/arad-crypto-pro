@@ -1877,6 +1877,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ZEREBRO_USDT|SHORT|EARLY|1794463572",
+      "symbol": "ZEREBRO_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.02355,
+      "sl": 0.023642249977875434,
+      "tp": [
+        0.02345775002212457,
+        0.023411625033186854
+      ],
+      "created_at": 1794463572,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
