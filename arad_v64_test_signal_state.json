@@ -149,7 +149,7 @@
   },
   "SXT_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794420532
+    "sent_at": 1794444819
   },
   "CFX_USDT|SHORT": {
     "type": "WATCH",
@@ -230,5 +230,21 @@
   "MSFT_USDT|SHORT": {
     "type": "CONFIRMED",
     "sent_at": 1794420536
+  },
+  "ERA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794444819
+  },
+  "AGT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794444819
+  },
+  "MRNA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794444820
+  },
+  "POL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794444820
   }
 }
