@@ -3098,6 +3098,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "HUMA_USDT|SHORT|EARLY|1794497714",
+      "symbol": "HUMA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.008052,
+      "sl": 0.00822097134222834,
+      "tp": [
+        0.00788302865777166,
+        0.00779854298665749,
+        0.0077140573155433205,
+        0.007629571644429151,
+        0.007545085973314981,
+        0.007376114631086641
+      ],
+      "created_at": 1794497714,
+      "first_candle_time": 1794498000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
