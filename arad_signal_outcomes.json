@@ -1656,6 +1656,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SUPER_USDT|LONG|EARLY|1794463546",
+      "symbol": "SUPER_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.15685,
+      "sl": 0.15650700404724507,
+      "tp": [
+        0.1571929959527549,
+        0.15736449392913238
+      ],
+      "created_at": 1794463546,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
