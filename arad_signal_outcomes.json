@@ -2442,6 +2442,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "LINEA_USDT|SHORT|EARLY|1794465169",
+      "symbol": "LINEA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.00206,
+      "sl": 0.002062870734876808,
+      "tp": [
+        0.0020571292651231925,
+        0.0020556938976847884,
+        0.0020542585302463848,
+        0.002052823162807981,
+        0.002051387795369577,
+        0.0020485170604927693
+      ],
+      "created_at": 1794465169,
+      "first_candle_time": 1794465300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
