@@ -336,7 +336,7 @@
   },
   "JCT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794358749,
+    "sent_at": 1794452677,
     "trigger": ""
   },
   "CT_USDT|SHORT": {
@@ -382,6 +382,21 @@
   "MAV_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794435400,
+    "trigger": ""
+  },
+  "CLO_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794452677,
+    "trigger": "15M_RANGE_BREAK"
+  },
+  "SAGA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794452678,
+    "trigger": ""
+  },
+  "HOT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794452678,
     "trigger": ""
   }
 }
