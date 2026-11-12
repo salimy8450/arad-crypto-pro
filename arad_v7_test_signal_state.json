@@ -138,7 +138,8 @@
   },
   "HUMA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794289583
+    "sent_at": 1794527721,
+    "trigger": ""
   },
   "CBRS_USDT|LONG": {
     "type": "WATCH",
@@ -265,9 +266,9 @@
     "trigger": ""
   },
   "TRIA_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794294219,
-    "trigger": ""
+    "type": "EARLY",
+    "sent_at": 1794527720,
+    "trigger": "FIRST_BULLISH_15M_CANDLE"
   },
   "PHA_USDT|SHORT": {
     "type": "EARLY",
@@ -447,6 +448,26 @@
   "IDOL_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794508899,
+    "trigger": ""
+  },
+  "BAT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794527719,
+    "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "BARD_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794527720,
+    "trigger": "15M_EMA9_CROSS"
+  },
+  "PREDICT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794527721,
+    "trigger": ""
+  },
+  "XAN_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794527721,
     "trigger": ""
   }
 }
