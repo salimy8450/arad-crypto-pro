@@ -2547,6 +2547,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SAFE_USDT|LONG|EARLY|1794465178",
+      "symbol": "SAFE_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.08687,
+      "sl": 0.0864149362320623,
+      "tp": [
+        0.08732506376793771,
+        0.08755259565190657,
+        0.08778012753587541,
+        0.08800765941984426,
+        0.08823519130381312,
+        0.08869025507175082
+      ],
+      "created_at": 1794465178,
+      "first_candle_time": 1794465300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
