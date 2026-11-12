@@ -3654,6 +3654,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "HOT_USDT|SHORT|CONFIRMED|1794520797",
+      "symbol": "HOT_USDT",
+      "direction": "SHORT",
+      "alert_type": "CONFIRMED",
+      "entry": 0.0003903,
+      "sl": 0.00039233334131021915,
+      "tp": [
+        0.00038826665868978085,
+        0.00038724998803467127,
+        0.0003862333173795617,
+        0.0003852166467244521,
+        0.00038419997606934254,
+        0.0003821666347591234
+      ],
+      "created_at": 1794520797,
+      "first_candle_time": 1794520800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
