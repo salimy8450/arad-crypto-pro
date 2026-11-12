@@ -2610,6 +2610,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "AIA_USDT|LONG|EARLY|1794466313",
+      "symbol": "AIA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.06255,
+      "sl": 0.06222841265986731,
+      "tp": [
+        0.06287158734013268,
+        0.06303238101019902,
+        0.06319317468026536,
+        0.0633539683503317,
+        0.06351476202039805,
+        0.06383634936053073
+      ],
+      "created_at": 1794466313,
+      "first_candle_time": 1794466500,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
