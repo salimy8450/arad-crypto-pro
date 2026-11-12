@@ -3486,6 +3486,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SQD_USDT|SHORT|EARLY|1794520779",
+      "symbol": "SQD_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.01557,
+      "sl": 0.015679168000992772,
+      "tp": [
+        0.015460831999007229,
+        0.015406247998510843,
+        0.015351663998014457,
+        0.015297079997518072,
+        0.015242495997021686,
+        0.015133327996028914
+      ],
+      "created_at": 1794520779,
+      "first_candle_time": 1794520800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
