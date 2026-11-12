@@ -850,24 +850,8 @@ def analyze_stage3(candidate):
 
 def early_5m_confirmation_ok(candles5, direction):
     """Require a real 5m price break and participation before a 15m early alert."""
-    if len(candles5) < 35:
-        return False
-    m5 = market_metrics(candles5)
-    if m5["atr"] <= 0:
-        return False
-    last, previous = candles5[-1], candles5[-2]
-    candle_range = max(last["high"] - last["low"], 1e-12)
-    body_ratio = abs(last["close"] - last["open"]) / candle_range
-    close_position = (last["close"] - last["low"]) / candle_range
-    if direction == "SHORT":
-        directional = last["close"] < last["open"] and close_position <= 0.42
-        one_bar_break = last["close"] < previous["low"]
-    else:
-        directional = last["close"] > last["open"] and close_position >= 0.58
-        one_bar_break = last["close"] > previous["high"]
-    structure_break = one_bar_break or micro_breakout_signal(candles5, direction)
-    volume_ok = m5["volume_ratio"] >= 1.05 or impulse_volume_ok(candles5, direction)
-    return directional and body_ratio >= 0.40 and structure_break and volume_ok
+    # The 15m setup is not sent until the first 5m impulse itself scores well.
+    return first_impulse_quality(candles5, direction, min_volume_ratio=0.90) is not None
 
 
 def first_impulse_quality(candles, direction, min_volume_ratio=0.90):
@@ -1023,13 +1007,13 @@ def detect_early_15m(candles, live_price, candles5=None, require_5m=False):
         direction, trigger = "SHORT", "FIRST_BEARISH_15M_CANDLE"
     elif not direction and first_bullish:
         direction, trigger = "LONG", "FIRST_BULLISH_15M_CANDLE"
-    elif short_break and last["close"] < last["open"] and body_ratio >= 0.45 and close_position <= 0.35:
+    elif not direction and short_break and last["close"] < last["open"] and body_ratio >= 0.45 and close_position <= 0.35:
         direction, trigger = "SHORT", "15M_RANGE_BREAK"
-    elif long_break and last["close"] > last["open"] and body_ratio >= 0.45 and close_position >= 0.65:
+    elif not direction and long_break and last["close"] > last["open"] and body_ratio >= 0.45 and close_position >= 0.65:
         direction, trigger = "LONG", "15M_RANGE_BREAK"
-    elif short_cross and last["close"] < previous["low"] and last["close"] < last["open"] and m["volume_ratio"] >= 1.25:
+    elif not direction and short_cross and last["close"] < previous["low"] and last["close"] < last["open"] and m["volume_ratio"] >= 1.25:
         direction, trigger = "SHORT", "15M_EMA9_CROSS_MICRO_BREAK"
-    elif long_cross and last["close"] > previous["high"] and last["close"] > last["open"] and m["volume_ratio"] >= 1.25:
+    elif not direction and long_cross and last["close"] > previous["high"] and last["close"] > last["open"] and m["volume_ratio"] >= 1.25:
         direction, trigger = "LONG", "15M_EMA9_CROSS_MICRO_BREAK"
 
     if not direction:
@@ -1105,6 +1089,7 @@ def early_entry_message(item):
         "RSI 15m: {:.1f} | حجم: {:.2f}x".format(item["m15"]["rsi"], item["m15"]["volume_ratio"]),
         "محرک: {} | قدرت بدنه: {:.0f}%".format(item["trigger"], item["body_ratio"] * 100),
         "تأیید ۵ دقیقه: {}".format("شکست ساختار و حجم تأیید شد" if item.get("confirmation_5m") else "در انتظار تأیید"),
+        "قدرت پیش‌بینی کندل اول ۱۵m: {}/7".format(item.get("predictive_score", 0)),
         "قدرت پیش‌بینی کندل اول: {}/7".format(item.get("predictive_score", 0)),
         "فاصله حد ضرر: {:.2f} ATR".format(item.get("risk_atr", 0.0)),
         "امتیاز شروع حرکت: {}".format(item["score"]),
