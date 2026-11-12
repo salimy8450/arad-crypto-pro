@@ -50,5 +50,57 @@
   "IREN_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794465182
+  },
+  "ANTHROPIC_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794466313
+  },
+  "AIA_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794466314
+  },
+  "CHZ_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794466316
+  },
+  "IRYS_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794466317
+  },
+  "QQQ_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794466318
+  },
+  "BICO_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794466320
+  },
+  "CVC_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794466320
+  },
+  "WLFI_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794466322
+  },
+  "SUI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794466322
+  },
+  "SAGA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794466323
+  },
+  "PENGU_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794466323
+  },
+  "TOWNS_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794466323
+  },
+  "KGEN_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794466324
   }
 }
