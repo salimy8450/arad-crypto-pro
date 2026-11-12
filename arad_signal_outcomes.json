@@ -2993,6 +2993,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MU_USDT|SHORT|EARLY|1794497706",
+      "symbol": "MU_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 777.09,
+      "sl": 780.279964382945,
+      "tp": [
+        773.9000356170551,
+        772.3050534255826,
+        770.7100712341102,
+        769.1150890426377,
+        767.5201068511652,
+        764.3301424682203
+      ],
+      "created_at": 1794497706,
+      "first_candle_time": 1794498000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
