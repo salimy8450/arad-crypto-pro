@@ -1093,9 +1093,10 @@
       ],
       "created_at": 1794413717,
       "first_candle_time": 1794414000,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794426300
     },
     {
       "id": "TUT_USDT|LONG|EARLY|1794413719",
@@ -1128,9 +1129,10 @@
       ],
       "created_at": 1794413721,
       "first_candle_time": 1794414000,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794430500
     },
     {
       "id": "PLTR_USDT|LONG|EARLY|1794413722",
@@ -1145,9 +1147,10 @@
       ],
       "created_at": 1794413722,
       "first_candle_time": 1794414000,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794431400
     },
     {
       "id": "SNPS_USDT|LONG|EARLY|1794413724",
@@ -1162,9 +1165,10 @@
       ],
       "created_at": 1794413724,
       "first_candle_time": 1794414000,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794423900
     },
     {
       "id": "BLACKBERRY_USDT|LONG|EARLY|1794413725",
@@ -1287,9 +1291,10 @@
       ],
       "created_at": 1794413740,
       "first_candle_time": 1794414000,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794420900
     },
     {
       "id": "XBI_USDT|LONG|EARLY|1794413741",
@@ -1322,9 +1327,10 @@
       ],
       "created_at": 1794413743,
       "first_candle_time": 1794414000,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "LOSS_SL",
+      "max_tp": 0,
+      "exit_candle": 1794423900
     },
     {
       "id": "ON_USDT|LONG|EARLY|1794413745",
@@ -1555,9 +1561,10 @@
       ],
       "created_at": 1794413769,
       "first_candle_time": 1794414000,
-      "status": "OPEN",
-      "result": null,
-      "max_tp": 0
+      "status": "CLOSED",
+      "result": "WIN_TP1",
+      "max_tp": 1,
+      "exit_candle": 1794427500
     },
     {
       "id": "DOT_USDT|LONG|EARLY|1794413770",
