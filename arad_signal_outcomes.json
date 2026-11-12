@@ -1911,6 +1911,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "10Y_USDT|LONG|EARLY|1794463578",
+      "symbol": "10Y_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 4.9238,
+      "sl": 4.910641790020441,
+      "tp": [
+        4.936958209979559,
+        4.943537314969339
+      ],
+      "created_at": 1794463578,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
