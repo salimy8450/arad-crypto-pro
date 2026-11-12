@@ -3035,6 +3035,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "HBAR_USDT|SHORT|EARLY|1794497709",
+      "symbol": "HBAR_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.06336,
+      "sl": 0.06397772651354287,
+      "tp": [
+        0.06274227348645713,
+        0.06243341022968569,
+        0.06212454697291425,
+        0.061815683716142815,
+        0.06150682045937138,
+        0.060889093945828504
+      ],
+      "created_at": 1794497709,
+      "first_candle_time": 1794498000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
