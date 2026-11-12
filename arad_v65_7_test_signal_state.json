@@ -1,0 +1,54 @@
+{
+  "AKAM_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794465168
+  },
+  "LINEA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794465170
+  },
+  "ZBT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794465172
+  },
+  "HAJIMI_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794465173
+  },
+  "SBIN_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794465175
+  },
+  "GOLDCIR_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794465177
+  },
+  "SAFE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794465179
+  },
+  "ADA_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794465180
+  },
+  "HOT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794465181
+  },
+  "SXT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794465181
+  },
+  "JCT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794465182
+  },
+  "0G_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794465182
+  },
+  "IREN_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794465182
+  }
+}
