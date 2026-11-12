@@ -1707,6 +1707,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "RSR_USDT|LONG|EARLY|1794463552",
+      "symbol": "RSR_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.001531,
+      "sl": 0.0015223696564923973,
+      "tp": [
+        0.0015396303435076027,
+        0.001543945515261404
+      ],
+      "created_at": 1794463552,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
