@@ -2336,6 +2336,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "OPENAI_USDT|LONG|EARLY|1794463630",
+      "symbol": "OPENAI_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 1271.04,
+      "sl": 1266.727787280793,
+      "tp": [
+        1275.3522127192068,
+        1277.5083190788102
+      ],
+      "created_at": 1794463630,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
