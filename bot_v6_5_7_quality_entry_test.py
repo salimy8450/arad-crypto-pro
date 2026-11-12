@@ -1330,7 +1330,7 @@ def early_entry_message(item):
     for i, target in enumerate(item["tp"], 1):
         lines.append("TP{}: {}".format(i, format_price(target)))
     lines += [
-        "ریسک: {:.2f} ATR | نسبت TP6 به ریسک: 4.00R".format(item["risk_atr"]),
+        "ریسک: {:.2f} ATR | تعداد تارگت‌ها: {}".format(item["risk_atr"], len(item["tp"])),
         "RSI 5m: {:.1f} | حجم: {:.2f}x".format(item["m5"]["rsi"], item["m5"]["volume_ratio"]),
         "ساختار خرد: {} | تأیید حجم: {}".format("شکست تأیید شد" if item.get("micro_bos") else "رد شد", "بله" if item.get("volume_confirmed") else "خیر"),
         "قدرت پیش‌بینی کندل اول: {}/7".format(item.get("predictive_score", 0)),
