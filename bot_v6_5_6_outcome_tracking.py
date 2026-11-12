@@ -1098,7 +1098,6 @@ def early_entry_message(item):
             "بله" if item.get("first_impulse_evidence", {}).get("macd_improving") else "خیر",
             "بله" if item.get("first_impulse_evidence", {}).get("ema_turn") else "خیر",
         ),
-        "قدرت پیش‌بینی کندل اول: {}/7".format(item.get("predictive_score", 0)),
         "فاصله حد ضرر: {:.2f} ATR".format(item.get("risk_atr", 0.0)),
         "امتیاز شروع حرکت: {}".format(item["score"]),
         "",
