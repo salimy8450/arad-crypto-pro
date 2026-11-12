@@ -3402,6 +3402,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ONDO_USDT|LONG|EARLY|1794513144",
+      "symbol": "ONDO_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.3515,
+      "sl": 0.34937423486092284,
+      "tp": [
+        0.3536257651390771,
+        0.3546886477086157,
+        0.35575153027815426,
+        0.35681441284769283,
+        0.3578772954172314,
+        0.36000306055630854
+      ],
+      "created_at": 1794513144,
+      "first_candle_time": 1794513300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
