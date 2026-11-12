@@ -2166,6 +2166,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "GENIUS_USDT|SHORT|EARLY|1794463608",
+      "symbol": "GENIUS_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.2802,
+      "sl": 0.2807401,
+      "tp": [
+        0.2796599,
+        0.27938985000000005
+      ],
+      "created_at": 1794463608,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
