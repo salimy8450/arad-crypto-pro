@@ -1085,12 +1085,14 @@ def detect_early_5m(candles5, candles15, live_price):
 
     # A single EMA9 cross or a candle closing near its extreme is not enough.
     # Require meaningful participation and an observable price/structure break.
-    volume_ok = m5["volume_ratio"] >= 1.05 or impulse_volume_ok(candles5, direction)
+    volume_floor = 0.90 if predictive else 1.05
+    volume_ok = m5["volume_ratio"] >= volume_floor or impulse_volume_ok(candles5, direction)
     if not volume_ok:
         return None
     micro_bos = short_structure_break if direction == "SHORT" else long_structure_break
     structure_direction, _sweep, structure_bos = structure_signal(candles5)
-    fresh_bos = micro_bos or (structure_direction == direction and structure_bos)
+    predictive_sweep = bool(predictive and predictive.get("sweep_reclaim"))
+    fresh_bos = micro_bos or predictive_sweep or (structure_direction == direction and structure_bos)
     if not fresh_bos and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM"):
         return None
 
