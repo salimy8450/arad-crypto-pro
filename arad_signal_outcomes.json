@@ -2909,6 +2909,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "QNT_USDT|SHORT|EARLY|1794477433",
+      "symbol": "QNT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 163.86,
+      "sl": 164.48944930715984,
+      "tp": [
+        163.23055069284018,
+        162.91582603926025,
+        162.60110138568035,
+        162.28637673210045,
+        161.97165207852052,
+        161.3422027713607
+      ],
+      "created_at": 1794477433,
+      "first_candle_time": 1794477600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
