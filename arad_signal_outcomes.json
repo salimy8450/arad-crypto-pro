@@ -2951,6 +2951,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "2Z_USDT|SHORT|EARLY|1794497703",
+      "symbol": "2Z_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.01858,
+      "sl": 0.018626399630852653,
+      "tp": [
+        0.018533600369147345,
+        0.018510400553721017,
+        0.01848720073829469,
+        0.018464000922868366,
+        0.018440801107442038,
+        0.018394401476589384
+      ],
+      "created_at": 1794497703,
+      "first_candle_time": 1794498000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
