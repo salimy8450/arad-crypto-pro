@@ -1161,6 +1161,11 @@ def detect_early_5m(candles5, candles15, live_price):
         "first_impulse_evidence": predictive or {},
     }
 
+def early_5m_confirmation_ok(candles5, direction):
+    """Require the same qualified first 5m impulse before a 15m early alert."""
+    return first_impulse_quality(candles5, direction, min_volume_ratio=0.90) is not None
+
+
 def detect_early_15m(candles, live_price, candles5=None, require_5m=False):
     """
     Detect an early 15m move, but never treat EMA9 cross or candle color alone
