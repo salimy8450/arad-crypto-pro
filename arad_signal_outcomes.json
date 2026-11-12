@@ -2673,6 +2673,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "QQQ_USDT|SHORT|EARLY|1794466317",
+      "symbol": "QQQ_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 684.3,
+      "sl": 685.3852899999999,
+      "tp": [
+        683.21471,
+        682.672065,
+        682.12942,
+        681.586775,
+        681.04413,
+        679.95884
+      ],
+      "created_at": 1794466317,
+      "first_candle_time": 1794466500,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
