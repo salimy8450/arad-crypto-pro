@@ -3465,6 +3465,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "PENGU_USDT|LONG|EARLY|1794513150",
+      "symbol": "PENGU_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.006127,
+      "sl": 0.006086863768065245,
+      "tp": [
+        0.0061671362319347545,
+        0.006187204347902132,
+        0.0062072724638695094,
+        0.0062273405798368864,
+        0.006247408695804264,
+        0.006287544927739019
+      ],
+      "created_at": 1794513150,
+      "first_candle_time": 1794513300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
