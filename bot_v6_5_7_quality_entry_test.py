@@ -926,66 +926,61 @@ def classify_early_move(direction, m15):
 
 
 def detect_early_5m(candles5, candles15, live_price):
-    """Detect the first observable 5m reversal/impulse in either direction.
-    15m is context only and never vetoes an otherwise valid 5m trigger."""
+    """Detect a genuinely early 5m move with volume, micro-structure and exhaustion checks."""
     if len(candles5) < 35 or live_price <= 0:
         return None
     m5 = market_metrics(candles5)
     if not m5.get("atr") or not m5.get("ema9"):
         return None
     m15 = market_metrics(candles15) if candles15 and len(candles15) >= 30 else {
-        "trend": "NEUTRAL", "rsi": 50.0, "volume_ratio": 0.0
+        "trend": "NEUTRAL", "rsi": 50.0, "volume_ratio": 0.0, "macd_hist": 0.0
     }
     last, previous = candles5[-1], candles5[-2]
-    recent, prior3 = candles5[-7:-1], candles5[-4:-1]
+    prior3 = candles5[-4:-1]
     candle_range = max(last["high"] - last["low"], 1e-12)
     body_ratio = abs(last["close"] - last["open"]) / candle_range
     close_position = (last["close"] - last["low"]) / candle_range
     upper_wick = last["high"] - max(last["open"], last["close"])
     lower_wick = min(last["open"], last["close"]) - last["low"]
-    upper_wick_ratio, lower_wick_ratio = upper_wick / candle_range, lower_wick / candle_range
-    prev_ema9 = ema([c["close"] for c in candles5[:-1]], 9)
-    if not prev_ema9:
-        return None
+    upper_wick_ratio = upper_wick / candle_range
+    lower_wick_ratio = lower_wick / candle_range
+
     live_gap_atr = abs(live_price - last["close"]) / m5["atr"]
     candle_size_atr = candle_range / m5["atr"]
-    if live_gap_atr > 0.75 or candle_size_atr > 2.80:
+    ema21_distance_atr = abs(last["close"] - m5["ema21"]) / m5["atr"] if m5.get("ema21") else 0.0
+    if live_gap_atr > 0.60 or candle_size_atr > 2.40 or ema21_distance_atr > 1.80:
         return None
 
-    prior_high, prior_low = max(c["high"] for c in recent), min(c["low"] for c in recent)
-    micro_high, micro_low = max(c["high"] for c in prior3), min(c["low"] for c in prior3)
-    short_cross = previous["close"] >= prev_ema9 and last["close"] < m5["ema9"]
-    long_cross = previous["close"] <= prev_ema9 and last["close"] > m5["ema9"]
     bullish_before = sum(1 for c in prior3 if c["close"] > c["open"])
     bearish_before = sum(1 for c in prior3 if c["close"] < c["open"])
+    one_bar_short_break = last["close"] < previous["low"]
+    one_bar_long_break = last["close"] > previous["high"]
+    micro_short_break = micro_breakout_signal(candles5, "SHORT")
+    micro_long_break = micro_breakout_signal(candles5, "LONG")
+    short_structure_break = one_bar_short_break or micro_short_break
+    long_structure_break = one_bar_long_break or micro_long_break
 
     first_bearish = (
-        last["close"] < last["open"] and bullish_before >= 1
-        and body_ratio >= 0.35 and close_position <= 0.48
-        and (last["close"] < previous["low"] or short_cross or close_position <= 0.25)
+        last["close"] < last["open"] and bullish_before >= 2
+        and body_ratio >= 0.45 and close_position <= 0.38
+        and short_structure_break
     )
     first_bullish = (
-        last["close"] > last["open"] and bearish_before >= 1
-        and body_ratio >= 0.35 and close_position >= 0.52
-        and (last["close"] > previous["high"] or long_cross or close_position >= 0.75)
+        last["close"] > last["open"] and bearish_before >= 2
+        and body_ratio >= 0.45 and close_position >= 0.62
+        and long_structure_break
     )
+    recent_high = max(c["high"] for c in candles5[-7:-1])
+    recent_low = min(c["low"] for c in candles5[-7:-1])
     short_rejection = (
-        last["high"] > prior_high and last["close"] < prior_high
-        and last["close"] < last["open"] and upper_wick_ratio >= 0.25
-        and close_position <= 0.60
+        last["high"] > recent_high and last["close"] < recent_high
+        and last["close"] < last["open"] and upper_wick_ratio >= 0.30
+        and close_position <= 0.45
     )
     long_rejection = (
-        last["low"] < prior_low and last["close"] > prior_low
-        and last["close"] > last["open"] and lower_wick_ratio >= 0.25
-        and close_position >= 0.40
-    )
-    short_break = (
-        last["close"] < micro_low and last["close"] < last["open"]
-        and body_ratio >= 0.35 and close_position <= 0.40
-    )
-    long_break = (
-        last["close"] > micro_high and last["close"] > last["open"]
-        and body_ratio >= 0.35 and close_position >= 0.60
+        last["low"] < recent_low and last["close"] > recent_low
+        and last["close"] > last["open"] and lower_wick_ratio >= 0.30
+        and close_position >= 0.55
     )
 
     direction = trigger = None
@@ -997,33 +992,63 @@ def detect_early_5m(candles5, candles15, live_price):
         direction, trigger = "SHORT", "FIRST_BEARISH_5M_CANDLE"
     elif first_bullish:
         direction, trigger = "LONG", "FIRST_BULLISH_5M_CANDLE"
-    elif short_break:
+    elif micro_short_break and last["close"] < last["open"] and body_ratio >= 0.45 and close_position <= 0.38:
         direction, trigger = "SHORT", "5M_MICRO_BOS"
-    elif long_break:
+    elif micro_long_break and last["close"] > last["open"] and body_ratio >= 0.45 and close_position >= 0.62:
         direction, trigger = "LONG", "5M_MICRO_BOS"
+
     if not direction:
         return None
 
-    # In a weak/opposite 15m context, a lone first-color candle is only a
-    # counter-trend correction candidate. Do not send it as an entry until
-    # the 5m candle also breaks nearby micro structure in the signal direction.
+    # A single EMA9 cross or a candle closing near its extreme is not enough.
+    # Require meaningful participation and an observable price/structure break.
+    volume_ok = m5["volume_ratio"] >= 1.05 or impulse_volume_ok(candles5, direction)
+    if not volume_ok:
+        return None
+    micro_bos = short_structure_break if direction == "SHORT" else long_structure_break
+    structure_direction, _sweep, structure_bos = structure_signal(candles5)
+    fresh_bos = micro_bos or (structure_direction == direction and structure_bos)
+    if not fresh_bos and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM"):
+        return None
+
     setup = classify_early_move(direction, m15)
-    entry_confirmation = "FIRST_5M_TRIGGER"
+    entry_confirmation = "5M_STRUCTURE_AND_VOLUME"
     if setup["setup_type"] in ("CORRECTIVE_LONG", "CORRECTIVE_SHORT"):
-        structure_direction, _sweep, structure_bos = structure_signal(candles5)
-        micro_bos = micro_breakout_signal(candles5, direction)
-        if not (micro_bos or (structure_direction == direction and structure_bos)):
+        if not fresh_bos:
             return None
         entry_confirmation = "CORRECTIVE_MICRO_BOS_CONFIRMED"
     elif setup["setup_type"].startswith("EARLY_REVERSAL_"):
-        entry_confirmation = "EARLY_REVERSAL_TRIGGER"
+        if not fresh_bos and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM"):
+            return None
+        entry_confirmation = "EARLY_REVERSAL_STRUCTURE_CONFIRMED"
+
+    # Do not chase a mature 15m move. A very fresh BOS with strong volume is
+    # the only exception when RSI is already at an exhaustion extreme.
+    rsi15 = as_float(m15.get("rsi"), 50.0)
+    if direction == "SHORT":
+        if rsi15 <= 34.0 and not (fresh_bos and m5["volume_ratio"] >= 1.50):
+            return None
+        if rsi15 <= 38.0 and not fresh_bos:
+            return None
+    else:
+        if rsi15 >= 66.0 and not (fresh_bos and m5["volume_ratio"] >= 1.50):
+            return None
+        if rsi15 >= 62.0 and not fresh_bos:
+            return None
 
     entry = live_price
-    swing = max(c["high"] for c in candles5[-4:]) if direction == "SHORT" else min(c["low"] for c in candles5[-4:])
+    recent = candles5[-4:]
     buffer = max(m5["atr"] * 0.15, entry * 0.0003)
-    stop = swing + buffer if direction == "SHORT" else swing - buffer
+    min_risk = m5["atr"] * 0.65
+    if direction == "SHORT":
+        structural_stop = max(c["high"] for c in recent) + buffer
+        stop = max(structural_stop, entry + min_risk)
+    else:
+        structural_stop = min(c["low"] for c in recent) - buffer
+        stop = min(structural_stop, entry - min_risk)
     risk = abs(stop - entry)
-    if risk <= 0 or risk / m5["atr"] > 2.00:
+    risk_atr = risk / m5["atr"]
+    if risk <= 0 or risk_atr > 2.00:
         return None
     if (direction == "SHORT" and stop <= entry) or (direction == "LONG" and stop >= entry):
         return None
@@ -1033,17 +1058,17 @@ def detect_early_5m(candles5, candles15, live_price):
     score = 5
     score += 2 if trigger in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM") else 0
     score += 1 if body_ratio >= 0.55 else 0
-    score += 1 if m5["volume_ratio"] >= 1.0 else 0
+    score += 1 if m5["volume_ratio"] >= 1.50 else 0
     score += 1 if m15.get("trend") == direction else 0
-    score += 1 if m15.get("trend") == "NEUTRAL" else 0
+    score += 1 if fresh_bos else 0
     return {
         "symbol": "", "direction": direction, "price": entry, "entry": entry,
         "sl": stop, "tp": targets, "score": score, "m5": m5, "m15": m15,
-        "body_ratio": body_ratio, "trigger": trigger, "risk_atr": risk / m5["atr"],
+        "body_ratio": body_ratio, "trigger": trigger, "risk_atr": risk_atr,
         "setup_type": setup["setup_type"], "setup_label": setup["setup_label"],
         "context_note": setup["context_note"], "entry_confirmation": entry_confirmation,
+        "micro_bos": fresh_bos, "volume_confirmed": volume_ok,
     }
-
 
 def early_entry_message(item):
     direction_fa = "فروش SHORT" if item["direction"] == "SHORT" else "خرید LONG"
@@ -1061,6 +1086,7 @@ def early_entry_message(item):
     lines += [
         "ریسک: {:.2f} ATR | نسبت TP6 به ریسک: 4.00R".format(item["risk_atr"]),
         "RSI 5m: {:.1f} | حجم: {:.2f}x".format(item["m5"]["rsi"], item["m5"]["volume_ratio"]),
+        "ساختار خرد: {} | تأیید حجم: {}".format("شکست تأیید شد" if item.get("micro_bos") else "رد شد", "بله" if item.get("volume_confirmed") else "خیر"),
         "روند زمینه 15m: {} | RSI: {:.1f}".format(item["m15"]["trend"], item["m15"]["rsi"]),
         "نوع حرکت: {}".format(item.get("setup_label", "نامشخص")),
         "تفسیر: {}".format(item.get("context_note", "زمینه حرکت نیازمند بررسی است.")),
