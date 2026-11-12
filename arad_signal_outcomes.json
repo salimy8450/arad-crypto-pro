@@ -2251,6 +2251,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SLX_USDT|SHORT|EARLY|1794463620",
+      "symbol": "SLX_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.03449,
+      "sl": 0.03485848229192663,
+      "tp": [
+        0.03412151770807337,
+        0.033937276562110055
+      ],
+      "created_at": 1794463620,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
