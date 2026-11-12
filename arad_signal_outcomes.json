@@ -3171,6 +3171,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "DYDX_USDT|LONG|EARLY|1794511559",
+      "symbol": "DYDX_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.0897,
+      "sl": 0.08894268140825039,
+      "tp": [
+        0.09045731859174962,
+        0.09083597788762443,
+        0.09121463718349923,
+        0.09159329647937403,
+        0.09197195577524885,
+        0.09272927436699846
+      ],
+      "created_at": 1794511559,
+      "first_candle_time": 1794511800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
