@@ -3192,6 +3192,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ASTS_USDT|LONG|EARLY|1794511561",
+      "symbol": "ASTS_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 35.62,
+      "sl": 35.249448109187774,
+      "tp": [
+        35.99055189081222,
+        36.17582783621833,
+        36.36110378162444,
+        36.546379727030555,
+        36.731655672436666,
+        37.10220756324889
+      ],
+      "created_at": 1794511561,
+      "first_candle_time": 1794511800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
