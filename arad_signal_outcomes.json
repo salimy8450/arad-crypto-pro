@@ -1809,6 +1809,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "DYM_USDT|SHORT|EARLY|1794463564",
+      "symbol": "DYM_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.01435,
+      "sl": 0.014486364045133733,
+      "tp": [
+        0.014213635954866266,
+        0.0141454539322994
+      ],
+      "created_at": 1794463564,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
