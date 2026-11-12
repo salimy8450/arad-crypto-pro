@@ -37,7 +37,7 @@
   },
   "SXT_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794465181
+    "sent_at": 1794477436
   },
   "JCT_USDT|SHORT": {
     "type": "WATCH",
@@ -102,5 +102,53 @@
   "KGEN_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794466324
+  },
+  "FLR_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794477425
+  },
+  "THE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794477427
+  },
+  "WOO_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794477428
+  },
+  "ACE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794477429
+  },
+  "NIL_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794477431
+  },
+  "ZETA_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794477432
+  },
+  "QNT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794477434
+  },
+  "CLO_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794477435
+  },
+  "IDOL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794477435
+  },
+  "MRNA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794477436
+  },
+  "TRIA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794477436
+  },
+  "OP_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794477436
   }
 }
