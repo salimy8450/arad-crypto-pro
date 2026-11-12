@@ -3276,6 +3276,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "INTC_USDT|LONG|EARLY|1794511570",
+      "symbol": "INTC_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 62.05,
+      "sl": 61.642682499354954,
+      "tp": [
+        62.45731750064504,
+        62.660976250967565,
+        62.86463500129008,
+        63.0682937516126,
+        63.271952501935125,
+        63.67927000258017
+      ],
+      "created_at": 1794511570,
+      "first_candle_time": 1794511800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
