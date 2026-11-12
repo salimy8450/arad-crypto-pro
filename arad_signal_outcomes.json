@@ -2505,6 +2505,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SBIN_USDT|LONG|EARLY|1794465174",
+      "symbol": "SBIN_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 11.509,
+      "sl": 11.4965473,
+      "tp": [
+        11.521452700000001,
+        11.527679050000001,
+        11.533905400000002,
+        11.540131750000002,
+        11.546358100000003,
+        11.558810800000003
+      ],
+      "created_at": 1794465174,
+      "first_candle_time": 1794465300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
