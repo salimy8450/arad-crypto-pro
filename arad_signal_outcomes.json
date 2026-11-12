@@ -2694,6 +2694,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BICO_USDT|SHORT|EARLY|1794466319",
+      "symbol": "BICO_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.01312,
+      "sl": 0.013185189428217604,
+      "tp": [
+        0.013054810571782396,
+        0.013022215857673594,
+        0.012989621143564792,
+        0.01295702642945599,
+        0.012924431715347188,
+        0.012859242287129584
+      ],
+      "created_at": 1794466319,
+      "first_candle_time": 1794466500,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
