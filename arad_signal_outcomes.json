@@ -2888,6 +2888,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ZETA_USDT|LONG|EARLY|1794477431",
+      "symbol": "ZETA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.0331,
+      "sl": 0.0329473001751189,
+      "tp": [
+        0.0332526998248811,
+        0.03332904973732165,
+        0.0334053996497622,
+        0.03348174956220275,
+        0.0335580994746433,
+        0.0337107992995244
+      ],
+      "created_at": 1794477431,
+      "first_candle_time": 1794477600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
