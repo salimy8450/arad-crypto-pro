@@ -573,6 +573,62 @@ def late_entry_ok(m15, m5, direction):
     return not (m15["rsi"] > EXTREME_RSI_LONG_15M or m5["rsi"] > EXTREME_RSI_LONG_5M)
 
 
+def confirmed_directional_context_ok(m15, m5, candles5, direction, bos15=False, sweep15=False):
+    """
+    Strict confirmation gate for trade-plan alerts.
+    Early impulse alerts remain a separate path; CONFIRMED must show an
+    aligned 15m trend and a real 5m trigger, not just a green/red candle.
+    """
+    if not candles5 or len(candles5) < 3:
+        return False
+
+    last = candles5[-1]
+    candle_range = max(last["high"] - last["low"], 1e-12)
+    body_ratio = abs(last["close"] - last["open"]) / candle_range
+    close_position = (last["close"] - last["low"]) / candle_range
+
+    if direction == "LONG":
+        m15_aligned = (
+            m15["trend"] == "LONG"
+            and m15["price"] > m15["ema21"]
+            and m15["ema9"] > m15["ema21"]
+            and m15["macd_hist"] > 0
+            and m15["rsi"] >= 50
+        )
+        m5_trigger = (
+            last["close"] > last["open"]
+            and body_ratio >= 0.40
+            and close_position >= 0.60
+            and m5["price"] >= m5["ema9"]
+            and m5["rsi"] >= 48
+        )
+    else:
+        m15_aligned = (
+            m15["trend"] == "SHORT"
+            and m15["price"] < m15["ema21"]
+            and m15["ema9"] < m15["ema21"]
+            and m15["macd_hist"] < 0
+            and m15["rsi"] <= 50
+        )
+        m5_trigger = (
+            last["close"] < last["open"]
+            and body_ratio >= 0.40
+            and close_position <= 0.40
+            and m5["price"] <= m5["ema9"]
+            and m5["rsi"] <= 52
+        )
+
+    # A countertrend reversal is not a routine CONFIRMED trade.
+    # It needs an actual 15m BOS/sweep and stronger 5m participation;
+    # the early scanner can still report it as EARLY for observation.
+    reversal_override = (
+        (bos15 or sweep15)
+        and m5["volume_ratio"] >= 1.35
+        and m5_trigger
+    )
+    return bool((m15_aligned and m5_trigger) or reversal_override)
+
+
 def momentum_confirmed(m15, m5, direction):
     # V6.5 TEST: 15m is the directional momentum authority.
     # 5m is the entry trigger/pullback timeframe; requiring its MACD and
@@ -818,13 +874,17 @@ def analyze_stage3(candidate):
     live_diff = abs(candidate["price"] - m5["price"]) / m5["price"] * 100 if m5["price"] > 0 else 999
     live_ok = live_diff <= MAX_LIVE_DIFF
     momentum_ok = momentum_confirmed(candidate["m15"], m5, direction)
+    directional_context_ok = confirmed_directional_context_ok(
+        candidate["m15"], m5, candles, direction,
+        bos15=bool(candidate.get("bos15")),
+        sweep15=bool(candidate.get("sweep")),
+    )
 
     # Keep the 15m structure gate strict and directional.
     structure_ok = (
         (
             candidate["bos15"] or candidate["sweep"]
             or candidate.get("micro15", False)
-            or first_candle15 == direction
         )
         and candidate.get("structure") in ("NONE", direction)
     )
@@ -852,7 +912,8 @@ def analyze_stage3(candidate):
 
     confirmed = (
         score >= MIN_SCORE_TRADE and higher_aligned and htf_rsi_ok and structure_ok
-        and trigger_ok and momentum_ok and late_ok and volume_ok and live_ok
+        and trigger_ok and momentum_ok and directional_context_ok
+        and late_ok and volume_ok and live_ok
     )
 
     if confirmed:
@@ -871,6 +932,7 @@ def analyze_stage3(candidate):
         if not trigger_ok:
             failed.append("PULLBACK_AND_CONTINUATION")
         if not momentum_ok: failed.append("RSI_MACD_TREND")
+        if not directional_context_ok: failed.append("15M_DIRECTION_5M_TRIGGER")
         if not late_ok: failed.append("LATE_ENTRY")
         if not volume_ok: failed.append("VOLUME")
         if not live_ok: failed.append("LIVE_PRICE_GAP")
@@ -1888,7 +1950,7 @@ def main():
     rejection_counts = {}
     path_counts = {"PULLBACK": 0, "MOMENTUM_CONTINUATION": 0, "BOTH": 0, "NONE": 0}
     gate_counts = {
-        "HTF": 0, "HTF_RSI_EXHAUSTION": 0, "15M_STRUCTURE": 0, "ENTRY_PATH": 0, "RSI_MACD_TREND": 0,
+        "HTF": 0, "HTF_RSI_EXHAUSTION": 0, "15M_STRUCTURE": 0, "ENTRY_PATH": 0, "RSI_MACD_TREND": 0, "15M_DIRECTION_5M_TRIGGER": 0,
         "LATE_ENTRY": 0, "VOLUME": 0, "LIVE_PRICE_GAP": 0, "RISK_OR_NEARBY_STRUCTURE": 0,
     }
     for item in final_results:
