@@ -3150,6 +3150,27 @@
       "result": "WIN_TP1",
       "max_tp": 1,
       "exit_candle": 1794498300
+    },
+    {
+      "id": "HAJIMI_USDT|LONG|EARLY|1794511557",
+      "symbol": "HAJIMI_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.01633,
+      "sl": 0.016167331850276474,
+      "tp": [
+        0.016492668149723527,
+        0.016574002224585292,
+        0.016655336299447054,
+        0.016736670374308815,
+        0.01681800444917058,
+        0.016980672598894107
+      ],
+      "created_at": 1794511557,
+      "first_candle_time": 1794511800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
