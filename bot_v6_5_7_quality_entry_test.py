@@ -1161,11 +1161,161 @@ def detect_early_5m(candles5, candles15, live_price):
         "first_impulse_evidence": predictive or {},
     }
 
+def detect_early_15m(candles, live_price, candles5=None, require_5m=False):
+    """
+    Detect an early 15m move, but never treat EMA9 cross or candle color alone
+    as an entry. A candidate must have structure, participation and 5m proof.
+    """
+    if len(candles) < 35 or live_price <= 0:
+        return None
+    m = market_metrics(candles)
+    if not m["atr"] or not m["ema9"] or not m["ema21"]:
+        return None
+
+    last, previous = candles[-1], candles[-2]
+    candle_range = max(last["high"] - last["low"], 1e-12)
+    body_ratio = abs(last["close"] - last["open"]) / candle_range
+    close_position = (last["close"] - last["low"]) / candle_range
+    upper_wick = last["high"] - max(last["open"], last["close"])
+    lower_wick = min(last["open"], last["close"]) - last["low"]
+    upper_wick_ratio = upper_wick / candle_range
+    lower_wick_ratio = lower_wick / candle_range
+    prev_ema9 = ema([c["close"] for c in candles[:-1]], 9)
+    if not prev_ema9:
+        return None
+
+    live_gap_atr = abs(live_price - last["close"]) / m["atr"]
+    ema21_distance_atr = abs(last["close"] - m["ema21"]) / m["atr"]
+    candle_size_atr = candle_range / m["atr"]
+    if live_gap_atr > 0.60 or ema21_distance_atr > 1.65 or candle_size_atr > 2.20:
+        return None
+
+    prior = candles[-7:-1]
+    prior_high = max(c["high"] for c in prior)
+    prior_low = min(c["low"] for c in prior)
+    short_break = last["close"] < prior_low
+    long_break = last["close"] > prior_high
+    short_cross = previous["close"] >= prev_ema9 and last["close"] < m["ema9"]
+    long_cross = previous["close"] <= prev_ema9 and last["close"] > m["ema9"]
+
+    previous_three = candles[-4:-1]
+    bearish_before = sum(1 for c in previous_three if c["close"] < c["open"])
+    bullish_before = sum(1 for c in previous_three if c["close"] > c["open"])
+    first_bullish = (
+        last["close"] > last["open"] and bearish_before >= 2
+        and body_ratio >= 0.50 and close_position >= 0.68
+        and last["close"] > previous["high"]
+    )
+    first_bearish = (
+        last["close"] < last["open"] and bullish_before >= 2
+        and body_ratio >= 0.50 and close_position <= 0.32
+        and last["close"] < previous["low"]
+    )
+
+    short_reversal = (
+        last["high"] > prior_high and last["close"] < prior_high
+        and last["close"] < last["open"] and upper_wick_ratio >= 0.30
+        and close_position <= 0.50
+    )
+    long_reversal = (
+        last["low"] < prior_low and last["close"] > prior_low
+        and last["close"] > last["open"] and lower_wick_ratio >= 0.30
+        and close_position >= 0.50
+    )
+
+    # Detect the first 15m impulse candle from structure, volume and
+    # momentum acceleration. The separate 5m gate below must also agree.
+    early_short = first_impulse_quality(candles, "SHORT")
+    early_long = first_impulse_quality(candles, "LONG")
+    direction = trigger = None
+    predictive = None
+    if early_short and (not early_long or early_short["score"] >= early_long["score"]):
+        direction, trigger, predictive = "SHORT", "FIRST_IMPULSE_15M_PREDICTIVE", early_short
+    elif early_long:
+        direction, trigger, predictive = "LONG", "FIRST_IMPULSE_15M_PREDICTIVE", early_long
+
+    if not direction and short_reversal:
+        direction, trigger = "SHORT", "15M_SWING_HIGH_REJECTION"
+    elif not direction and long_reversal:
+        direction, trigger = "LONG", "15M_SWING_LOW_RECLAIM"
+    elif not direction and first_bearish:
+        direction, trigger = "SHORT", "FIRST_BEARISH_15M_CANDLE"
+    elif not direction and first_bullish:
+        direction, trigger = "LONG", "FIRST_BULLISH_15M_CANDLE"
+    elif not direction and short_break and last["close"] < last["open"] and body_ratio >= 0.45 and close_position <= 0.35:
+        direction, trigger = "SHORT", "15M_RANGE_BREAK"
+    elif not direction and long_break and last["close"] > last["open"] and body_ratio >= 0.45 and close_position >= 0.65:
+        direction, trigger = "LONG", "15M_RANGE_BREAK"
+    elif not direction and short_cross and last["close"] < previous["low"] and last["close"] < last["open"] and m["volume_ratio"] >= 1.25:
+        direction, trigger = "SHORT", "15M_EMA9_CROSS_MICRO_BREAK"
+    elif not direction and long_cross and last["close"] > previous["high"] and last["close"] > last["open"] and m["volume_ratio"] >= 1.25:
+        direction, trigger = "LONG", "15M_EMA9_CROSS_MICRO_BREAK"
+
+    if not direction:
+        return None
+
+    # Avoid chasing an already exhausted 15m leg unless a fresh BOS is backed
+    # by exceptional participation.
+    structure_direction, _sweep, structure_bos = structure_signal(candles)
+    fresh_bos = structure_bos and structure_direction == direction
+    if direction == "SHORT" and m["rsi"] <= 35.0 and not (fresh_bos and m["volume_ratio"] >= 1.50):
+        return None
+    if direction == "LONG" and m["rsi"] >= 65.0 and not (fresh_bos and m["volume_ratio"] >= 1.50):
+        return None
+
+    volume_floor = 1.10 if trigger in ("15M_RANGE_BREAK", "FIRST_BEARISH_15M_CANDLE", "FIRST_BULLISH_15M_CANDLE") else 0.95
+    volume_ok = m["volume_ratio"] >= volume_floor or impulse_volume_ok(candles, direction)
+    if not volume_ok:
+        return None
+
+    if require_5m and not early_5m_confirmation_ok(candles5 or [], direction):
+        return None
+
+    entry = live_price
+    recent = candles[-4:]
+    buffer = max(m["atr"] * 0.15, entry * 0.0005)
+    min_risk = m["atr"] * 0.65
+    if direction == "SHORT":
+        structural_stop = max(c["high"] for c in recent) + buffer
+        stop = max(structural_stop, entry + min_risk)
+    else:
+        structural_stop = min(c["low"] for c in recent) - buffer
+        stop = min(structural_stop, entry - min_risk)
+    risk = abs(stop - entry)
+    risk_atr = risk / m["atr"]
+    if risk <= 0 or risk_atr > 1.80:
+        return None
+
+    targets = (
+        [entry - risk, entry - risk * 1.5]
+        if direction == "SHORT"
+        else [entry + risk, entry + risk * 1.5]
+    )
+    score = 6
+    if predictive:
+        score = max(score, predictive["score"] + 3)
+    score += 2 if trigger in ("15M_SWING_HIGH_REJECTION", "15M_SWING_LOW_RECLAIM") else 0
+    score += 1 if m["volume_ratio"] >= 1.20 else 0
+    score += 1 if body_ratio >= 0.60 or upper_wick_ratio >= 0.40 or lower_wick_ratio >= 0.40 else 0
+    score += 1 if fresh_bos else 0
+
+    return {
+        "symbol": "", "direction": direction, "price": entry, "entry": entry,
+        "sl": stop, "tp": targets, "score": score, "m15": m,
+        "body_ratio": body_ratio, "breakout": short_break if direction == "SHORT" else long_break,
+        "trigger": trigger, "risk_atr": risk_atr,
+        "confirmation_5m": bool(require_5m),
+        "predictive_score": predictive["score"] if predictive else 0,
+        "first_impulse_evidence": predictive or {},
+    }
+
+
+
 def early_entry_message(item):
     direction_fa = "فروش SHORT" if item["direction"] == "SHORT" else "خرید LONG"
     lines = [
-        "🟠 ARAD CRYPTO PRO | EARLY 5M ENTRY",
-        "هشدار شروع حرکت بر اساس اولین نشانه قابل‌شناسایی در کندل بسته ۵ دقیقه",
+        "🟠 ARAD CRYPTO PRO | EARLY {} ENTRY".format(item.get("source_tf", "5M")),
+        "هشدار شروع حرکت بر اساس اولین نشانه قابل‌شناسایی در کندل بسته {}".format("۵ دقیقه" if item.get("source_tf") == "5M" else "۱۵ دقیقه با تأیید ۵ دقیقه"),
         "",
         "نماد: {}".format(item["symbol"]),
         "جهت: {}".format(direction_fa),
@@ -1560,7 +1710,7 @@ def main():
     log("START: " + now_text())
     log("MODE: V6.5.7 TEST ONLY | stricter entry filters | no orders")
     log("BASE URL: " + BASE_URL)
-    log("V6.5.7 PATCH: independent 5m early LONG/SHORT scan + 15m context + six risk-based targets")
+    log("V6.5.7 PATCH: unified 5m + 15m early scan; 15m requires 5m confirmation; one early alert per symbol")
 
     ping = api_get("/api/v1/contract/ping")
     if ping is None:
@@ -1602,28 +1752,69 @@ def main():
     log("STAGE 1 SCAN COUNT: {}".format(len(selected)))
     log("METAL CONTRACTS PINNED: {}".format(len(pinned)))
 
-    # Independent 5m early-entry scan on the most liquid 300 USDT contracts.
-    # Fetch 15m context only after a 5m trigger; 15m never vetoes the early setup.
-    early_alerts = []
+    # Unified early scan: 5m first impulse + independent 15m impulse confirmed by 5m.
+    # Both detectors run inside this single process; one early Telegram alert per symbol.
+    early_by_symbol = {}
     for i, item in enumerate(selected, 1):
         if PRINT_ALL_STAGES:
-            log("EARLY 5M SCAN: {} / {} {}".format(i, len(selected), item["symbol"]))
+            log("EARLY 5M+15M SCAN: {} / {} {}".format(i, len(selected), item["symbol"]))
+        live_price = ticker_price(item["ticker"])
         candles5_early = get_candles(item["symbol"], "5m")
+        candles15_early = get_candles(item["symbol"], "15m")
+        candidate5 = None
+        candidate15 = None
+
         if candles5_early:
-            early = detect_early_5m(candles5_early, [], ticker_price(item["ticker"]))
-            if early:
-                candles15_early = get_candles(item["symbol"], "15m")
-                early = detect_early_5m(candles5_early, candles15_early, ticker_price(item["ticker"]))
-                if early:
-                    early["symbol"] = item["symbol"]
-                    early_alerts.append(early)
-                    log("EARLY 5M SIGNAL: {} {} SCORE {} TRIGGER {}".format(
-                        item["symbol"], early["direction"], early["score"], early["trigger"]
-                    ))
+            candidate5 = detect_early_5m(candles5_early, candles15_early, live_price)
+            if candidate5:
+                candidate5["source_tf"] = "5M"
+                candidate5["symbol"] = item["symbol"]
+
+        if candles15_early and candles5_early:
+            preliminary15 = detect_early_15m(candles15_early, live_price)
+            if preliminary15:
+                candidate15 = detect_early_15m(
+                    candles15_early, live_price, candles5_early, require_5m=True
+                )
+                if candidate15:
+                    candidate15["source_tf"] = "15M"
+                    candidate15["symbol"] = item["symbol"]
+                    candidate15["m5"] = market_metrics(candles5_early)
+                    candidate15["micro_bos"] = bool(
+                        candidate15.get("first_impulse_evidence", {}).get("micro_break")
+                        or candidate15.get("first_impulse_evidence", {}).get("sweep_reclaim")
+                    )
+                    candidate15["volume_confirmed"] = True
+                    candidate15["entry_confirmation"] = "15M_IMPULSE_CONFIRMED_BY_5M"
+                    setup15 = classify_early_move(candidate15["direction"], candidate15["m15"])
+                    candidate15["setup_type"] = setup15["setup_type"]
+                    candidate15["setup_label"] = setup15["setup_label"]
+                    candidate15["context_note"] = setup15["context_note"]
+
+        # Resolve same-symbol overlap. Prefer the faster 5m entry when both
+        # agree; suppress the symbol for this run when the timeframes conflict.
+        if candidate5 and candidate15:
+            if candidate5["direction"] == candidate15["direction"]:
+                candidate5["also_15m_confirmed"] = True
+                candidate5["score"] = max(candidate5["score"], candidate15["score"])
+                early_by_symbol[item["symbol"]] = candidate5
+                log("EARLY MERGED: {} {} (5m entry + 15m confirmation)".format(
+                    item["symbol"], candidate5["direction"]
+                ))
+            else:
+                log("EARLY CONFLICT SKIPPED: {} 5m={} 15m={}".format(
+                    item["symbol"], candidate5["direction"], candidate15["direction"]
+                ))
+        elif candidate5:
+            early_by_symbol[item["symbol"]] = candidate5
+        elif candidate15:
+            early_by_symbol[item["symbol"]] = candidate15
+
         time.sleep(REQUEST_PAUSE)
 
+    early_alerts = list(early_by_symbol.values())
     early_alerts.sort(key=lambda x: (x["score"], x["m5"]["volume_ratio"]), reverse=True)
-    log("EARLY 5M SIGNALS FOUND: {}".format(len(early_alerts)))
+    log("UNIFIED EARLY 5M/15M SIGNALS FOUND: {}".format(len(early_alerts)))
 
     stage1 = []
     for i, item in enumerate(selected, 1):
@@ -1654,7 +1845,7 @@ def main():
 
     # TEST MODE: send a capped number of WATCH alerts plus every CONFIRMED alert.
     # WATCH is informational only; CONFIRMED includes an entry/SL/TP plan.
-    log("TELEGRAM TEST MODE: EARLY + capped WATCH + CONFIRMED; EARLY/CONFIRMED outcomes tracked; no orders.")
+    log("TELEGRAM TEST MODE: unified EARLY 5m/15m + capped WATCH + CONFIRMED; outcomes tracked; no orders.")
 
     final_results = []
     for i, candidate in enumerate(stage2, 1):
@@ -1685,7 +1876,7 @@ def main():
     log("ELIGIBLE CONTRACTS SCANNED: {}".format(len(selected)))
     log("STAGE 1 PROMISING: {}".format(len(stage1)))
     log("STAGE 2 PASSED / WATCH CANDIDATES: {}".format(len(stage2)))
-    log("EARLY 5M SIGNALS FOUND: {}".format(len(early_alerts)))
+    log("UNIFIED EARLY 5M/15M SIGNALS FOUND: {}".format(len(early_alerts)))
     log("CONFIRMED SETUPS: {}".format(len(confirmed)))
     log("WATCH SETUPS: {}".format(len(watch)))
     log("ELAPSED: {:.1f} seconds".format(elapsed))
