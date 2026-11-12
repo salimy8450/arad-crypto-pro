@@ -225,7 +225,7 @@
   },
   "JCT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794470840
+    "sent_at": 1794502493
   },
   "MSFT_USDT|SHORT": {
     "type": "CONFIRMED",
@@ -262,5 +262,21 @@
   "TOWNS_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794470841
+  },
+  "TAIKO_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794502493
+  },
+  "PRL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794502494
+  },
+  "TRIA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794502494
+  },
+  "CBRS_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794502494
   }
 }
