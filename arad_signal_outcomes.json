@@ -2421,6 +2421,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "AKAM_USDT|LONG|EARLY|1794465167",
+      "symbol": "AKAM_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 86.22,
+      "sl": 86.134134,
+      "tp": [
+        86.305866,
+        86.34879899999999,
+        86.39173199999999,
+        86.434665,
+        86.47759799999999,
+        86.56346399999998
+      ],
+      "created_at": 1794465167,
+      "first_candle_time": 1794465300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
