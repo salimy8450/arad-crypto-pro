@@ -3633,6 +3633,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "APT_USDT|SHORT|EARLY|1794520793",
+      "symbol": "APT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.5542,
+      "sl": 0.5573602077738317,
+      "tp": [
+        0.5510397922261684,
+        0.5494596883392526,
+        0.5478795844523368,
+        0.5462994805654209,
+        0.5447193766785051,
+        0.5415591689046735
+      ],
+      "created_at": 1794520793,
+      "first_candle_time": 1794520800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
