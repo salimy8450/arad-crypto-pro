@@ -1639,6 +1639,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CAKE_USDT|LONG|EARLY|1794463543",
+      "symbol": "CAKE_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 1.8048,
+      "sl": 1.7992108940080935,
+      "tp": [
+        1.8103891059919064,
+        1.8131836589878596
+      ],
+      "created_at": 1794463543,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
