@@ -2200,6 +2200,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ASTER_USDT|LONG|EARLY|1794463613",
+      "symbol": "ASTER_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.6561,
+      "sl": 0.6539567484858987,
+      "tp": [
+        0.6582432515141013,
+        0.659314877271152
+      ],
+      "created_at": 1794463613,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
