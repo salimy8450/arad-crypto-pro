@@ -2867,6 +2867,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "NIL_USDT|LONG|EARLY|1794477430",
+      "symbol": "NIL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.0564,
+      "sl": 0.05609922886497155,
+      "tp": [
+        0.05670077113502845,
+        0.05685115670254268,
+        0.0570015422700569,
+        0.05715192783757113,
+        0.057302313405085355,
+        0.05760308454011381
+      ],
+      "created_at": 1794477430,
+      "first_candle_time": 1794477600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
