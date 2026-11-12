@@ -13,7 +13,7 @@
   },
   "HAJIMI_USDT|LONG": {
     "type": "EARLY",
-    "sent_at": 1794465173
+    "sent_at": 1794511558
   },
   "SBIN_USDT|LONG": {
     "type": "EARLY",
@@ -137,7 +137,7 @@
   },
   "IDOL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794477435
+    "sent_at": 1794511575
   },
   "MRNA_USDT|SHORT": {
     "type": "WATCH",
@@ -194,5 +194,49 @@
   "TAIKO_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794497716
+  },
+  "DYDX_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794511560
+  },
+  "ASTS_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794511562
+  },
+  "ERA_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794511565
+  },
+  "MOVE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794511567
+  },
+  "BMT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794511569
+  },
+  "INTC_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794511571
+  },
+  "KORU_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794511574
+  },
+  "MU_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794511574
+  },
+  "HMSTR_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794511575
+  },
+  "XRP_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794511575
+  },
+  "GOOGL_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794511576
   }
 }
