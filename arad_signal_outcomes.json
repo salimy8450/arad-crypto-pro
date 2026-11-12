@@ -2568,6 +2568,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ADA_USDT|LONG|EARLY|1794465179",
+      "symbol": "ADA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.173,
+      "sl": 0.17213081013906917,
+      "tp": [
+        0.1738691898609308,
+        0.17430378479139622,
+        0.17473837972186163,
+        0.17517297465232703,
+        0.17560756958279244,
+        0.17647675944372326
+      ],
+      "created_at": 1794465179,
+      "first_candle_time": 1794465300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
