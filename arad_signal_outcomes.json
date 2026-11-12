@@ -3014,6 +3014,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TRIA_USDT|SHORT|EARLY|1794497707",
+      "symbol": "TRIA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.002542,
+      "sl": 0.0025587970021768614,
+      "tp": [
+        0.0025252029978231386,
+        0.002516804496734708,
+        0.0025084059956462772,
+        0.0025000074945578463,
+        0.002491608993469416,
+        0.0024748119912925545
+      ],
+      "created_at": 1794497707,
+      "first_candle_time": 1794498000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
