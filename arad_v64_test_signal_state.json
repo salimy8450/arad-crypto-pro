@@ -125,7 +125,7 @@
   },
   "AVGO_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794254846
+    "sent_at": 1794523634
   },
   "B2_USDT|LONG": {
     "type": "WATCH",
@@ -181,7 +181,7 @@
   },
   "TRX_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794353514
+    "sent_at": 1794523632
   },
   "XAU_USDT|SHORT": {
     "type": "WATCH",
@@ -278,5 +278,17 @@
   "CBRS_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794502494
+  },
+  "ARM_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794523632
+  },
+  "ANTHROPIC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794523633
+  },
+  "0G_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794523633
   }
 }
