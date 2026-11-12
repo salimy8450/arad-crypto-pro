@@ -57,7 +57,7 @@
   },
   "AIA_USDT|LONG": {
     "type": "EARLY",
-    "sent_at": 1794466314
+    "sent_at": 1794513149
   },
   "CHZ_USDT|SHORT": {
     "type": "EARLY",
@@ -238,5 +238,53 @@
   "GOOGL_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794511576
+  },
+  "ZKC_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794513137
+  },
+  "CARV_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794513140
+  },
+  "ROSE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794513141
+  },
+  "TOWNS_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794513143
+  },
+  "ONDO_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794513145
+  },
+  "LIT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794513147
+  },
+  "PENGU_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794513151
+  },
+  "JUP_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794513152
+  },
+  "AMD_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794513152
+  },
+  "NATGAS_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794513153
+  },
+  "ETH_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794513153
+  },
+  "DOT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794513154
   }
 }
