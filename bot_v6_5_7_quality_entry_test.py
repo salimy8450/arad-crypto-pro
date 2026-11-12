@@ -881,6 +881,50 @@ def analyze_stage3(candidate):
     return candidate
 
 
+def classify_early_move(direction, m15):
+    """Label an early 5m move as corrective, trend-aligned, or an early reversal attempt."""
+    trend = str(m15.get("trend", "NEUTRAL")).upper()
+    rsi15 = as_float(m15.get("rsi"), 50.0)
+    macd15 = as_float(m15.get("macd_hist"), 0.0)
+
+    if direction == "LONG":
+        if trend == "SHORT" or (trend == "NEUTRAL" and (rsi15 < 48.0 or macd15 < 0)):
+            return {
+                "setup_type": "CORRECTIVE_LONG",
+                "setup_label": "LONG اصلاحی در روند نزولی/زمینه ضعیف",
+                "context_note": "این حرکت می‌تواند پولبک صعودی باشد و هنوز تغییر روند تأیید نشده است.",
+            }
+        if trend == "LONG":
+            return {
+                "setup_type": "TREND_LONG",
+                "setup_label": "LONG هم‌جهت با روند صعودی",
+                "context_note": "حرکت اولیه با روند زمینه هم‌جهت است.",
+            }
+        return {
+            "setup_type": "EARLY_REVERSAL_LONG",
+            "setup_label": "تلاش اولیه برای برگشت صعودی",
+            "context_note": "روند زمینه خنثی است؛ شکست ساختار برای تأیید برگشت لازم است.",
+        }
+
+    if trend == "LONG" or (trend == "NEUTRAL" and (rsi15 > 52.0 or macd15 > 0)):
+        return {
+            "setup_type": "CORRECTIVE_SHORT",
+            "setup_label": "SHORT اصلاحی در روند صعودی/زمینه قوی",
+            "context_note": "این حرکت می‌تواند پولبک نزولی باشد و هنوز تغییر روند تأیید نشده است.",
+        }
+    if trend == "SHORT":
+        return {
+            "setup_type": "TREND_SHORT",
+            "setup_label": "SHORT هم‌جهت با روند نزولی",
+            "context_note": "حرکت اولیه با روند زمینه هم‌جهت است.",
+        }
+    return {
+        "setup_type": "EARLY_REVERSAL_SHORT",
+        "setup_label": "تلاش اولیه برای برگشت نزولی",
+        "context_note": "روند زمینه خنثی است؛ شکست ساختار برای تأیید برگشت لازم است.",
+    }
+
+
 def detect_early_5m(candles5, candles15, live_price):
     """Detect the first observable 5m reversal/impulse in either direction.
     15m is context only and never vetoes an otherwise valid 5m trigger."""
@@ -972,6 +1016,7 @@ def detect_early_5m(candles5, candles15, live_price):
 
     r_multiples = (1.0, 1.5, 2.0, 2.5, 3.0, 4.0)
     targets = [entry - risk * r if direction == "SHORT" else entry + risk * r for r in r_multiples]
+    setup = classify_early_move(direction, m15)
     score = 5
     score += 2 if trigger in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM") else 0
     score += 1 if body_ratio >= 0.55 else 0
@@ -982,6 +1027,8 @@ def detect_early_5m(candles5, candles15, live_price):
         "symbol": "", "direction": direction, "price": entry, "entry": entry,
         "sl": stop, "tp": targets, "score": score, "m5": m5, "m15": m15,
         "body_ratio": body_ratio, "trigger": trigger, "risk_atr": risk / m5["atr"],
+        "setup_type": setup["setup_type"], "setup_label": setup["setup_label"],
+        "context_note": setup["context_note"],
     }
 
 
@@ -1002,6 +1049,8 @@ def early_entry_message(item):
         "ریسک: {:.2f} ATR | نسبت TP6 به ریسک: 4.00R".format(item["risk_atr"]),
         "RSI 5m: {:.1f} | حجم: {:.2f}x".format(item["m5"]["rsi"], item["m5"]["volume_ratio"]),
         "روند زمینه 15m: {} | RSI: {:.1f}".format(item["m15"]["trend"], item["m15"]["rsi"]),
+        "نوع حرکت: {}".format(item.get("setup_label", "نامشخص")),
+        "تفسیر: {}".format(item.get("context_note", "زمینه حرکت نیازمند بررسی است.")),
         "محرک: {} | قدرت بدنه: {:.0f}%".format(item["trigger"], item["body_ratio"] * 100),
         "امتیاز شروع حرکت: {}".format(item["score"]),
         "",
