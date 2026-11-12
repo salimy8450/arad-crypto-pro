@@ -1826,6 +1826,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MANA_USDT|LONG|EARLY|1794463566",
+      "symbol": "MANA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.06944,
+      "sl": 0.06901545367602933,
+      "tp": [
+        0.06986454632397067,
+        0.07007681948595601
+      ],
+      "created_at": 1794463566,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
