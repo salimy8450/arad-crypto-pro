@@ -2132,6 +2132,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SKR_USDT|SHORT|EARLY|1794463604",
+      "symbol": "SKR_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.010845,
+      "sl": 0.01092446625557032,
+      "tp": [
+        0.01076553374442968,
+        0.01072580061664452
+      ],
+      "created_at": 1794463604,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
