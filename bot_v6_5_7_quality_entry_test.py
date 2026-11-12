@@ -1342,7 +1342,7 @@ def early_entry_message(item):
         "تفسیر: {}".format(item.get("context_note", "زمینه حرکت نیازمند بررسی است.")),
         "تأیید ورود: {}".format(
             "شکست ساختار خرد ۵ دقیقه تأیید شد" if item.get("entry_confirmation") == "CORRECTIVE_MICRO_BOS_CONFIRMED"
-            else "محرک اولیه ۵ دقیقه؛ هنوز برگشت روند قطعی نیست"
+            else ("محرک ۱۵ دقیقه با تأیید ۵ دقیقه" if item.get("source_tf") == "15M" else "محرک اولیه ۵ دقیقه؛ هنوز برگشت روند قطعی نیست")
         ),
         "محرک: {} | قدرت بدنه: {:.0f}%".format(item["trigger"], item["body_ratio"] * 100),
         "امتیاز شروع حرکت: {}".format(item["score"]),
