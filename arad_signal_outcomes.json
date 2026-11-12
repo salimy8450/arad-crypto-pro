@@ -3339,6 +3339,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CARV_USDT|LONG|EARLY|1794513138",
+      "symbol": "CARV_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.02566,
+      "sl": 0.025496582856969742,
+      "tp": [
+        0.025823417143030256,
+        0.025905125714545382,
+        0.025986834286060512,
+        0.026068542857575643,
+        0.02615025142909077,
+        0.026313668572121026
+      ],
+      "created_at": 1794513138,
+      "first_candle_time": 1794513300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
