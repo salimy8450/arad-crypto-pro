@@ -2463,6 +2463,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ZBT_USDT|SHORT|EARLY|1794465171",
+      "symbol": "ZBT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.05617,
+      "sl": 0.05626801673720904,
+      "tp": [
+        0.056071983262790955,
+        0.056022974894186436,
+        0.05597396652558191,
+        0.055924958156977386,
+        0.05587594978837287,
+        0.055777933051163825
+      ],
+      "created_at": 1794465171,
+      "first_candle_time": 1794465300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
