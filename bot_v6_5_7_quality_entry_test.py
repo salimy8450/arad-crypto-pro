@@ -1026,12 +1026,14 @@ def detect_early_5m(candles5, candles15, live_price):
     # the only exception when RSI is already at an exhaustion extreme.
     rsi15 = as_float(m15.get("rsi"), 50.0)
     if direction == "SHORT":
-        if rsi15 <= 34.0 and not (fresh_bos and m5["volume_ratio"] >= 1.50):
+        # At RSI <= 33 the 15m leg is already too stretched for a fresh SHORT.
+        if rsi15 <= 33.0:
             return None
         if rsi15 <= 38.0 and not fresh_bos:
             return None
     else:
-        if rsi15 >= 66.0 and not (fresh_bos and m5["volume_ratio"] >= 1.50):
+        # Symmetric protection against buying an already overbought 15m leg.
+        if rsi15 >= 67.0:
             return None
         if rsi15 >= 62.0 and not fresh_bos:
             return None
