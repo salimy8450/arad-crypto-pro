@@ -3612,6 +3612,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TAO_USDT|SHORT|EARLY|1794520791",
+      "symbol": "TAO_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 211.99,
+      "sl": 213.06438345089586,
+      "tp": [
+        210.91561654910416,
+        210.37842482365625,
+        209.8412330982083,
+        209.30404137276037,
+        208.76684964731245,
+        207.6924661964166
+      ],
+      "created_at": 1794520791,
+      "first_candle_time": 1794520800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
