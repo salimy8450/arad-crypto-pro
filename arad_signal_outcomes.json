@@ -2484,6 +2484,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "HAJIMI_USDT|LONG|EARLY|1794465172",
+      "symbol": "HAJIMI_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.01606,
+      "sl": 0.015938933260592057,
+      "tp": [
+        0.016181066739407945,
+        0.016241600109111916,
+        0.01630213347881589,
+        0.016362666848519863,
+        0.016423200218223834,
+        0.016544266957631778
+      ],
+      "created_at": 1794465172,
+      "first_candle_time": 1794465300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
