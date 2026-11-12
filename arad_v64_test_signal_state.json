@@ -225,7 +225,7 @@
   },
   "JCT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794420535
+    "sent_at": 1794470840
   },
   "MSFT_USDT|SHORT": {
     "type": "CONFIRMED",
@@ -246,5 +246,21 @@
   "POL_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794444820
+  },
+  "ZIL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794470839
+  },
+  "USELESS_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794470839
+  },
+  "TIA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794470840
+  },
+  "TOWNS_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794470841
   }
 }
