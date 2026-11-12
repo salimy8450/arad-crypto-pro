@@ -1860,6 +1860,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SYRUP_USDT|SHORT|EARLY|1794463570",
+      "symbol": "SYRUP_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.12913,
+      "sl": 0.13020197641454018,
+      "tp": [
+        0.1280580235854598,
+        0.12752203537818974
+      ],
+      "created_at": 1794463570,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
