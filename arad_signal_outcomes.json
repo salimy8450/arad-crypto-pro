@@ -3381,6 +3381,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TOWNS_USDT|LONG|EARLY|1794513142",
+      "symbol": "TOWNS_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.001084,
+      "sl": 0.0010783394646158896,
+      "tp": [
+        0.0010896605353841102,
+        0.0010924908030761652,
+        0.0010953210707682205,
+        0.0010981513384602758,
+        0.0011009816061523308,
+        0.0011066421415364411
+      ],
+      "created_at": 1794513142,
+      "first_candle_time": 1794513300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
