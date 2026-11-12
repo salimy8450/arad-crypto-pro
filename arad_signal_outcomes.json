@@ -1792,6 +1792,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "DOOD_USDT|SHORT|EARLY|1794463562",
+      "symbol": "DOOD_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.001536,
+      "sl": 0.0015506479722721617,
+      "tp": [
+        0.0015213520277278384,
+        0.0015140280415917575
+      ],
+      "created_at": 1794463562,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
