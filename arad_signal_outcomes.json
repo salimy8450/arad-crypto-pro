@@ -3234,6 +3234,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MOVE_USDT|LONG|EARLY|1794511566",
+      "symbol": "MOVE_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.005447,
+      "sl": 0.005418224227162708,
+      "tp": [
+        0.005475775772837291,
+        0.005490163659255937,
+        0.005504551545674583,
+        0.005518939432093228,
+        0.005533327318511874,
+        0.005562103091349166
+      ],
+      "created_at": 1794511566,
+      "first_candle_time": 1794511800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
