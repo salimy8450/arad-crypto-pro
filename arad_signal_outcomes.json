@@ -2217,6 +2217,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "VKTX_USDT|LONG|EARLY|1794463615",
+      "symbol": "VKTX_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 28.39,
+      "sl": 28.365804999999998,
+      "tp": [
+        28.414195000000003,
+        28.426292500000002
+      ],
+      "created_at": 1794463615,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
