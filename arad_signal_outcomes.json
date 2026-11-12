@@ -2846,6 +2846,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ACE_USDT|LONG|EARLY|1794477429",
+      "symbol": "ACE_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.11365,
+      "sl": 0.1131616339741736,
+      "tp": [
+        0.1141383660258264,
+        0.1143825490387396,
+        0.1146267320516528,
+        0.11487091506456601,
+        0.1151150980774792,
+        0.1156034641033056
+      ],
+      "created_at": 1794477429,
+      "first_candle_time": 1794477600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
