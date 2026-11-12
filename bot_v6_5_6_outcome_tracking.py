@@ -848,24 +848,42 @@ def analyze_stage3(candidate):
     return candidate
 
 
-def detect_early_15m(candles, live_price):
+def early_5m_confirmation_ok(candles5, direction):
+    """Require a real 5m price break and participation before a 15m early alert."""
+    if len(candles5) < 35:
+        return False
+    m5 = market_metrics(candles5)
+    if m5["atr"] <= 0:
+        return False
+    last, previous = candles5[-1], candles5[-2]
+    candle_range = max(last["high"] - last["low"], 1e-12)
+    body_ratio = abs(last["close"] - last["open"]) / candle_range
+    close_position = (last["close"] - last["low"]) / candle_range
+    if direction == "SHORT":
+        directional = last["close"] < last["open"] and close_position <= 0.42
+        one_bar_break = last["close"] < previous["low"]
+    else:
+        directional = last["close"] > last["open"] and close_position >= 0.58
+        one_bar_break = last["close"] > previous["high"]
+    structure_break = one_bar_break or micro_breakout_signal(candles5, direction)
+    volume_ok = m5["volume_ratio"] >= 1.05 or impulse_volume_ok(candles5, direction)
+    return directional and body_ratio >= 0.40 and structure_break and volume_ok
+
+
+def detect_early_15m(candles, live_price, candles5=None, require_5m=False):
     """
-    Detect early continuation OR a confirmed 15m swing-rejection reversal.
-    Only closed candles are used. This creates an actionable early-entry alert
-    with an invalidation stop; it does not place orders.
+    Detect an early 15m move, but never treat EMA9 cross or candle color alone
+    as an entry. A candidate must have structure, participation and 5m proof.
     """
-    if len(candles) < 30 or live_price <= 0:
+    if len(candles) < 35 or live_price <= 0:
         return None
     m = market_metrics(candles)
     if not m["atr"] or not m["ema9"] or not m["ema21"]:
         return None
 
-    last = candles[-1]
-    previous = candles[-2]
-    prior = candles[-5:-1]
+    last, previous = candles[-1], candles[-2]
     candle_range = max(last["high"] - last["low"], 1e-12)
-    body = abs(last["close"] - last["open"])
-    body_ratio = body / candle_range
+    body_ratio = abs(last["close"] - last["open"]) / candle_range
     close_position = (last["close"] - last["low"]) / candle_range
     upper_wick = last["high"] - max(last["open"], last["close"])
     lower_wick = min(last["open"], last["close"]) - last["low"]
@@ -875,104 +893,98 @@ def detect_early_15m(candles, live_price):
     if not prev_ema9:
         return None
 
-    # Reject late entries, abnormal candles and poor live-price tracking.
     live_gap_atr = abs(live_price - last["close"]) / m["atr"]
     ema21_distance_atr = abs(last["close"] - m["ema21"]) / m["atr"]
     candle_size_atr = candle_range / m["atr"]
-    if live_gap_atr > 0.60 or ema21_distance_atr > 1.80 or candle_size_atr > 2.20:
-        return None
-    if m["volume_ratio"] < 0.75:
+    if live_gap_atr > 0.60 or ema21_distance_atr > 1.65 or candle_size_atr > 2.20:
         return None
 
-    prior_high = max(c["high"] for c in candles[-7:-1])
-    prior_low = min(c["low"] for c in candles[-7:-1])
-    short_break = last["close"] < min(c["low"] for c in prior)
+    prior = candles[-7:-1]
+    prior_high = max(c["high"] for c in prior)
+    prior_low = min(c["low"] for c in prior)
+    short_break = last["close"] < prior_low
+    long_break = last["close"] > prior_high
     short_cross = previous["close"] >= prev_ema9 and last["close"] < m["ema9"]
-    long_break = last["close"] > max(c["high"] for c in prior)
     long_cross = previous["close"] <= prev_ema9 and last["close"] > m["ema9"]
 
-    # FIRST directional candle after an opposing sequence.
-    # Require a CLOSED candle, meaningful body, close near its extreme,
-    # and a micro break or EMA9 reclaim/loss to avoid alerting on every color change.
     previous_three = candles[-4:-1]
     bearish_before = sum(1 for c in previous_three if c["close"] < c["open"])
     bullish_before = sum(1 for c in previous_three if c["close"] > c["open"])
     first_bullish = (
-        last["close"] > last["open"]
-        and bearish_before >= 2
-        and body_ratio >= 0.45
-        and close_position >= 0.68
-        and (last["close"] > previous["high"] or long_cross)
-        and 28.0 <= m["rsi"] <= 68.0
+        last["close"] > last["open"] and bearish_before >= 2
+        and body_ratio >= 0.50 and close_position >= 0.68
+        and last["close"] > previous["high"]
     )
     first_bearish = (
-        last["close"] < last["open"]
-        and bullish_before >= 2
-        and body_ratio >= 0.45
-        and close_position <= 0.32
-        and (last["close"] < previous["low"] or short_cross)
-        and 32.0 <= m["rsi"] <= 72.0
+        last["close"] < last["open"] and bullish_before >= 2
+        and body_ratio >= 0.50 and close_position <= 0.32
+        and last["close"] < previous["low"]
     )
 
-    # Reversal at a local extreme: sweep the recent swing, then close back
-    # inside the range with a rejection wick and directional candle body.
     short_reversal = (
-        last["high"] > prior_high
-        and last["close"] < prior_high
-        and last["close"] < last["open"]
-        and upper_wick_ratio >= 0.30
-        and close_position <= 0.55
-        and 48.0 <= m["rsi"] <= 76.0
+        last["high"] > prior_high and last["close"] < prior_high
+        and last["close"] < last["open"] and upper_wick_ratio >= 0.30
+        and close_position <= 0.50
     )
     long_reversal = (
-        last["low"] < prior_low
-        and last["close"] > prior_low
-        and last["close"] > last["open"]
-        and lower_wick_ratio >= 0.30
-        and close_position >= 0.45
-        and 24.0 <= m["rsi"] <= 52.0
+        last["low"] < prior_low and last["close"] > prior_low
+        and last["close"] > last["open"] and lower_wick_ratio >= 0.30
+        and close_position >= 0.50
     )
 
-    direction = None
-    trigger = None
-    if first_bullish:
-        direction, trigger = "LONG", "FIRST_BULLISH_15M_CANDLE"
-    elif first_bearish:
-        direction, trigger = "SHORT", "FIRST_BEARISH_15M_CANDLE"
-    elif short_reversal:
+    direction = trigger = None
+    if short_reversal:
         direction, trigger = "SHORT", "15M_SWING_HIGH_REJECTION"
     elif long_reversal:
         direction, trigger = "LONG", "15M_SWING_LOW_RECLAIM"
-    elif (
-        last["close"] < last["open"]
-        and close_position <= 0.40
-        and (short_break or short_cross)
-        and 25.0 <= m["rsi"] <= 70.0
-        and body_ratio >= 0.40
-    ):
-        direction = "SHORT"
-        trigger = "15M_RANGE_BREAK" if short_break else "15M_EMA9_CROSS"
-    elif (
-        last["close"] > last["open"]
-        and close_position >= 0.60
-        and (long_break or long_cross)
-        and 30.0 <= m["rsi"] <= 75.0
-        and body_ratio >= 0.40
-    ):
-        direction = "LONG"
-        trigger = "15M_RANGE_BREAK" if long_break else "15M_EMA9_CROSS"
+    elif first_bearish:
+        direction, trigger = "SHORT", "FIRST_BEARISH_15M_CANDLE"
+    elif first_bullish:
+        direction, trigger = "LONG", "FIRST_BULLISH_15M_CANDLE"
+    elif short_break and last["close"] < last["open"] and body_ratio >= 0.45 and close_position <= 0.35:
+        direction, trigger = "SHORT", "15M_RANGE_BREAK"
+    elif long_break and last["close"] > last["open"] and body_ratio >= 0.45 and close_position >= 0.65:
+        direction, trigger = "LONG", "15M_RANGE_BREAK"
+    elif short_cross and last["close"] < previous["low"] and last["close"] < last["open"] and m["volume_ratio"] >= 1.25:
+        direction, trigger = "SHORT", "15M_EMA9_CROSS_MICRO_BREAK"
+    elif long_cross and last["close"] > previous["high"] and last["close"] > last["open"] and m["volume_ratio"] >= 1.25:
+        direction, trigger = "LONG", "15M_EMA9_CROSS_MICRO_BREAK"
 
     if not direction:
         return None
 
-    entry = live_price
-    buffer = max(m["atr"] * 0.15, entry * 0.0005)
-    stop = last["high"] + buffer if direction == "SHORT" else last["low"] - buffer
-    risk = abs(stop - entry)
-    if risk <= 0 or risk / m["atr"] > 1.80:
+    # Avoid chasing an already exhausted 15m leg unless a fresh BOS is backed
+    # by exceptional participation.
+    structure_direction, _sweep, structure_bos = structure_signal(candles)
+    fresh_bos = structure_bos and structure_direction == direction
+    if direction == "SHORT" and m["rsi"] <= 35.0 and not (fresh_bos and m["volume_ratio"] >= 1.50):
+        return None
+    if direction == "LONG" and m["rsi"] >= 65.0 and not (fresh_bos and m["volume_ratio"] >= 1.50):
         return None
 
-    # Keep targets realistic for an early scalp setup.
+    volume_floor = 1.10 if trigger in ("15M_RANGE_BREAK", "FIRST_BEARISH_15M_CANDLE", "FIRST_BULLISH_15M_CANDLE") else 0.95
+    volume_ok = m["volume_ratio"] >= volume_floor or impulse_volume_ok(candles, direction)
+    if not volume_ok:
+        return None
+
+    if require_5m and not early_5m_confirmation_ok(candles5 or [], direction):
+        return None
+
+    entry = live_price
+    recent = candles[-4:]
+    buffer = max(m["atr"] * 0.15, entry * 0.0005)
+    min_risk = m["atr"] * 0.65
+    if direction == "SHORT":
+        structural_stop = max(c["high"] for c in recent) + buffer
+        stop = max(structural_stop, entry + min_risk)
+    else:
+        structural_stop = min(c["low"] for c in recent) - buffer
+        stop = min(structural_stop, entry - min_risk)
+    risk = abs(stop - entry)
+    risk_atr = risk / m["atr"]
+    if risk <= 0 or risk_atr > 1.80:
+        return None
+
     targets = (
         [entry - risk, entry - risk * 1.5]
         if direction == "SHORT"
@@ -982,12 +994,14 @@ def detect_early_15m(candles, live_price):
     score += 2 if trigger in ("15M_SWING_HIGH_REJECTION", "15M_SWING_LOW_RECLAIM") else 0
     score += 1 if m["volume_ratio"] >= 1.20 else 0
     score += 1 if body_ratio >= 0.60 or upper_wick_ratio >= 0.40 or lower_wick_ratio >= 0.40 else 0
+    score += 1 if fresh_bos else 0
 
     return {
         "symbol": "", "direction": direction, "price": entry, "entry": entry,
         "sl": stop, "tp": targets, "score": score, "m15": m,
         "body_ratio": body_ratio, "breakout": short_break if direction == "SHORT" else long_break,
-        "trigger": trigger,
+        "trigger": trigger, "risk_atr": risk_atr,
+        "confirmation_5m": bool(require_5m),
     }
 
 def early_entry_message(item):
@@ -1004,6 +1018,8 @@ def early_entry_message(item):
         "TP2: {}".format(format_price(item["tp"][1])),
         "RSI 15m: {:.1f} | حجم: {:.2f}x".format(item["m15"]["rsi"], item["m15"]["volume_ratio"]),
         "محرک: {} | قدرت بدنه: {:.0f}%".format(item["trigger"], item["body_ratio"] * 100),
+        "تأیید ۵ دقیقه: {}".format("شکست ساختار و حجم تأیید شد" if item.get("confirmation_5m") else "در انتظار تأیید"),
+        "فاصله حد ضرر: {:.2f} ATR".format(item.get("risk_atr", 0.0)),
         "امتیاز شروع حرکت: {}".format(item["score"]),
         "",
         "⚠️ هشدار زودهنگام است؛ منتظر مدیریت ریسک باش. سفارش خودکار ثبت نمی‌شود.",
@@ -1418,11 +1434,21 @@ def main():
             log("EARLY 15M SCAN: {} / {} {}".format(i, len(selected), item["symbol"]))
         candles15_early = get_candles(item["symbol"], "15m")
         if candles15_early:
-            early = detect_early_15m(candles15_early, ticker_price(item["ticker"]))
-            if early:
-                early["symbol"] = item["symbol"]
-                early_alerts.append(early)
-                log("EARLY 15M SIGNAL: {} {} SCORE {}".format(item["symbol"], early["direction"], early["score"]))
+            live_price = ticker_price(item["ticker"])
+            candidate_early = detect_early_15m(candles15_early, live_price)
+            if candidate_early:
+                # Fetch the faster timeframe only for a 15m candidate; require
+                # a 5m structure break and volume confirmation before Telegram.
+                candles5_early = get_candles(item["symbol"], "5m")
+                early = detect_early_15m(candles15_early, live_price, candles5_early, require_5m=True)
+                if early:
+                    early["symbol"] = item["symbol"]
+                    early_alerts.append(early)
+                    log("EARLY 15M+5M CONFIRMED: {} {} SCORE {}".format(
+                        item["symbol"], early["direction"], early["score"]
+                    ))
+                else:
+                    log("EARLY 15M CANDIDATE BLOCKED BY 5M/QUALITY GATE: {}".format(item["symbol"]))
         time.sleep(REQUEST_PAUSE)
 
     early_alerts.sort(key=lambda x: (x["score"], x["m15"]["volume_ratio"]), reverse=True)
