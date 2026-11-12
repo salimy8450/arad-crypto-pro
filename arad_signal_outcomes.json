@@ -2930,6 +2930,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CLO_USDT|SHORT|EARLY|1794477434",
+      "symbol": "CLO_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.03609,
+      "sl": 0.03659630898416355,
+      "tp": [
+        0.035583691015836444,
+        0.03533053652375467,
+        0.03507738203167289,
+        0.034824227539591114,
+        0.03457107304750934,
+        0.034064764063345784
+      ],
+      "created_at": 1794477434,
+      "first_candle_time": 1794477600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
