@@ -1605,6 +1605,23 @@
       "result": "LOSS_SL",
       "max_tp": 0,
       "exit_candle": 1794415200
+    },
+    {
+      "id": "VST_USDT|LONG|EARLY|1794463539",
+      "symbol": "VST_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 131.96,
+      "sl": 131.74402,
+      "tp": [
+        132.17598,
+        132.28397
+      ],
+      "created_at": 1794463539,
+      "first_candle_time": 1794463800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
