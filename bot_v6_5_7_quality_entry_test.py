@@ -9,7 +9,7 @@ import urllib.error
 from datetime import datetime, timezone
 
 # ==========================================================
-# ARAD CRYPTO PRO V6.5.6 OUTCOME TRACKING OURBIT
+# ARAD CRYPTO PRO V6.5.7 EARLY 5M LONG/SHORT TEST OURBIT
 # EARLY WATCH + CONFIRMED TELEGRAM ALERTS
 # MTF | BOS | SWEEP | PULLBACK | RISK FILTERS
 # ANALYSIS ONLY - NO ORDERS
@@ -22,6 +22,7 @@ MAX_STAGE1_SYMBOLS = 300  # liquid top-300 universe for reliable 5m test cadence
 MAX_STAGE2_SYMBOLS = 80
 MAX_STAGE3_SYMBOLS = 60
 MAX_TELEGRAM_WATCH_ALERTS = 5  # cap WATCH messages per test run to prevent Telegram flooding
+MAX_EARLY_ALERTS = 8  # cap early-entry messages per 5m test run
 
 TIMEFRAMES = {
     "5m": ("Min5", 300),
@@ -102,7 +103,7 @@ def as_float(value, default=0.0):
 
 def http_json(url, method="GET", payload=None, headers=None, timeout=REQUEST_TIMEOUT):
     body = None
-    request_headers = {"User-Agent": "ARAD-CRYPTO-PRO/6.5.6", "Accept": "application/json"}
+    request_headers = {"User-Agent": "ARAD-CRYPTO-PRO/6.5.7", "Accept": "application/json"}
     if headers:
         request_headers.update(headers)
     if payload is not None:
@@ -1477,11 +1478,12 @@ def main():
     # Send best WATCH candidates for visibility and all CONFIRMED setups.
     watch.sort(key=candidate_quality, reverse=True)
     watch_to_send = watch[:MAX_TELEGRAM_WATCH_ALERTS]
+    early_to_send = early_alerts[:MAX_EARLY_ALERTS]
     log("TELEGRAM ALERT QUEUE: {} EARLY + {} WATCH + {} CONFIRMED = {} TOTAL BEFORE DEDUP".format(
-        len(early_alerts), len(watch_to_send), len(confirmed),
-        len(early_alerts) + len(watch_to_send) + len(confirmed)
+        len(early_to_send), len(watch_to_send), len(confirmed),
+        len(early_to_send) + len(watch_to_send) + len(confirmed)
     ))
-    dispatch_alerts(early_alerts, watch_to_send, confirmed)
+    dispatch_alerts(early_to_send, watch_to_send, confirmed)
 
     elapsed = time.time() - started
     log("")
@@ -1491,7 +1493,7 @@ def main():
     log("ELIGIBLE CONTRACTS SCANNED: {}".format(len(selected)))
     log("STAGE 1 PROMISING: {}".format(len(stage1)))
     log("STAGE 2 PASSED / WATCH CANDIDATES: {}".format(len(stage2)))
-    log("EARLY 15M SIGNALS FOUND: {}".format(len(early_alerts)))
+    log("EARLY 5M SIGNALS FOUND: {}".format(len(early_alerts)))
     log("CONFIRMED SETUPS: {}".format(len(confirmed)))
     log("WATCH SETUPS: {}".format(len(watch)))
     log("ELAPSED: {:.1f} seconds".format(elapsed))
