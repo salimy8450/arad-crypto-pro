@@ -3423,6 +3423,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "LIT_USDT|LONG|EARLY|1794513146",
+      "symbol": "LIT_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 3.185,
+      "sl": 3.1628377630518196,
+      "tp": [
+        3.2071622369481805,
+        3.2182433554222705,
+        3.229324473896361,
+        3.2404055923704513,
+        3.2514867108445413,
+        3.2736489477927218
+      ],
+      "created_at": 1794513146,
+      "first_candle_time": 1794513300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
