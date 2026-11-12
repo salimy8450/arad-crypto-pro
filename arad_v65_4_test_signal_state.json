@@ -29,7 +29,7 @@
   },
   "PHA_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794454437
+    "sent_at": 1794484015
   },
   "MERL_USDT|SHORT": {
     "type": "EARLY",
@@ -189,7 +189,7 @@
   },
   "EDGEX_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794251554
+    "sent_at": 1794484004
   },
   "XRP_USDT|SHORT": {
     "type": "WATCH",
@@ -233,11 +233,11 @@
   },
   "THETA_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794257174
+    "sent_at": 1794484007
   },
   "DNA_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794257176
+    "sent_at": 1794484006
   },
   "BABA_USDT|LONG": {
     "type": "EARLY",
@@ -317,7 +317,7 @@
   },
   "IN_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794271406
+    "sent_at": 1794484018
   },
   "OPG_USDT|SHORT": {
     "type": "EARLY",
@@ -333,7 +333,7 @@
   },
   "GRVT_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794413758
+    "sent_at": 1794484023
   },
   "NEX_USDT|SHORT": {
     "type": "EARLY",
@@ -389,11 +389,11 @@
   },
   "FIDA_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794257242
+    "sent_at": 1794484019
   },
   "ICP_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794257244
+    "sent_at": 1794484016
   },
   "BLESS_USDT|SHORT": {
     "type": "EARLY",
@@ -409,7 +409,7 @@
   },
   "STRK_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794257250
+    "sent_at": 1794484026
   },
   "VIRTUAL_USDT|SHORT": {
     "type": "EARLY",
@@ -445,7 +445,7 @@
   },
   "SKDD_USDT|LONG": {
     "type": "EARLY",
-    "sent_at": 1794271385
+    "sent_at": 1794484013
   },
   "SOLV_USDT|LONG": {
     "type": "EARLY",
@@ -469,7 +469,7 @@
   },
   "DRAM_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326467
+    "sent_at": 1794484004
   },
   "PATH_USDT|LONG": {
     "type": "EARLY",
@@ -561,7 +561,7 @@
   },
   "EIGEN_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794297018
+    "sent_at": 1794484014
   },
   "SHIB_USDT|SHORT": {
     "type": "EARLY",
@@ -589,7 +589,7 @@
   },
   "DEEP_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794271401
+    "sent_at": 1794483993
   },
   "SAMSUNGEM_USDT|SHORT": {
     "type": "EARLY",
@@ -617,7 +617,7 @@
   },
   "SLX_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794463622
+    "sent_at": 1794484016
   },
   "CC_USDT|SHORT": {
     "type": "EARLY",
@@ -629,7 +629,7 @@
   },
   "ZEST_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794271404
+    "sent_at": 1794483989
   },
   "POL_USDT|SHORT": {
     "type": "EARLY",
@@ -749,7 +749,7 @@
   },
   "FLOCK_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794271419
+    "sent_at": 1794484014
   },
   "EQT_USDT|SHORT": {
     "type": "EARLY",
@@ -761,7 +761,7 @@
   },
   "CATI_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794271421
+    "sent_at": 1794484017
   },
   "BARD_USDT|SHORT": {
     "type": "EARLY",
@@ -873,7 +873,7 @@
   },
   "DELTAELEC_USDT|LONG": {
     "type": "EARLY",
-    "sent_at": 1794297005
+    "sent_at": 1794484011
   },
   "CSCO_USDT|SHORT": {
     "type": "EARLY",
@@ -1193,11 +1193,11 @@
   },
   "BEAM_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326452
+    "sent_at": 1794484021
   },
   "ASML_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326452
+    "sent_at": 1794484008
   },
   "KODEX200_USDT|SHORT": {
     "type": "EARLY",
@@ -1205,7 +1205,7 @@
   },
   "SMSN_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326453
+    "sent_at": 1794484016
   },
   "AMD_USDT|SHORT": {
     "type": "EARLY",
@@ -1225,19 +1225,19 @@
   },
   "EWY_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326456
+    "sent_at": 1794484003
   },
   "ORCL_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326456
+    "sent_at": 1794484022
   },
   "QQQ_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326457
+    "sent_at": 1794484010
   },
   "CXMT_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326458
+    "sent_at": 1794483995
   },
   "GTLB_USDT|SHORT": {
     "type": "EARLY",
@@ -1265,7 +1265,7 @@
   },
   "SQQQ_USDT|LONG": {
     "type": "EARLY",
-    "sent_at": 1794326461
+    "sent_at": 1794483996
   },
   "ICNT_USDT|SHORT": {
     "type": "EARLY",
@@ -1273,11 +1273,11 @@
   },
   "TQQQ_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326462
+    "sent_at": 1794484000
   },
   "CRDO_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326462
+    "sent_at": 1794484010
   },
   "POPMART_USDT|SHORT": {
     "type": "EARLY",
@@ -1293,7 +1293,7 @@
   },
   "MUU_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326464
+    "sent_at": 1794483998
   },
   "KSTR_USDT|SHORT": {
     "type": "EARLY",
@@ -1317,11 +1317,11 @@
   },
   "PENG_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326466
+    "sent_at": 1794484002
   },
   "GLW_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326466
+    "sent_at": 1794484017
   },
   "CATSTOCK_USDT|SHORT": {
     "type": "EARLY",
@@ -1329,11 +1329,11 @@
   },
   "GS_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326467
+    "sent_at": 1794484000
   },
   "COHR_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326467
+    "sent_at": 1794483993
   },
   "EWT_USDT|SHORT": {
     "type": "EARLY",
@@ -1353,11 +1353,11 @@
   },
   "AMAT_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326469
+    "sent_at": 1794483996
   },
   "KORU_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794326470
+    "sent_at": 1794484008
   },
   "AMZN_USDT|SHORT": {
     "type": "EARLY",
@@ -1417,7 +1417,7 @@
   },
   "BIRB_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794347169
+    "sent_at": 1794484021
   },
   "MAV_USDT|SHORT": {
     "type": "EARLY",
@@ -1437,7 +1437,7 @@
   },
   "METIS_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794347171
+    "sent_at": 1794484001
   },
   "TRIA_USDT|SHORT": {
     "type": "EARLY",
@@ -1457,7 +1457,7 @@
   },
   "ATH_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794347174
+    "sent_at": 1794483992
   },
   "SXT_USDT|SHORT": {
     "type": "EARLY",
@@ -1549,7 +1549,7 @@
   },
   "CLANKER_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794361159
+    "sent_at": 1794484017
   },
   "FORM_USDT|LONG": {
     "type": "EARLY",
@@ -1585,7 +1585,7 @@
   },
   "LAB_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794361165
+    "sent_at": 1794483998
   },
   "SYN_USDT|LONG": {
     "type": "EARLY",
@@ -1593,7 +1593,7 @@
   },
   "ACE_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794361166
+    "sent_at": 1794484024
   },
   "NEWT_USDT|LONG": {
     "type": "EARLY",
@@ -2069,7 +2069,7 @@
   },
   "TWT_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794413718
+    "sent_at": 1794484023
   },
   "TUT_USDT|LONG": {
     "type": "EARLY",
@@ -2157,7 +2157,7 @@
   },
   "BLUAI_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794454443
+    "sent_at": 1794483991
   },
   "DOT_USDT|LONG": {
     "type": "EARLY",
@@ -2168,8 +2168,8 @@
     "sent_at": 1794413774
   },
   "IRYS_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794413775
+    "type": "EARLY",
+    "sent_at": 1794484007
   },
   "ICP_USDT|LONG": {
     "type": "CONFIRMED",
@@ -2201,7 +2201,7 @@
   },
   "ARM_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794437608
+    "sent_at": 1794484011
   },
   "TBT_USDT|LONG": {
     "type": "EARLY",
@@ -2333,7 +2333,7 @@
   },
   "INTW_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794454445
+    "sent_at": 1794484009
   },
   "KGEN_USDT|LONG": {
     "type": "EARLY",
@@ -2473,7 +2473,7 @@
   },
   "XAN_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794463586
+    "sent_at": 1794484018
   },
   "LINK_USDT|SHORT": {
     "type": "EARLY",
@@ -2489,7 +2489,7 @@
   },
   "ZORA_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794463593
+    "sent_at": 1794483999
   },
   "EUL_USDT|SHORT": {
     "type": "EARLY",
@@ -2497,7 +2497,7 @@
   },
   "OGN_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794463597
+    "sent_at": 1794483991
   },
   "BAN_USDT|SHORT": {
     "type": "EARLY",
@@ -2546,5 +2546,209 @@
   "UNI_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794463642
+  },
+  "CVXSTOCK_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794483990
+  },
+  "ANKR_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483990
+  },
+  "BROCCOLI_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483991
+  },
+  "QCOM_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483992
+  },
+  "STM_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483993
+  },
+  "WLFI_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794483994
+  },
+  "AZTEC_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483994
+  },
+  "FORM_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483994
+  },
+  "COAI_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483995
+  },
+  "SNDK_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483996
+  },
+  "NAS100_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483997
+  },
+  "TLM_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483997
+  },
+  "SNXX_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483997
+  },
+  "SILVER_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483998
+  },
+  "SPX500_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794483999
+  },
+  "XBI_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484000
+  },
+  "LDO_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484001
+  },
+  "DELL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484001
+  },
+  "CBRS_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484002
+  },
+  "CKB_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484003
+  },
+  "ZKC_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484003
+  },
+  "HYUNDAI_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484004
+  },
+  "1000XEC_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484005
+  },
+  "SIGN_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484005
+  },
+  "EVAA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484005
+  },
+  "WDC_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484006
+  },
+  "LITE_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484007
+  },
+  "HOOD_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484008
+  },
+  "API3_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484009
+  },
+  "HUMA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484010
+  },
+  "SKL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484011
+  },
+  "AVGO_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484012
+  },
+  "RUM_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484012
+  },
+  "BR_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484013
+  },
+  "VET_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484013
+  },
+  "AMZN_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794484014
+  },
+  "MEME_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484015
+  },
+  "RKLB_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484018
+  },
+  "ZBT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484019
+  },
+  "DRIFT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484020
+  },
+  "HEMI_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484020
+  },
+  "BLUR_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484020
+  },
+  "MEW_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484022
+  },
+  "SNX_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484022
+  },
+  "TRUST_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484023
+  },
+  "PNUT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484024
+  },
+  "BLACKBERRY_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484025
+  },
+  "MRVL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484025
+  },
+  "1000PEPE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794484025
+  },
+  "BANK_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484026
+  },
+  "GOAT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794484027
   }
 }
