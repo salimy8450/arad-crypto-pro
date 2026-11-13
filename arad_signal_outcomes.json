@@ -4022,6 +4022,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MRVL_USDT|SHORT|EARLY|1794548070",
+      "symbol": "MRVL_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 163.23,
+      "sl": 164.45319397059285,
+      "tp": [
+        162.00680602940713,
+        161.3952090441107,
+        160.78361205881427,
+        160.17201507351785,
+        159.5604180882214,
+        158.33722411762855
+      ],
+      "created_at": 1794548070,
+      "first_candle_time": 1794548100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
