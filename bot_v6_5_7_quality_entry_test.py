@@ -55,10 +55,10 @@ CONTINUATION_BREAKOUT_LOOKBACK = 6
 CONTINUATION_MIN_DIRECTIONAL_BARS = 2
 MICRO_BREAKOUT_LOOKBACK = 4
 MICRO_BREAKOUT_MIN_BODY = 0.45
-EXTREME_RSI_SHORT_15M = 25.0
-EXTREME_RSI_SHORT_5M = 22.0
-EXTREME_RSI_LONG_15M = 72.0
-EXTREME_RSI_LONG_5M = 75.0
+EXTREME_RSI_SHORT_15M = 32.0
+EXTREME_RSI_SHORT_5M = 28.0
+EXTREME_RSI_LONG_15M = 68.0
+EXTREME_RSI_LONG_5M = 72.0
 # Higher-timeframe exhaustion guard for confirmed entries.
 EXTREME_RSI_LONG_1H = 75.0
 EXTREME_RSI_SHORT_1H = 25.0
@@ -938,6 +938,16 @@ def analyze_stage3(candidate):
         if not live_ok: failed.append("LIVE_PRICE_GAP")
         candidate["rejection_reason"] = ",".join(failed) or "SCORE"
 
+    # Never send a late WATCH after the directional leg is already exhausted.
+    # Such a candidate is rejected rather than advertised as an actionable setup.
+    if not late_ok:
+        candidate["status"] = "REJECTED_LATE"
+        candidate["rejection_reason"] = (
+            candidate.get("rejection_reason", "") + ",LATE_EXHAUSTED_MOVE"
+        ).strip(",")
+        candidate["live_diff"] = live_diff
+        return candidate
+
     candidate["status"] = "WATCH"
     candidate["live_diff"] = live_diff
     return candidate
@@ -1117,6 +1127,32 @@ def detect_early_5m(candles5, candles15, live_price):
         and close_position >= 0.55
     )
 
+    # Earlier swing-failure detector: catch the first rollover candle near a
+    # local extreme before a multi-candle BOS has already happened.
+    prev5_metrics = market_metrics(candles5[:-1])
+    prior_high = max(c["high"] for c in candles5[-7:-1])
+    prior_low = min(c["low"] for c in candles5[-7:-1])
+    short_swing_failure = (
+        last["close"] < last["open"]
+        and last["high"] >= prior_high * 0.999
+        and last["close"] < prior_high
+        and upper_wick_ratio >= 0.20
+        and close_position <= 0.58
+        and prev5_metrics["rsi"] - m5["rsi"] >= 1.0
+        and m5["macd_hist"] < prev5_metrics["macd_hist"]
+        and (m5["volume_ratio"] >= 0.80 or impulse_volume_ok(candles5, "SHORT"))
+    )
+    long_swing_failure = (
+        last["close"] > last["open"]
+        and last["low"] <= prior_low * 1.001
+        and last["close"] > prior_low
+        and lower_wick_ratio >= 0.20
+        and close_position >= 0.42
+        and m5["rsi"] - prev5_metrics["rsi"] >= 1.0
+        and m5["macd_hist"] > prev5_metrics["macd_hist"]
+        and (m5["volume_ratio"] >= 0.80 or impulse_volume_ok(candles5, "LONG"))
+    )
+
     # Predict the first directional impulse candle using 7 evidence points.
     # This is evaluated before legacy triggers so the alert can fire on the first
     # closed impulse candle, not after a multi-candle trend is already mature.
@@ -1133,6 +1169,10 @@ def detect_early_5m(candles5, candles15, live_price):
         direction, trigger = "SHORT", "5M_RESISTANCE_REJECTION"
     elif not direction and long_rejection:
         direction, trigger = "LONG", "5M_SUPPORT_RECLAIM"
+    elif not direction and short_swing_failure:
+        direction, trigger = "SHORT", "5M_EARLY_SWING_FAILURE"
+    elif not direction and long_swing_failure:
+        direction, trigger = "LONG", "5M_EARLY_SWING_FAILURE"
     elif not direction and first_bearish:
         direction, trigger = "SHORT", "FIRST_BEARISH_5M_CANDLE"
     elif not direction and first_bullish:
@@ -1155,7 +1195,7 @@ def detect_early_5m(candles5, candles15, live_price):
     structure_direction, _sweep, structure_bos = structure_signal(candles5)
     predictive_sweep = bool(predictive and predictive.get("sweep_reclaim"))
     fresh_bos = micro_bos or predictive_sweep or (structure_direction == direction and structure_bos)
-    if not fresh_bos and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM"):
+    if not fresh_bos and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE"):
         return None
 
     setup = classify_early_move(direction, m15)
@@ -1165,7 +1205,7 @@ def detect_early_5m(candles5, candles15, live_price):
             return None
         entry_confirmation = "CORRECTIVE_MICRO_BOS_CONFIRMED"
     elif setup["setup_type"].startswith("EARLY_REVERSAL_"):
-        if not fresh_bos and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM"):
+        if not fresh_bos and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE"):
             return None
         entry_confirmation = "EARLY_REVERSAL_STRUCTURE_CONFIRMED"
 
