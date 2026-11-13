@@ -411,9 +411,9 @@
     "trigger": "15M_RANGE_BREAK"
   },
   "USELESS_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794481032,
-    "trigger": "15M_SWING_HIGH_REJECTION"
+    "type": "WATCH",
+    "sent_at": 1794598690,
+    "trigger": ""
   },
   "PENGU_USDT|SHORT": {
     "type": "WATCH",
@@ -446,9 +446,9 @@
     "trigger": ""
   },
   "IDOL_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794508899,
-    "trigger": ""
+    "type": "EARLY",
+    "sent_at": 1794598689,
+    "trigger": "FIRST_BEARISH_15M_CANDLE"
   },
   "BAT_USDT|SHORT": {
     "type": "EARLY",
@@ -481,9 +481,9 @@
     "trigger": ""
   },
   "BERA_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794543058,
-    "trigger": ""
+    "type": "EARLY",
+    "sent_at": 1794598689,
+    "trigger": "FIRST_BEARISH_15M_CANDLE"
   },
   "PLUME_USDT|LONG": {
     "type": "WATCH",
@@ -493,6 +493,21 @@
   "INIT_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794571749,
+    "trigger": ""
+  },
+  "HUMA_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794598688,
+    "trigger": "15M_SWING_LOW_RECLAIM"
+  },
+  "DODO_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794598689,
+    "trigger": ""
+  },
+  "HMSTR_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794598690,
     "trigger": ""
   }
 }
