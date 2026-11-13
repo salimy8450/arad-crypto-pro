@@ -69,7 +69,7 @@
   },
   "REZ_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794539132
+    "sent_at": 1794593753
   },
   "CYBER_USDT|SHORT": {
     "type": "WATCH",
@@ -253,7 +253,7 @@
   },
   "USELESS_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794470839
+    "sent_at": 1794593753
   },
   "TIA_USDT|SHORT": {
     "type": "WATCH",
@@ -322,5 +322,17 @@
   "HAEDAL_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794567195
+  },
+  "HOME_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794593754
+  },
+  "ZETA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794593754
+  },
+  "IDOL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794593755
   }
 }
