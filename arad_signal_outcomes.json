@@ -4043,6 +4043,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "INTW_USDT|SHORT|EARLY|1794548072",
+      "symbol": "INTW_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 6.211,
+      "sl": 6.293200493155165,
+      "tp": [
+        6.128799506844835,
+        6.087699260267253,
+        6.04659901368967,
+        6.005498767112088,
+        5.964398520534505,
+        5.88219802737934
+      ],
+      "created_at": 1794548072,
+      "first_candle_time": 1794548100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
