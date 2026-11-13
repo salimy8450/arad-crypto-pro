@@ -1315,23 +1315,38 @@ def early_5m_turn_confirmation_ok(candles5, direction):
     close_pos = (last["close"] - last["low"]) / rng
     lower_wick = (min(last["open"], last["close"]) - last["low"]) / rng
     upper_wick = (last["high"] - max(last["open"], last["close"])) / rng
+    recent_pivots = candles5[-5:-1]
     if direction == "LONG":
-        swept = last["low"] < min(x["low"] for x in prior) and last["close"] > min(x["low"] for x in prior)
+        pivot = min(x["low"] for x in recent_pivots)
+        bars_since_pivot = len(recent_pivots) - 1 - min(range(len(recent_pivots)), key=lambda i: recent_pivots[i]["low"])
+        fresh_turn = (
+            1 <= bars_since_pivot <= 3
+            and last["close"] >= pivot
+            and (last["close"] - pivot) / m["atr"] <= 1.50
+            and last["close"] > last["open"]
+            and (last["close"] > candles5[-2]["high"] or (last["close"] > candles5[-2]["close"] and close_pos >= 0.60))
+        )
         turn = (
-            last["close"] > last["open"] and (swept or last["close"] > candles5[-2]["high"])
-            and (lower_wick >= 0.15 or close_pos >= 0.68)
-            and m["rsi"] >= p["rsi"] + 0.5
+            fresh_turn and (lower_wick >= 0.10 or close_pos >= 0.60)
+            and m["rsi"] >= p["rsi"] + 0.25
             and m["macd_hist"] > p["macd_hist"]
-            and m["rsi"] < 62
+            and m["rsi"] < 65
         )
     else:
-        swept = last["high"] > max(x["high"] for x in prior) and last["close"] < max(x["high"] for x in prior)
+        pivot = max(x["high"] for x in recent_pivots)
+        bars_since_pivot = len(recent_pivots) - 1 - max(range(len(recent_pivots)), key=lambda i: recent_pivots[i]["high"])
+        fresh_turn = (
+            1 <= bars_since_pivot <= 3
+            and last["close"] <= pivot
+            and (pivot - last["close"]) / m["atr"] <= 1.50
+            and last["close"] < last["open"]
+            and (last["close"] < candles5[-2]["low"] or (last["close"] < candles5[-2]["close"] and close_pos <= 0.40))
+        )
         turn = (
-            last["close"] < last["open"] and (swept or last["close"] < candles5[-2]["low"])
-            and (upper_wick >= 0.15 or close_pos <= 0.32)
-            and m["rsi"] <= p["rsi"] - 0.5
+            fresh_turn and (upper_wick >= 0.10 or close_pos <= 0.40)
+            and m["rsi"] <= p["rsi"] - 0.25
             and m["macd_hist"] < p["macd_hist"]
-            and m["rsi"] > 38
+            and m["rsi"] > 35
         )
     return bool(turn and (m["volume_ratio"] >= 0.55 or impulse_volume_ok(candles5, direction)))
 
@@ -1409,25 +1424,53 @@ def detect_early_15m(candles, live_price, candles5=None, require_5m=False):
     turn_prior = candles[-7:-1]
     turn_low = min(x["low"] for x in turn_prior)
     turn_high = max(x["high"] for x in turn_prior)
+    # Find a just-formed local pivot among the last few CLOSED candles.
+    # The confirmation candle may arrive 1-3 bars after the actual low/high;
+    # it does NOT need to sweep the pivot again (the old late-entry flaw).
+    pivot_window = candles[-5:-1]
+    pivot_low_idx = min(range(len(pivot_window)), key=lambda i: pivot_window[i]["low"])
+    pivot_high_idx = max(range(len(pivot_window)), key=lambda i: pivot_window[i]["high"])
+    pivot_low = pivot_window[pivot_low_idx]["low"]
+    pivot_high = pivot_window[pivot_high_idx]["high"]
+    bars_after_low = len(pivot_window) - 1 - pivot_low_idx
+    bars_after_high = len(pivot_window) - 1 - pivot_high_idx
+    near_fresh_low = (
+        1 <= bars_after_low <= 3
+        and (last["close"] - pivot_low) / m["atr"] <= 1.25
+        and last["close"] >= pivot_low
+    )
+    near_fresh_high = (
+        1 <= bars_after_high <= 3
+        and (pivot_high - last["close"]) / m["atr"] <= 1.25
+        and last["close"] <= pivot_high
+    )
+    first_bullish_shift = (
+        last["close"] > last["open"]
+        and (last["close"] > previous["high"] or
+             (last["close"] > previous["close"] and close_position >= 0.62))
+    )
+    first_bearish_shift = (
+        last["close"] < last["open"]
+        and (last["close"] < previous["low"] or
+             (last["close"] < previous["close"] and close_position <= 0.38))
+    )
     long_base_turn = (
-        last["low"] < turn_low and last["close"] > turn_low
-        and last["close"] > last["open"]
-        and lower_wick_ratio >= 0.15 and close_position >= 0.52
-        and m["rsi"] >= prev_metrics["rsi"] + 0.5
+        near_fresh_low and first_bullish_shift
+        and (lower_wick_ratio >= 0.10 or close_position >= 0.62)
+        and m["rsi"] >= prev_metrics["rsi"] + 0.25
         and m["macd_hist"] > prev_metrics["macd_hist"]
-        and 34.0 <= m["rsi"] <= 55.0
-        and abs(last["close"] - m["ema21"]) / m["atr"] <= 1.25
-        and (m["volume_ratio"] >= 0.60 or impulse_volume_ok(candles, "LONG"))
+        and 32.0 <= m["rsi"] <= 60.0
+        and abs(last["close"] - m["ema21"]) / m["atr"] <= 1.50
+        and (m["volume_ratio"] >= 0.50 or impulse_volume_ok(candles, "LONG"))
     )
     short_top_turn = (
-        last["high"] > turn_high and last["close"] < turn_high
-        and last["close"] < last["open"]
-        and upper_wick_ratio >= 0.15 and close_position <= 0.48
-        and m["rsi"] <= prev_metrics["rsi"] - 0.5
+        near_fresh_high and first_bearish_shift
+        and (upper_wick_ratio >= 0.10 or close_position <= 0.38)
+        and m["rsi"] <= prev_metrics["rsi"] - 0.25
         and m["macd_hist"] < prev_metrics["macd_hist"]
-        and 45.0 <= m["rsi"] <= 66.0
-        and abs(last["close"] - m["ema21"]) / m["atr"] <= 1.25
-        and (m["volume_ratio"] >= 0.60 or impulse_volume_ok(candles, "SHORT"))
+        and 40.0 <= m["rsi"] <= 68.0
+        and abs(last["close"] - m["ema21"]) / m["atr"] <= 1.50
+        and (m["volume_ratio"] >= 0.50 or impulse_volume_ok(candles, "SHORT"))
     )
 
     # Detect the first 15m impulse candle from structure, volume and
