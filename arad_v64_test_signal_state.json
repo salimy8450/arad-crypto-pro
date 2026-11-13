@@ -68,8 +68,8 @@
     "sent_at": 1794306987
   },
   "REZ_USDT|SHORT": {
-    "type": "CONFIRMED",
-    "sent_at": 1794177084
+    "type": "WATCH",
+    "sent_at": 1794539132
   },
   "CYBER_USDT|SHORT": {
     "type": "WATCH",
@@ -181,7 +181,7 @@
   },
   "TRX_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794523632
+    "sent_at": 1794539131
   },
   "XAU_USDT|SHORT": {
     "type": "WATCH",
@@ -290,5 +290,21 @@
   "0G_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794523633
+  },
+  "WLFI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794539131
+  },
+  "AAVE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794539132
+  },
+  "XAN_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794539132
+  },
+  "HOT_USDT|SHORT": {
+    "type": "CONFIRMED",
+    "sent_at": 1794539133
   }
 }
