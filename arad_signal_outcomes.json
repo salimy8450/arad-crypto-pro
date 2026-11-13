@@ -3938,6 +3938,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "UAI_USDT|SHORT|EARLY|1794543318",
+      "symbol": "UAI_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.03483,
+      "sl": 0.03545684716243767,
+      "tp": [
+        0.03420315283756233,
+        0.033889729256343495,
+        0.033576305675124665,
+        0.033262882093905835,
+        0.032949458512687,
+        0.03232261135024933
+      ],
+      "created_at": 1794543318,
+      "first_candle_time": 1794543600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
