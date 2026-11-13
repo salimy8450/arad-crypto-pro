@@ -4169,6 +4169,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BRENTOIL_USDT|LONG|EARLY|1794548085",
+      "symbol": "BRENTOIL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 93.13,
+      "sl": 93.05703610700711,
+      "tp": [
+        93.20296389299288,
+        93.23944583948932,
+        93.27592778598577,
+        93.31240973248222,
+        93.34889167897866,
+        93.42185557197155
+      ],
+      "created_at": 1794548085,
+      "first_candle_time": 1794548100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
