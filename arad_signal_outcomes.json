@@ -3854,6 +3854,27 @@
       "result": "LOSS_SL",
       "max_tp": 0,
       "exit_candle": 1794537000
+    },
+    {
+      "id": "SENT_USDT|SHORT|EARLY|1794543310",
+      "symbol": "SENT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.01606,
+      "sl": 0.016216848588533523,
+      "tp": [
+        0.01590315141146648,
+        0.01582472711719972,
+        0.015746302822932958,
+        0.015667878528666197,
+        0.015589454234399436,
+        0.015432605645865915
+      ],
+      "created_at": 1794543310,
+      "first_candle_time": 1794543600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
