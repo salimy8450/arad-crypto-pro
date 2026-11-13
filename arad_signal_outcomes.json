@@ -4785,6 +4785,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MAGMA_USDT|SHORT|EARLY|1794610238",
+      "symbol": "MAGMA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.31774,
+      "sl": 0.324204071803275,
+      "tp": [
+        0.31127592819672506,
+        0.30804389229508755
+      ],
+      "created_at": 1794610238,
+      "first_candle_time": 1794610500,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
