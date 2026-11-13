@@ -4190,6 +4190,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CTSI_USDT|SHORT|EARLY|1794555380",
+      "symbol": "CTSI_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.02457,
+      "sl": 0.024755913986067957,
+      "tp": [
+        0.024384086013932046,
+        0.02429112902089807,
+        0.02419817202786409,
+        0.02410521503483011,
+        0.024012258041796134,
+        0.02382634405572818
+      ],
+      "created_at": 1794555380,
+      "first_candle_time": 1794555600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
