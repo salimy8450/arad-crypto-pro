@@ -4434,6 +4434,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ILV_USDT|LONG|EARLY|1794563472",
+      "symbol": "ILV_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 2.631,
+      "sl": 2.6186227908210564,
+      "tp": [
+        2.643377209178943,
+        2.649565813768415,
+        2.6557544183578865,
+        2.661943022947358,
+        2.66813162753683,
+        2.6805088367157732
+      ],
+      "created_at": 1794563472,
+      "first_candle_time": 1794563700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
