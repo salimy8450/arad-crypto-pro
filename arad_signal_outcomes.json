@@ -4692,6 +4692,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "YAGEO_USDT|LONG|EARLY|1794590952",
+      "symbol": "YAGEO_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 12.395,
+      "sl": 12.3792815,
+      "tp": [
+        12.4107185,
+        12.41857775,
+        12.426437,
+        12.43429625,
+        12.4421555,
+        12.457874
+      ],
+      "created_at": 1794590952,
+      "first_candle_time": 1794591000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
