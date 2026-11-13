@@ -4329,6 +4329,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CHZ_USDT|SHORT|EARLY|1794555395",
+      "symbol": "CHZ_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.01068,
+      "sl": 0.010737139328907644,
+      "tp": [
+        0.010622860671092357,
+        0.010594291006638536,
+        0.010565721342184713,
+        0.01053715167773089,
+        0.01050858201327707,
+        0.010451442684369426
+      ],
+      "created_at": 1794555395,
+      "first_candle_time": 1794555600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
