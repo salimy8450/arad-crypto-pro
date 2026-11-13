@@ -4312,6 +4312,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "IRYS_USDT|SHORT|EARLY|1794555393",
+      "symbol": "IRYS_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.01551,
+      "sl": 0.015685110667608856,
+      "tp": [
+        0.015334889332391143,
+        0.015247333998586715
+      ],
+      "created_at": 1794555393,
+      "first_candle_time": 1794555600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
