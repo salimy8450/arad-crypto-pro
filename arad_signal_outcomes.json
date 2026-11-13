@@ -3735,6 +3735,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "NIGHT_USDT|LONG|EARLY|1794536714",
+      "symbol": "NIGHT_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.04491,
+      "sl": 0.04453020047393747,
+      "tp": [
+        0.045289799526062526,
+        0.04547969928909379,
+        0.04566959905212505,
+        0.045859498815156316,
+        0.04604939857818758,
+        0.046429198104250106
+      ],
+      "created_at": 1794536714,
+      "first_candle_time": 1794537000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
