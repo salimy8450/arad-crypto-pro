@@ -3917,6 +3917,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "COPPER_USDT|SHORT|EARLY|1794543316",
+      "symbol": "COPPER_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 6.313,
+      "sl": 6.3188939,
+      "tp": [
+        6.3071060999999995,
+        6.304159149999999,
+        6.301212199999999,
+        6.298265249999999,
+        6.295318299999999,
+        6.289424399999999
+      ],
+      "created_at": 1794543316,
+      "first_candle_time": 1794543600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
