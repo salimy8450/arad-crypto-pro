@@ -4270,6 +4270,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "NES_USDT|SHORT|EARLY|1794555388",
+      "symbol": "NES_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.1383,
+      "sl": 0.13953229136071624,
+      "tp": [
+        0.13706770863928378,
+        0.13645156295892566,
+        0.13583541727856754,
+        0.13521927159820943,
+        0.1346031259178513,
+        0.13337083455713508
+      ],
+      "created_at": 1794555388,
+      "first_candle_time": 1794555600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
