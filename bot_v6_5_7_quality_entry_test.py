@@ -1194,7 +1194,7 @@ def detect_early_5m(candles5, candles15, live_price):
     micro_bos = short_structure_break if direction == "SHORT" else long_structure_break
     structure_direction, _sweep, structure_bos = structure_signal(candles5)
     predictive_sweep = bool(predictive and predictive.get("sweep_reclaim"))
-    fresh_bos = micro_bos or predictive_sweep or (structure_direction == direction and structure_bos)
+    fresh_bos = micro_bos or predictive_sweep or (structure_direction == direction and structure_bos) or trigger == "5M_EARLY_SWING_FAILURE"
     if not fresh_bos and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE"):
         return None
 
