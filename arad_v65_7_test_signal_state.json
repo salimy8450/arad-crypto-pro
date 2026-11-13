@@ -185,7 +185,7 @@
   },
   "INJ_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794497716
+    "sent_at": 1794548088
   },
   "MAV_USDT|SHORT": {
     "type": "WATCH",
@@ -288,8 +288,8 @@
     "sent_at": 1794513154
   },
   "SQD_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794520780
+    "type": "WATCH",
+    "sent_at": 1794548088
   },
   "MAGMA_USDT|SHORT": {
     "type": "EARLY",
@@ -410,5 +410,49 @@
   "BERA_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794543327
+  },
+  "MRVL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794548071
+  },
+  "INTW_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794548073
+  },
+  "VET_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794548075
+  },
+  "SHELL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794548077
+  },
+  "ONE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794548080
+  },
+  "XPT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794548082
+  },
+  "CYBER_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794548084
+  },
+  "BRENTOIL_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794548086
+  },
+  "MAGMA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794548087
+  },
+  "1000PEPE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794548087
+  },
+  "SILVER_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794548088
   }
 }
