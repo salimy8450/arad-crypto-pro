@@ -4291,6 +4291,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "EIGEN_USDT|SHORT|EARLY|1794555391",
+      "symbol": "EIGEN_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.1555,
+      "sl": 0.15713163632125157,
+      "tp": [
+        0.15386836367874843,
+        0.15305254551812264,
+        0.15223672735749685,
+        0.15142090919687107,
+        0.15060509103624528,
+        0.1489734547149937
+      ],
+      "created_at": 1794555391,
+      "first_candle_time": 1794555600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
