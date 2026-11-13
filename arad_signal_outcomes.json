@@ -4455,6 +4455,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BLESS_USDT|SHORT|EARLY|1794563473",
+      "symbol": "BLESS_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.008293,
+      "sl": 0.008359149823310206,
+      "tp": [
+        0.008226850176689794,
+        0.00819377526503469,
+        0.008160700353379588,
+        0.008127625441724485,
+        0.008094550530069381,
+        0.008028400706759175
+      ],
+      "created_at": 1794563473,
+      "first_candle_time": 1794563700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
