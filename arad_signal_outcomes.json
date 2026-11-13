@@ -4064,6 +4064,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "VET_USDT|LONG|EARLY|1794548074",
+      "symbol": "VET_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.005004,
+      "sl": 0.004981708818518659,
+      "tp": [
+        0.005026291181481341,
+        0.005037436772222011,
+        0.005048582362962682,
+        0.005059727953703352,
+        0.005070873544444023,
+        0.005093164725925364
+      ],
+      "created_at": 1794548074,
+      "first_candle_time": 1794548100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
