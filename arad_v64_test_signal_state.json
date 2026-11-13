@@ -321,7 +321,7 @@
   },
   "HAEDAL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794567195
+    "sent_at": 1794613478
   },
   "HOME_USDT|SHORT": {
     "type": "WATCH",
@@ -334,5 +334,21 @@
   "IDOL_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794593755
+  },
+  "INIT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794613477
+  },
+  "BILL_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794613478
+  },
+  "HBAR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794613478
+  },
+  "HMSTR_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794613479
   }
 }
