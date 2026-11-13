@@ -266,9 +266,9 @@
     "trigger": ""
   },
   "TRIA_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794527720,
-    "trigger": "FIRST_BULLISH_15M_CANDLE"
+    "type": "WATCH",
+    "sent_at": 1794571750,
+    "trigger": ""
   },
   "PHA_USDT|SHORT": {
     "type": "EARLY",
@@ -483,6 +483,16 @@
   "BERA_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794543058,
+    "trigger": ""
+  },
+  "PLUME_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794571748,
+    "trigger": ""
+  },
+  "INIT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794571749,
     "trigger": ""
   }
 }
