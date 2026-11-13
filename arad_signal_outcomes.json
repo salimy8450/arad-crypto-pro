@@ -4211,6 +4211,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "IMX_USDT|SHORT|EARLY|1794555382",
+      "symbol": "IMX_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.1119,
+      "sl": 0.11342933585616209,
+      "tp": [
+        0.11037066414383791,
+        0.10960599621575687,
+        0.10884132828767581,
+        0.10807666035959476,
+        0.10731199243151372,
+        0.10578265657535163
+      ],
+      "created_at": 1794555382,
+      "first_candle_time": 1794555600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
