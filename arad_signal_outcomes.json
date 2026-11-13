@@ -4743,6 +4743,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ROSE_USDT|LONG|EARLY|1794610234",
+      "symbol": "ROSE_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.005125,
+      "sl": 0.005083723109800202,
+      "tp": [
+        0.0051662768901997985,
+        0.005186915335299698,
+        0.005207553780399597,
+        0.005228192225499495,
+        0.005248830670599395,
+        0.005290107560799193
+      ],
+      "created_at": 1794610234,
+      "first_candle_time": 1794610500,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
