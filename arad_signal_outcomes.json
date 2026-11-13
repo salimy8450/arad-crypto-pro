@@ -4232,6 +4232,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ABBV_USDT|SHORT|EARLY|1794555384",
+      "symbol": "ABBV_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 296.4,
+      "sl": 296.68892,
+      "tp": [
+        296.11107999999996,
+        295.9666199999999,
+        295.82215999999994,
+        295.67769999999996,
+        295.5332399999999,
+        295.2443199999999
+      ],
+      "created_at": 1794555384,
+      "first_candle_time": 1794555600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
