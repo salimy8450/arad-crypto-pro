@@ -304,7 +304,23 @@
     "sent_at": 1794539132
   },
   "HOT_USDT|SHORT": {
-    "type": "CONFIRMED",
-    "sent_at": 1794539133
+    "type": "WATCH",
+    "sent_at": 1794567195
+  },
+  "CVC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794567190
+  },
+  "SOPH_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794567194
+  },
+  "TSLA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794567194
+  },
+  "HAEDAL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794567195
   }
 }
