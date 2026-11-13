@@ -3980,6 +3980,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BEAT_USDT|SHORT|EARLY|1794543322",
+      "symbol": "BEAT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.07643,
+      "sl": 0.07727715623157744,
+      "tp": [
+        0.07558284376842256,
+        0.07515926565263384,
+        0.07473568753684512,
+        0.0743121094210564,
+        0.07388853130526768,
+        0.07304137507369024
+      ],
+      "created_at": 1794543322,
+      "first_candle_time": 1794543600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
