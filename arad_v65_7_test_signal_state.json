@@ -233,7 +233,7 @@
   },
   "XRP_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794511575
+    "sent_at": 1794536726
   },
   "GOOGL_USDT|LONG": {
     "type": "WATCH",
@@ -281,7 +281,7 @@
   },
   "ETH_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794513153
+    "sent_at": 1794536725
   },
   "DOT_USDT|SHORT": {
     "type": "WATCH",
@@ -330,5 +330,49 @@
   "TRX_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794520796
+  },
+  "NFLX_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794536711
+  },
+  "BLESS_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794536713
+  },
+  "NIGHT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794536715
+  },
+  "TLM_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794536717
+  },
+  "CELO_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794536719
+  },
+  "AAVE_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794536721
+  },
+  "STBL_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794536723
+  },
+  "USELESS_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794536724
+  },
+  "BCH_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794536725
+  },
+  "WAL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794536726
+  },
+  "CORE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794536727
   }
 }
