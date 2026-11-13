@@ -4001,6 +4001,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "XAUT_USDT|SHORT|EARLY|1794543324",
+      "symbol": "XAUT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 3908.79,
+      "sl": 3914.172637,
+      "tp": [
+        3903.407363,
+        3900.7160445,
+        3898.0247259999996,
+        3895.3334074999993,
+        3892.6420889999995,
+        3887.2594519999993
+      ],
+      "created_at": 1794543324,
+      "first_candle_time": 1794543600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
