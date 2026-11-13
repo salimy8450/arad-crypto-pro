@@ -4608,6 +4608,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SUI_USDT|SHORT|EARLY|1794590943",
+      "symbol": "SUI_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.7975,
+      "sl": 0.8028761062098142,
+      "tp": [
+        0.7921238937901858,
+        0.7894358406852786,
+        0.7867477875803716,
+        0.7840597344754645,
+        0.7813716813705573,
+        0.7759955751607431
+      ],
+      "created_at": 1794590943,
+      "first_candle_time": 1794591000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
