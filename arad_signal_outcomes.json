@@ -4587,6 +4587,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MELANIA_USDT|SHORT|EARLY|1794590941",
+      "symbol": "MELANIA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.05278,
+      "sl": 0.05315282179792714,
+      "tp": [
+        0.052407178202072864,
+        0.052220767303109296,
+        0.05203435640414573,
+        0.05184794550518216,
+        0.05166153460621859,
+        0.051288712808291455
+      ],
+      "created_at": 1794590941,
+      "first_candle_time": 1794591000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
