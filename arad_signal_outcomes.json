@@ -4865,6 +4865,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "1INCH_USDT|LONG|EARLY|1794610246",
+      "symbol": "1INCH_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.07117,
+      "sl": 0.07079868117229504,
+      "tp": [
+        0.07154131882770495,
+        0.07172697824155744,
+        0.07191263765540991,
+        0.07209829706926238,
+        0.07228395648311486,
+        0.07265527531081982
+      ],
+      "created_at": 1794610246,
+      "first_candle_time": 1794610500,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
