@@ -147,7 +147,7 @@
   },
   "ADA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794382221,
+    "sent_at": 1794543058,
     "trigger": ""
   },
   "USUAL_USDT|SHORT": {
@@ -468,6 +468,21 @@
   "XAN_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794527721,
+    "trigger": ""
+  },
+  "JCT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794543057,
+    "trigger": "15M_SWING_LOW_RECLAIM"
+  },
+  "UAI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794543057,
+    "trigger": ""
+  },
+  "BERA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794543058,
     "trigger": ""
   }
 }
