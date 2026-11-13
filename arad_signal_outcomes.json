@@ -3819,6 +3819,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "STBL_USDT|LONG|EARLY|1794536722",
+      "symbol": "STBL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.02112,
+      "sl": 0.021041608674214556,
+      "tp": [
+        0.021198391325785444,
+        0.021237586988678166,
+        0.02127678265157089,
+        0.02131597831446361,
+        0.021355173977356333,
+        0.021433565303141777
+      ],
+      "created_at": 1794536722,
+      "first_candle_time": 1794537000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
