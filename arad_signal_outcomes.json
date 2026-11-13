@@ -4253,6 +4253,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "NFLX_USDT|SHORT|EARLY|1794555386",
+      "symbol": "NFLX_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 62.99,
+      "sl": 63.061495,
+      "tp": [
+        62.918505,
+        62.882757500000004
+      ],
+      "created_at": 1794555386,
+      "first_candle_time": 1794555600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
