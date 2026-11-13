@@ -15,10 +15,6 @@
     "type": "WATCH",
     "sent_at": 1794049231
   },
-  "SKHYNIX_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1793942498
-  },
   "MU_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794009407
@@ -37,7 +33,7 @@
   },
   "ZIL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794481042
+    "sent_at": 1794570220
   },
   "MAV_USDT|SHORT": {
     "type": "WATCH",
@@ -85,7 +81,7 @@
   },
   "ZHIPU_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794435426
+    "sent_at": 1794570223
   },
   "BERA_USDT|SHORT": {
     "type": "WATCH",
@@ -131,25 +127,17 @@
     "type": "WATCH",
     "sent_at": 1793970267
   },
-  "BMNR_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1793942493
-  },
   "BTC_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794542108
   },
   "XRP_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794542110
+    "sent_at": 1794570222
   },
   "BNB_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794527661
-  },
-  "ONDO_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1793942498
   },
   "XPL_USDT|SHORT": {
     "type": "WATCH",
@@ -189,7 +177,7 @@
   },
   "MINIMAX_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1793970269
+    "sent_at": 1794570223
   },
   "PARTI_USDT|LONG": {
     "type": "WATCH",
@@ -217,7 +205,7 @@
   },
   "UNI_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794435431
+    "sent_at": 1794570220
   },
   "THE_USDT|SHORT": {
     "type": "WATCH",
@@ -269,7 +257,7 @@
   },
   "HOT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794542111
+    "sent_at": 1794570222
   },
   "ACT_USDT|LONG": {
     "type": "WATCH",
@@ -517,7 +505,7 @@
   },
   "XAU_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794527662
+    "sent_at": 1794570217
   },
   "MINIMAX_USDT|LONG": {
     "type": "WATCH",
@@ -529,11 +517,11 @@
   },
   "PAXG_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794414836
+    "sent_at": 1794570218
   },
   "SILVER_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794508900
+    "sent_at": 1794570220
   },
   "INIT_USDT|SHORT": {
     "type": "WATCH",
@@ -541,7 +529,7 @@
   },
   "KGEN_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794435427
+    "sent_at": 1794570222
   },
   "CORE_USDT|SHORT": {
     "type": "WATCH",
@@ -553,11 +541,11 @@
   },
   "NBIS_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794542107
+    "sent_at": 1794570219
   },
   "BARD_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794542107
+    "sent_at": 1794570221
   },
   "TRIA_USDT|LONG": {
     "type": "WATCH",
@@ -574,5 +562,29 @@
   "CBRS_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794542107
+  },
+  "XAUT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794570218
+  },
+  "HAEDAL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794570218
+  },
+  "FLR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794570219
+  },
+  "CBRS_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794570219
+  },
+  "SOPH_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794570221
+  },
+  "DODO_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794570223
   }
 }
