@@ -4106,6 +4106,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ONE_USDT|LONG|EARLY|1794548078",
+      "symbol": "ONE_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.001478,
+      "sl": 0.0014621343909071078,
+      "tp": [
+        0.001493865609092892,
+        0.001501798413639338,
+        0.0015097312181857842,
+        0.0015176640227322303,
+        0.0015255968272786763,
+        0.0015414624363715684
+      ],
+      "created_at": 1794548078,
+      "first_candle_time": 1794548100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
