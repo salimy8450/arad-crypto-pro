@@ -3756,6 +3756,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TLM_USDT|LONG|EARLY|1794536716",
+      "symbol": "TLM_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.001004,
+      "sl": 0.0009984669883033352,
+      "tp": [
+        0.0010095330116966646,
+        0.001012299517544997,
+        0.0010150660233933294,
+        0.0010178325292416618,
+        0.0010205990350899941,
+        0.0010261320467866589
+      ],
+      "created_at": 1794536716,
+      "first_candle_time": 1794537000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
