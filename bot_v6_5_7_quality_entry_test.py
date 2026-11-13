@@ -1301,6 +1301,41 @@ def detect_early_5m(candles5, candles15, live_price):
         "first_impulse_evidence": predictive or {},
     }
 
+def early_5m_turn_confirmation_ok(candles5, direction):
+    """Low-latency 5m corroboration for a fresh 15m swing turn."""
+    if not candles5 or len(candles5) < 35:
+        return False
+    m = market_metrics(candles5)
+    p = market_metrics(candles5[:-1])
+    last = candles5[-1]
+    prior = candles5[-7:-1]
+    if not prior or m["atr"] <= 0:
+        return False
+    rng = max(last["high"] - last["low"], 1e-12)
+    close_pos = (last["close"] - last["low"]) / rng
+    lower_wick = (min(last["open"], last["close"]) - last["low"]) / rng
+    upper_wick = (last["high"] - max(last["open"], last["close"])) / rng
+    if direction == "LONG":
+        swept = last["low"] < min(x["low"] for x in prior) and last["close"] > min(x["low"] for x in prior)
+        turn = (
+            last["close"] > last["open"] and (swept or last["close"] > candles5[-2]["high"])
+            and (lower_wick >= 0.15 or close_pos >= 0.68)
+            and m["rsi"] >= p["rsi"] + 0.5
+            and m["macd_hist"] > p["macd_hist"]
+            and m["rsi"] < 62
+        )
+    else:
+        swept = last["high"] > max(x["high"] for x in prior) and last["close"] < max(x["high"] for x in prior)
+        turn = (
+            last["close"] < last["open"] and (swept or last["close"] < candles5[-2]["low"])
+            and (upper_wick >= 0.15 or close_pos <= 0.32)
+            and m["rsi"] <= p["rsi"] - 0.5
+            and m["macd_hist"] < p["macd_hist"]
+            and m["rsi"] > 38
+        )
+    return bool(turn and (m["volume_ratio"] >= 0.55 or impulse_volume_ok(candles5, direction)))
+
+
 def early_5m_confirmation_ok(candles5, direction):
     """Require the same qualified first 5m impulse before a 15m early alert."""
     return first_impulse_quality(candles5, direction, min_volume_ratio=0.90) is not None
@@ -1368,13 +1403,44 @@ def detect_early_15m(candles, live_price, candles5=None, require_5m=False):
         and close_position >= 0.50
     )
 
+    # Detect a fresh swing turn at the base/top before a multi-candle
+    # range break. This is deliberately limited to non-extended momentum.
+    prev_metrics = market_metrics(candles[:-1])
+    turn_prior = candles[-7:-1]
+    turn_low = min(x["low"] for x in turn_prior)
+    turn_high = max(x["high"] for x in turn_prior)
+    long_base_turn = (
+        last["low"] < turn_low and last["close"] > turn_low
+        and last["close"] > last["open"]
+        and lower_wick_ratio >= 0.15 and close_position >= 0.52
+        and m["rsi"] >= prev_metrics["rsi"] + 0.5
+        and m["macd_hist"] > prev_metrics["macd_hist"]
+        and 34.0 <= m["rsi"] <= 55.0
+        and abs(last["close"] - m["ema21"]) / m["atr"] <= 1.25
+        and (m["volume_ratio"] >= 0.60 or impulse_volume_ok(candles, "LONG"))
+    )
+    short_top_turn = (
+        last["high"] > turn_high and last["close"] < turn_high
+        and last["close"] < last["open"]
+        and upper_wick_ratio >= 0.15 and close_position <= 0.48
+        and m["rsi"] <= prev_metrics["rsi"] - 0.5
+        and m["macd_hist"] < prev_metrics["macd_hist"]
+        and 45.0 <= m["rsi"] <= 66.0
+        and abs(last["close"] - m["ema21"]) / m["atr"] <= 1.25
+        and (m["volume_ratio"] >= 0.60 or impulse_volume_ok(candles, "SHORT"))
+    )
+
     # Detect the first 15m impulse candle from structure, volume and
     # momentum acceleration. The separate 5m gate below must also agree.
     early_short = first_impulse_quality(candles, "SHORT")
     early_long = first_impulse_quality(candles, "LONG")
     direction = trigger = None
     predictive = None
-    if early_short and (not early_long or early_short["score"] >= early_long["score"]):
+    if long_base_turn:
+        direction, trigger = "LONG", "15M_EARLY_BASE_TURN"
+    elif short_top_turn:
+        direction, trigger = "SHORT", "15M_EARLY_TOP_TURN"
+    elif early_short and (not early_long or early_short["score"] >= early_long["score"]):
         direction, trigger, predictive = "SHORT", "FIRST_IMPULSE_15M_PREDICTIVE", early_short
     elif early_long:
         direction, trigger, predictive = "LONG", "FIRST_IMPULSE_15M_PREDICTIVE", early_long
@@ -1408,13 +1474,17 @@ def detect_early_15m(candles, live_price, candles5=None, require_5m=False):
     if direction == "LONG" and m["rsi"] >= 65.0 and not (fresh_bos and m["volume_ratio"] >= 1.50):
         return None
 
-    volume_floor = 1.10 if trigger in ("15M_RANGE_BREAK", "FIRST_BEARISH_15M_CANDLE", "FIRST_BULLISH_15M_CANDLE") else 0.95
+    volume_floor = 0.60 if trigger in ("15M_EARLY_BASE_TURN", "15M_EARLY_TOP_TURN") else (1.10 if trigger in ("15M_RANGE_BREAK", "FIRST_BEARISH_15M_CANDLE", "FIRST_BULLISH_15M_CANDLE") else 0.95)
     volume_ok = m["volume_ratio"] >= volume_floor or impulse_volume_ok(candles, direction)
     if not volume_ok:
         return None
 
-    if require_5m and not early_5m_confirmation_ok(candles5 or [], direction):
-        return None
+    if require_5m:
+        five_min_ok = early_5m_confirmation_ok(candles5 or [], direction)
+        if trigger in ("15M_EARLY_BASE_TURN", "15M_EARLY_TOP_TURN"):
+            five_min_ok = five_min_ok or early_5m_turn_confirmation_ok(candles5 or [], direction)
+        if not five_min_ok:
+            return None
 
     entry = live_price
     recent = candles[-4:]
@@ -1439,7 +1509,7 @@ def detect_early_15m(candles, live_price, candles5=None, require_5m=False):
     score = 6
     if predictive:
         score = max(score, predictive["score"] + 3)
-    score += 2 if trigger in ("15M_SWING_HIGH_REJECTION", "15M_SWING_LOW_RECLAIM") else 0
+    score += 2 if trigger in ("15M_SWING_HIGH_REJECTION", "15M_SWING_LOW_RECLAIM", "15M_EARLY_BASE_TURN", "15M_EARLY_TOP_TURN") else 0
     score += 1 if m["volume_ratio"] >= 1.20 else 0
     score += 1 if body_ratio >= 0.60 or upper_wick_ratio >= 0.40 or lower_wick_ratio >= 0.40 else 0
     score += 1 if fresh_bos else 0
