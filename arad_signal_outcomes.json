@@ -3798,6 +3798,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "AAVE_USDT|LONG|EARLY|1794536720",
+      "symbol": "AAVE_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 113.6,
+      "sl": 112.99294827100091,
+      "tp": [
+        114.20705172899908,
+        114.51057759349862,
+        114.81410345799816,
+        115.11762932249769,
+        115.42115518699724,
+        116.02820691599632
+      ],
+      "created_at": 1794536720,
+      "first_candle_time": 1794537000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
