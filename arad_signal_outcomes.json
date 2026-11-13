@@ -4671,6 +4671,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "DOGE_USDT|SHORT|EARLY|1794590950",
+      "symbol": "DOGE_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.0647,
+      "sl": 0.065048304117511,
+      "tp": [
+        0.06435169588248899,
+        0.06417754382373347,
+        0.06400339176497798,
+        0.06382923970622248,
+        0.06365508764746697,
+        0.06330678352995596
+      ],
+      "created_at": 1794590950,
+      "first_candle_time": 1794591000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
