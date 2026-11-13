@@ -3693,6 +3693,27 @@
       "result": "LOSS_SL",
       "max_tp": 0,
       "exit_candle": 1794520800
+    },
+    {
+      "id": "NFLX_USDT|SHORT|EARLY|1794536709",
+      "symbol": "NFLX_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 63.01,
+      "sl": 63.088903,
+      "tp": [
+        62.931096999999994,
+        62.891645499999996,
+        62.85219399999999,
+        62.812742499999985,
+        62.773290999999986,
+        62.69438799999998
+      ],
+      "created_at": 1794536709,
+      "first_candle_time": 1794537000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
