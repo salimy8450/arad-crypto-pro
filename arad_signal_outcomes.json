@@ -4392,6 +4392,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "WLFI_USDT|LONG|EARLY|1794563469",
+      "symbol": "WLFI_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.0474,
+      "sl": 0.04726578,
+      "tp": [
+        0.047534219999999995,
+        0.04760133,
+        0.04766843999999999,
+        0.04773554999999999,
+        0.04780265999999999,
+        0.04793687999999999
+      ],
+      "created_at": 1794563469,
+      "first_candle_time": 1794563700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
