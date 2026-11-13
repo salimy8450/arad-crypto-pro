@@ -4350,6 +4350,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ORDI_USDT|SHORT|EARLY|1794563466",
+      "symbol": "ORDI_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 3.141,
+      "sl": 3.1595656055683174,
+      "tp": [
+        3.1224343944316826,
+        3.113151591647524,
+        3.103868788863365,
+        3.094585986079206,
+        3.0853031832950477,
+        3.0667375777267303
+      ],
+      "created_at": 1794563466,
+      "first_candle_time": 1794563700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
