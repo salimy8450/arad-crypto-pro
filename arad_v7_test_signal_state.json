@@ -187,8 +187,8 @@
   },
   "HYPE_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794291112,
-    "trigger": "15M_SWING_HIGH_REJECTION"
+    "sent_at": 1794696683,
+    "trigger": "15M_EMA9_CROSS"
   },
   "SAND_USDT|SHORT": {
     "type": "EARLY",
@@ -481,9 +481,9 @@
     "trigger": ""
   },
   "BERA_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794598689,
-    "trigger": "FIRST_BEARISH_15M_CANDLE"
+    "type": "WATCH",
+    "sent_at": 1794696684,
+    "trigger": ""
   },
   "PLUME_USDT|LONG": {
     "type": "WATCH",
@@ -557,12 +557,17 @@
   },
   "COOKIE_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794664469,
+    "sent_at": 1794696683,
     "trigger": ""
   },
   "ARB_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794682573,
+    "trigger": ""
+  },
+  "TIA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794696684,
     "trigger": ""
   }
 }
