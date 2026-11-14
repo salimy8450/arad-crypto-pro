@@ -5255,6 +5255,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CFX_USDT|LONG|EARLY|1794677461",
+      "symbol": "CFX_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.03578,
+      "sl": 0.03524782974397512,
+      "tp": [
+        0.03631217025602488,
+        0.03657825538403732,
+        0.03684434051204976,
+        0.0371104256400622,
+        0.03737651076807464,
+        0.03790868102409952
+      ],
+      "created_at": 1794677461,
+      "first_candle_time": 1794677700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
