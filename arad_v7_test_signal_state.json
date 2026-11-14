@@ -271,9 +271,9 @@
     "trigger": ""
   },
   "PHA_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794320229,
-    "trigger": "15M_SWING_HIGH_REJECTION"
+    "type": "WATCH",
+    "sent_at": 1794616181,
+    "trigger": ""
   },
   "PIEVERSE_USDT|LONG": {
     "type": "EARLY",
@@ -292,7 +292,7 @@
   },
   "HBAR_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794320231,
+    "sent_at": 1794616181,
     "trigger": ""
   },
   "WLD_USDT|SHORT": {
@@ -337,7 +337,7 @@
   },
   "JCT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794452677,
+    "sent_at": 1794616182,
     "trigger": ""
   },
   "CT_USDT|SHORT": {
@@ -509,5 +509,15 @@
     "type": "WATCH",
     "sent_at": 1794598690,
     "trigger": ""
+  },
+  "BMT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794616180,
+    "trigger": "15M_SWING_LOW_RECLAIM"
+  },
+  "RENDER_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794616180,
+    "trigger": "15M_SWING_HIGH_REJECTION"
   }
 }
