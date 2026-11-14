@@ -1091,6 +1091,39 @@ def first_impulse_quality(candles, direction, min_volume_ratio=0.90):
     }
 
 
+def first_target_room(candles, direction, entry, risk):
+    """
+    Measure clear space to the nearest recent 5m swing obstacle.
+    A first-impulse alert is blocked when nearby structure sits too close
+    to TP1; this avoids buying directly under resistance or selling above support.
+    """
+    if len(candles) < 8 or entry <= 0 or risk <= 0:
+        return None, None
+
+    history = candles[-25:-1]
+    pivots = []
+    for i in range(2, len(history) - 2):
+        if direction == "LONG":
+            level = history[i]["high"]
+            if (level > history[i-1]["high"] and level > history[i-2]["high"]
+                    and level >= history[i+1]["high"] and level >= history[i+2]["high"]
+                    and level > entry):
+                pivots.append(level)
+        else:
+            level = history[i]["low"]
+            if (level < history[i-1]["low"] and level < history[i-2]["low"]
+                    and level <= history[i+1]["low"] and level <= history[i+2]["low"]
+                    and level < entry):
+                pivots.append(level)
+
+    if not pivots:
+        return None, None
+
+    obstacle = min(pivots) if direction == "LONG" else max(pivots)
+    room_r = (obstacle - entry) / risk if direction == "LONG" else (entry - obstacle) / risk
+    return obstacle, room_r
+
+
 def detect_early_5m(candles5, candles15, live_price):
     """Detect a genuinely early 5m move with volume, micro-structure and exhaustion checks."""
     if len(candles5) < 35 or live_price <= 0:
@@ -1304,6 +1337,13 @@ def detect_early_5m(candles5, candles15, live_price):
 
     r_multiples = (1.0, 1.5, 2.0, 2.5, 3.0, 4.0)
     targets = [entry - risk * r if direction == "SHORT" else entry + risk * r for r in r_multiples]
+
+    # Require at least 1.15R of clear room to the nearest recent 5m swing
+    # obstacle before advertising the first impulse as an entry candidate.
+    obstacle, room_r = first_target_room(candles5, direction, entry, risk)
+    if room_r is not None and room_r < 1.15:
+        return None
+
     score = 5
     if predictive:
         score = max(score, predictive["score"] + 3)
@@ -1321,6 +1361,8 @@ def detect_early_5m(candles5, candles15, live_price):
         "micro_bos": fresh_bos, "volume_confirmed": volume_ok,
         "predictive_score": predictive["score"] if predictive else 0,
         "first_impulse_evidence": predictive or {},
+        "nearest_5m_obstacle": obstacle,
+        "room_to_obstacle_r": room_r,
     }
 
 def early_5m_turn_confirmation_ok(candles5, direction):
