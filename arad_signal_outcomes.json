@@ -4908,6 +4908,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "DOS_USDT|LONG|EARLY|1794624539",
+      "symbol": "DOS_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.1541,
+      "sl": 0.15146704080099382,
+      "tp": [
+        0.15673295919900615,
+        0.15804943879850925
+      ],
+      "created_at": 1794624539,
+      "first_candle_time": 1794624600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
