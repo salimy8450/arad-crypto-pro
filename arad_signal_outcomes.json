@@ -5398,6 +5398,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "LAB_USDT|LONG|EARLY|1794679654",
+      "symbol": "LAB_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.03434,
+      "sl": 0.03387345044749158,
+      "tp": [
+        0.03480654955250843,
+        0.03503982432876264,
+        0.03527309910501685,
+        0.035506373881271064,
+        0.035739648657525276,
+        0.0362061982100337
+      ],
+      "created_at": 1794679654,
+      "first_candle_time": 1794679800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
