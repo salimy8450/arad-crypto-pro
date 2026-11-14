@@ -5058,6 +5058,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TSLA_USDT|LONG|EARLY|1794672243",
+      "symbol": "TSLA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 386.44,
+      "sl": 385.934068,
+      "tp": [
+        386.94593199999997,
+        387.198898,
+        387.45186399999994,
+        387.7048299999999,
+        387.9577959999999,
+        388.4637279999999
+      ],
+      "created_at": 1794672243,
+      "first_candle_time": 1794672300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
