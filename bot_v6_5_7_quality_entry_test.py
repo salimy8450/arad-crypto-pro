@@ -10,7 +10,8 @@ from datetime import datetime, timezone
 
 # ==========================================================
 # ARAD CRYPTO PRO V6.5.7 EARLY 5M LONG/SHORT TEST OURBIT
-# EARLY WATCH + CONFIRMED TELEGRAM ALERTS
+# CONFIRMED-ONLY TELEGRAM ALERTS
+# Strict quality gates | MTF | BOS | SWEEP | PULLBACK | RISK FILTERS
 # MTF | BOS | SWEEP | PULLBACK | RISK FILTERS
 # ANALYSIS ONLY - NO ORDERS
 # ==========================================================
@@ -21,8 +22,9 @@ TELEGRAM_API = "https://api.telegram.org"
 MAX_STAGE1_SYMBOLS = 300  # liquid top-300 universe for reliable 5m test cadence
 MAX_STAGE2_SYMBOLS = 80
 MAX_STAGE3_SYMBOLS = 60
-MAX_TELEGRAM_WATCH_ALERTS = 5  # cap WATCH messages per test run to prevent Telegram flooding
-MAX_EARLY_ALERTS = 8  # cap early-entry messages per 5m test run
+MAX_TELEGRAM_WATCH_ALERTS = 0  # WATCH alerts are disabled
+MAX_EARLY_ALERTS = 0  # EARLY alerts are disabled
+TELEGRAM_CONFIRMED_ONLY = True
 
 TIMEFRAMES = {
     "5m": ("Min5", 300),
@@ -38,10 +40,10 @@ REQUEST_PAUSE = 0.12
 
 MIN_VOLUME_RATIO = 0.75
 MIN_SCORE_WATCH = 5
-MIN_SCORE_TRADE = 8
-MIN_RR = 1.30
-MAX_STOP_ATR = 2.00
-MAX_LIVE_DIFF = 0.35
+MIN_SCORE_TRADE = 10  # higher score threshold for fewer, stronger candidates
+MIN_RR = 2.00
+MAX_STOP_ATR = 1.60  # reject setups with an excessively wide stop
+MAX_LIVE_DIFF = 0.20  # do not chase a price that moved away from the closed 5m candle
 ATR_SL_MULTIPLIER = 1.20
 PIVOT_LOOKBACK = 12
 STRUCTURE_SCAN_BARS = 5
@@ -62,13 +64,13 @@ EXTREME_RSI_LONG_5M = 72.0
 # Higher-timeframe exhaustion guard for confirmed entries.
 EXTREME_RSI_LONG_1H = 75.0
 EXTREME_RSI_SHORT_1H = 25.0
-CONFIRM_MIN_VOLUME_RATIO = 0.90
+CONFIRM_MIN_VOLUME_RATIO = 1.00
 TRIGGER_MIN_BODY_RATIO = 0.45
 TRIGGER_CLOSE_EDGE = 0.25
 
 # Persistent anti-duplicate settings
 WATCH_COOLDOWN_MIN = 45
-CONFIRMED_COOLDOWN_MIN = 60
+CONFIRMED_COOLDOWN_MIN = 180
 STATE_FILE = "arad_v65_7_test_signal_state.json"
 OUTCOME_FILE = "arad_signal_outcomes.json"
 EARLY_COOLDOWN_MIN = 15
@@ -882,10 +884,7 @@ def analyze_stage3(candidate):
 
     # Keep the 15m structure gate strict and directional.
     structure_ok = (
-        (
-            candidate["bos15"] or candidate["sweep"]
-            or candidate.get("micro15", False)
-        )
+        (candidate["bos15"] or candidate["sweep"])
         and candidate.get("structure") in ("NONE", direction)
     )
     late_ok = late_entry_ok(candidate["m15"], m5, direction)
@@ -1785,6 +1784,10 @@ def confirmed_message(item):
 
 
 def dispatch_alerts(early_items, watch_items, confirmed_items):
+    # Safety lock: this version sends actionable CONFIRMED plans only.
+    if TELEGRAM_CONFIRMED_ONLY:
+        early_items = []
+        watch_items = []
     state, sha, state_ok = load_signal_state()
     if not state_ok:
         # Fail closed: avoid flooding Telegram if deduplication cannot be checked.
@@ -1964,11 +1967,11 @@ def print_result(item):
 def main():
     started = time.time()
     log("")
-    log("ARAD CRYPTO PRO V6.5.7 EARLY 5M REVERSAL TEST OURBIT")
+    log("ARAD CRYPTO PRO V6.5.7 CONFIRMED-ONLY QUALITY TEST OURBIT")
     log("START: " + now_text())
-    log("MODE: V6.5.7 TEST ONLY | stricter entry filters | no orders")
+    log("MODE: V6.5.7 CONFIRMED-ONLY | strict quality filters | no orders")
     log("BASE URL: " + BASE_URL)
-    log("V6.5.7 PATCH: unified 5m + 15m early scan; 15m requires 5m confirmation; one early alert per symbol")
+    log("V6.5.7 QUALITY PATCH: confirmed-only Telegram; score>=10; volume>=1.0x; live gap<=0.20%; stop<=1.60 ATR")
 
     ping = api_get("/api/v1/contract/ping")
     if ping is None:
@@ -2010,69 +2013,11 @@ def main():
     log("STAGE 1 SCAN COUNT: {}".format(len(selected)))
     log("METAL CONTRACTS PINNED: {}".format(len(pinned)))
 
-    # Unified early scan: 5m first impulse + independent 15m impulse confirmed by 5m.
-    # Both detectors run inside this single process; one early Telegram alert per symbol.
-    early_by_symbol = {}
-    for i, item in enumerate(selected, 1):
-        if PRINT_ALL_STAGES:
-            log("EARLY 5M+15M SCAN: {} / {} {}".format(i, len(selected), item["symbol"]))
-        live_price = ticker_price(item["ticker"])
-        candles5_early = get_candles(item["symbol"], "5m")
-        candles15_early = get_candles(item["symbol"], "15m")
-        candidate5 = None
-        candidate15 = None
+    # Predictive EARLY alerts are disabled in confirmed-only mode to save API calls.
+    early_alerts = []
+    log("EARLY 5M/15M TELEGRAM ALERTS: DISABLED (confirmed-only mode)")
 
-        if candles5_early:
-            candidate5 = detect_early_5m(candles5_early, candles15_early, live_price)
-            if candidate5:
-                candidate5["source_tf"] = "5M"
-                candidate5["symbol"] = item["symbol"]
 
-        if candles15_early and candles5_early:
-            preliminary15 = detect_early_15m(candles15_early, live_price)
-            if preliminary15:
-                candidate15 = detect_early_15m(
-                    candles15_early, live_price, candles5_early, require_5m=True
-                )
-                if candidate15:
-                    candidate15["source_tf"] = "15M"
-                    candidate15["symbol"] = item["symbol"]
-                    candidate15["m5"] = market_metrics(candles5_early)
-                    candidate15["micro_bos"] = bool(
-                        candidate15.get("first_impulse_evidence", {}).get("micro_break")
-                        or candidate15.get("first_impulse_evidence", {}).get("sweep_reclaim")
-                    )
-                    candidate15["volume_confirmed"] = True
-                    candidate15["entry_confirmation"] = "15M_IMPULSE_CONFIRMED_BY_5M"
-                    setup15 = classify_early_move(candidate15["direction"], candidate15["m15"])
-                    candidate15["setup_type"] = setup15["setup_type"]
-                    candidate15["setup_label"] = setup15["setup_label"]
-                    candidate15["context_note"] = setup15["context_note"]
-
-        # Resolve same-symbol overlap. Prefer the faster 5m entry when both
-        # agree; suppress the symbol for this run when the timeframes conflict.
-        if candidate5 and candidate15:
-            if candidate5["direction"] == candidate15["direction"]:
-                candidate5["also_15m_confirmed"] = True
-                candidate5["score"] = max(candidate5["score"], candidate15["score"])
-                early_by_symbol[item["symbol"]] = candidate5
-                log("EARLY MERGED: {} {} (5m entry + 15m confirmation)".format(
-                    item["symbol"], candidate5["direction"]
-                ))
-            else:
-                log("EARLY CONFLICT SKIPPED: {} 5m={} 15m={}".format(
-                    item["symbol"], candidate5["direction"], candidate15["direction"]
-                ))
-        elif candidate5:
-            early_by_symbol[item["symbol"]] = candidate5
-        elif candidate15:
-            early_by_symbol[item["symbol"]] = candidate15
-
-        time.sleep(REQUEST_PAUSE)
-
-    early_alerts = list(early_by_symbol.values())
-    early_alerts.sort(key=lambda x: (x["score"], x["m5"]["volume_ratio"]), reverse=True)
-    log("UNIFIED EARLY 5M/15M SIGNALS FOUND: {}".format(len(early_alerts)))
 
     stage1 = []
     for i, item in enumerate(selected, 1):
@@ -2101,9 +2046,8 @@ def main():
     stage2 = stage2[:MAX_STAGE3_SYMBOLS]
     log("STAGE 2 COMPLETE: {}".format(len(stage2)))
 
-    # TEST MODE: send a capped number of WATCH alerts plus every CONFIRMED alert.
-    # WATCH is informational only; CONFIRMED includes an entry/SL/TP plan.
-    log("TELEGRAM TEST MODE: unified EARLY 5m/15m + capped WATCH + CONFIRMED; outcomes tracked; no orders.")
+    # CONFIRMED-ONLY mode: no EARLY or WATCH messages are sent.
+    log("TELEGRAM MODE: CONFIRMED ONLY | strict quality gates | outcomes tracked | no orders.")
 
     final_results = []
     for i, candidate in enumerate(stage2, 1):
@@ -2116,15 +2060,9 @@ def main():
     confirmed = [x for x in final_results if x.get("status") == "CONFIRMED"]
     watch = [x for x in final_results if x.get("status") == "WATCH"]
 
-    # Send best WATCH candidates for visibility and all CONFIRMED setups.
-    watch.sort(key=candidate_quality, reverse=True)
-    watch_to_send = watch[:MAX_TELEGRAM_WATCH_ALERTS]
-    early_to_send = early_alerts[:MAX_EARLY_ALERTS]
-    log("TELEGRAM ALERT QUEUE: {} EARLY + {} WATCH + {} CONFIRMED = {} TOTAL BEFORE DEDUP".format(
-        len(early_to_send), len(watch_to_send), len(confirmed),
-        len(early_to_send) + len(watch_to_send) + len(confirmed)
-    ))
-    dispatch_alerts(early_to_send, watch_to_send, confirmed)
+    # Send only final CONFIRMED setups with entry, SL and TP plan.
+    log("TELEGRAM ALERT QUEUE: 0 EARLY + 0 WATCH + {} CONFIRMED".format(len(confirmed)))
+    dispatch_alerts([], [], confirmed)
 
     elapsed = time.time() - started
     log("")
