@@ -5100,6 +5100,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BE_USDT|LONG|EARLY|1794672249",
+      "symbol": "BE_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 186.14,
+      "sl": 185.67415799999998,
+      "tp": [
+        186.605842,
+        186.838763,
+        187.071684,
+        187.304605,
+        187.537526,
+        188.00336800000002
+      ],
+      "created_at": 1794672249,
+      "first_candle_time": 1794672300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
