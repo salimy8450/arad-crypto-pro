@@ -5150,6 +5150,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "POWR_USDT|LONG|EARLY|1794677452",
+      "symbol": "POWR_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.04486,
+      "sl": 0.04430548663017239,
+      "tp": [
+        0.0454145133698276,
+        0.045691770054741405,
+        0.04596902673965521,
+        0.04624628342456901,
+        0.046523540109482814,
+        0.04707805347931042
+      ],
+      "created_at": 1794677452,
+      "first_candle_time": 1794677700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
