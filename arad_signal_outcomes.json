@@ -4887,6 +4887,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ARM_USDT|SHORT|EARLY|1794624537",
+      "symbol": "ARM_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 186.47,
+      "sl": 186.885941,
+      "tp": [
+        186.054059,
+        185.8460885,
+        185.638118,
+        185.43014749999998,
+        185.222177,
+        184.80623599999998
+      ],
+      "created_at": 1794624537,
+      "first_candle_time": 1794624600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
