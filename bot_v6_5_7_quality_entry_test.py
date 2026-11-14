@@ -679,7 +679,10 @@ def analyze_higher_timeframes(c1):
 def score_stage2(direction, long_score, short_score, candles):
     metrics = market_metrics(candles)
     structure, sweep, bos = structure_signal(candles)
-    score = long_score if direction == "LONG" else short_score
+    # Start from 15m evidence; 1H contributes at most one context point.
+    score = 3
+    context_aligned = (long_score > short_score) if direction == "LONG" else (short_score > long_score)
+    score += 1 if context_aligned else 0
     score += 2 if structure == direction else 0
     score += int(sweep) + int(metrics["trend"] == direction)
     if direction == "LONG" and metrics["rsi"] >= 48:
