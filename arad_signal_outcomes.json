@@ -5377,6 +5377,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TQQQ_USDT|LONG|EARLY|1794679652",
+      "symbol": "TQQQ_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 55.73,
+      "sl": 55.39148214558006,
+      "tp": [
+        56.06851785441993,
+        56.2377767816299,
+        56.407035708839864,
+        56.57629463604983,
+        56.7455535632598,
+        57.08407141767973
+      ],
+      "created_at": 1794679652,
+      "first_candle_time": 1794679800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
