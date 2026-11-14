@@ -5079,6 +5079,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "USO_USDT|LONG|EARLY|1794672247",
+      "symbol": "USO_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 87.18,
+      "sl": 87.093846,
+      "tp": [
+        87.26615400000001,
+        87.30923100000001,
+        87.35230800000002,
+        87.39538500000003,
+        87.43846200000003,
+        87.52461600000004
+      ],
+      "created_at": 1794672247,
+      "first_candle_time": 1794672300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
