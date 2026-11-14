@@ -4946,6 +4946,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "GOLDCIR_USDT|LONG|EARLY|1794624542",
+      "symbol": "GOLDCIR_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 30.96,
+      "sl": 30.832095962540325,
+      "tp": [
+        31.087904037459676,
+        31.151856056189516
+      ],
+      "created_at": 1794624542,
+      "first_candle_time": 1794624600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
