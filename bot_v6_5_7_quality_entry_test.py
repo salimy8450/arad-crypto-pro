@@ -1287,6 +1287,7 @@ def detect_early_5m(candles5, candles15, live_price):
     actual_micro_bos = bool(
         (micro_short_break if direction == "SHORT" else micro_long_break)
         or (structure_direction == direction and structure_bos)
+        or (predictive and predictive.get("micro_break"))
     )
     predictive_sweep = bool(predictive and predictive.get("sweep_reclaim"))
     fresh_bos = actual_micro_bos or predictive_sweep or trigger == "5M_EARLY_SWING_FAILURE"
