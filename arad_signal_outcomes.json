@@ -5213,6 +5213,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "AXL_USDT|LONG|EARLY|1794677458",
+      "symbol": "AXL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.03358,
+      "sl": 0.03309237920721943,
+      "tp": [
+        0.03406762079278057,
+        0.034311431189170856,
+        0.03455524158556114,
+        0.03479905198195143,
+        0.03504286237834171,
+        0.035530483171122285
+      ],
+      "created_at": 1794677458,
+      "first_candle_time": 1794677700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
