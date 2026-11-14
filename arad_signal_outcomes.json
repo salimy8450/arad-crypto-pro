@@ -4925,6 +4925,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SPX500_USDT|SHORT|EARLY|1794624540",
+      "symbol": "SPX500_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 7537.6,
+      "sl": 7542.06128,
+      "tp": [
+        7533.138720000001,
+        7530.908080000001,
+        7528.677440000001,
+        7526.4468000000015,
+        7524.216160000002,
+        7519.754880000002
+      ],
+      "created_at": 1794624540,
+      "first_candle_time": 1794624600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
