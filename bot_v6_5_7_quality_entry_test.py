@@ -30,7 +30,6 @@ TIMEFRAMES = {
     "5m": ("Min5", 300),
     "15m": ("Min15", 900),
     "1h": ("Min60", 3600),
-    "4h": ("Hour4", 14400),
 }
 
 CANDLE_LIMIT = 220
@@ -668,14 +667,13 @@ def room_to_structure(candidate, plan):
     return support >= entry or (entry - support) >= required_room
 
 
-def analyze_higher_timeframes(c4, c1):
-    m4, m1 = market_metrics(c4), market_metrics(c1)
-    long_score = 3 * (m4["trend"] == "LONG") + 3 * (m1["trend"] == "LONG")
-    short_score = 3 * (m4["trend"] == "SHORT") + 3 * (m1["trend"] == "SHORT")
-    long_score += int(m4["rsi"] > 50) + int(m1["rsi"] > 50)
-    short_score += int(m4["rsi"] < 50) + int(m1["rsi"] < 50)
-    direction = "LONG" if long_score > short_score else "SHORT" if short_score > long_score else "NONE"
-    return direction, long_score, short_score, m4, m1
+def analyze_higher_timeframes(c1):
+    # 1H is context only; it never decides or blocks the trade direction.
+    m1 = market_metrics(c1)
+    long_score = 3 * (m1["trend"] == "LONG") + int(m1["rsi"] > 50) + int(m1["macd_hist"] > 0)
+    short_score = 3 * (m1["trend"] == "SHORT") + int(m1["rsi"] < 50) + int(m1["macd_hist"] < 0)
+    direction = m1["trend"] if m1["trend"] in ("LONG", "SHORT") else "NEUTRAL"
+    return direction, long_score, short_score, m1
 
 
 def score_stage2(direction, long_score, short_score, candles):
@@ -708,7 +706,8 @@ def make_trade_plan(direction, entry, current_atr, recent_candles):
     if risk <= 0:
         return None
     stop_atr = risk / current_atr
-    rr = abs(targets[-1] - entry) / risk
+    # Evaluate the minimum required RR at TP3 (2R), not the distant TP6 (4R).
+    rr = abs(targets[2] - entry) / risk
     if stop_atr > MAX_STOP_ATR or rr < MIN_RR:
         return None
     return {"entry": entry, "sl": stop, "tp": targets, "risk_atr": stop_atr, "rr": rr}
@@ -718,21 +717,16 @@ def analyze_symbol(symbol, ticker):
     price = ticker_price(ticker)
     if price <= 0:
         return None
-    c4 = get_candles(symbol, "4h")
-    time.sleep(REQUEST_PAUSE)
     c1 = get_candles(symbol, "1h")
     time.sleep(REQUEST_PAUSE)
-    if not c4 or not c1:
+    if not c1:
         return None
-    direction, ls, ss, m4, m1 = analyze_higher_timeframes(c4, c1)
-    if direction == "NONE":
-        return None
-    score = max(ls, ss)
-    if score < 4:
-        return None
+    direction, ls, ss, m1 = analyze_higher_timeframes(c1)
+    # Keep neutral 1H context candidates so 15m can establish the actual side.
+    score = max(ls, ss, 4)
     return {
         "symbol": symbol, "direction": direction, "price": price,
-        "long_score": ls, "short_score": ss, "score": score, "m4": m4, "m1": m1,
+        "long_score": ls, "short_score": ss, "score": score, "m1": m1,
     }
 
 
@@ -741,8 +735,14 @@ def analyze_stage2(candidate):
     time.sleep(REQUEST_PAUSE)
     if not candles:
         return None
+    metrics = market_metrics(candles)
+    # 15m is the directional authority; 1H remains context only.
+    direction = metrics["trend"] if metrics["trend"] in ("LONG", "SHORT") else candidate["direction"]
+    if direction not in ("LONG", "SHORT"):
+        return None
+    candidate["direction"] = direction
     score, metrics, structure, sweep, bos = score_stage2(
-        candidate["direction"], candidate["long_score"], candidate["short_score"], candles
+        direction, candidate["long_score"], candidate["short_score"], candles
     )
     if score < MIN_SCORE_WATCH:
         return None
@@ -791,8 +791,8 @@ def candidate_quality(item):
         score += 1
     elif direction == "LONG" and 35 <= rsi15 <= 70:
         score += 1
-    if item.get("m4", {}).get("trend") == direction and item.get("m1", {}).get("trend") == direction:
-        score += 2
+    if item.get("m1", {}).get("trend") == direction:
+        score += 1
     return score
 
 
@@ -861,7 +861,8 @@ def analyze_stage3(candidate):
         "micro5": micro5, "continuation5": continuation5,
     })
 
-    higher_aligned = candidate["m4"]["trend"] == direction and candidate["m1"]["trend"] == direction
+    # 1H is informational context only; it is deliberately not a hard entry gate.
+    higher_aligned = True
     volume_impulse_ok = (
         impulse_volume_ok(candidate["candles15"], direction)
         or impulse_volume_ok(candles, direction)
@@ -880,19 +881,35 @@ def analyze_stage3(candidate):
         candidate["m15"], m5, candles, direction,
         bos15=bool(candidate.get("bos15")),
         sweep15=bool(candidate.get("sweep")),
-    )
+    ) or first_impulse_path
 
     # Keep the 15m structure gate strict and directional.
+    # The 15m directional trend confirms the first 5m impulse; waiting for 15m BOS
+    # alone can delay entry until much of the move has already happened.
     structure_ok = (
-        (candidate["bos15"] or candidate["sweep"])
-        and candidate.get("structure") in ("NONE", direction)
+        candidate["m15"]["trend"] == direction
+        and ((direction == "LONG" and candidate["m15"]["price"] > candidate["m15"]["ema21"]
+              and candidate["m15"]["ema9"] > candidate["m15"]["ema21"])
+             or (direction == "SHORT" and candidate["m15"]["price"] < candidate["m15"]["ema21"]
+                 and candidate["m15"]["ema9"] < candidate["m15"]["ema21"]))
     )
     late_ok = late_entry_ok(candidate["m15"], m5, direction)
-    htf_rsi_ok = higher_timeframe_rsi_ok(candidate["m1"], direction)
+    # 1H RSI is included in scoring/context, not used as a hard veto.
+    htf_rsi_ok = True
 
     # Two distinct entry paths; neither bypasses the common quality/risk gates.
     pullback_path = near_pullback and trigger5
     continuation_path = continuation5
+    first_impulse5 = first_impulse_quality(candles, direction, min_volume_ratio=0.90)
+    first_impulse_path = bool(
+        first_impulse5
+        and candidate["m15"]["trend"] == direction
+        and ((direction == "LONG" and candidate["m15"]["rsi"] >= 48)
+             or (direction == "SHORT" and candidate["m15"]["rsi"] <= 52))
+    )
+    if first_impulse_path:
+        score += min(2, first_impulse5["score"] // 3)
+        candidate["score"] = score
     first_candle_path = first_candle15 == direction and (trigger5 or micro5)
     entry_path = (
         "PULLBACK" if pullback_path
@@ -900,9 +917,11 @@ def analyze_stage3(candidate):
         else "FIRST_CANDLE_15M" if first_candle_path
         else "NONE"
     )
-    trigger_ok = pullback_path or continuation_path or first_candle_path
+    trigger_ok = pullback_path or continuation_path or first_impulse_path or first_candle_path
     candidate["first_candle15"] = first_candle15
     candidate["first_candle_path"] = first_candle_path
+    candidate["first_impulse5"] = first_impulse5 or {}
+    candidate["first_impulse_path"] = first_impulse_path
     candidate["entry_path"] = entry_path
     candidate["pullback_path"] = pullback_path
     candidate["continuation_path"] = continuation_path
@@ -1746,7 +1765,7 @@ def watch_message(item):
         "جهت احتمالی: {}".format("خرید LONG" if item["direction"] == "LONG" else "فروش SHORT"),
         "قیمت فعلی: {}".format(format_price(item["price"])),
         "امتیاز تحلیلی: {} امتیاز".format(item["score"]),
-        "4H: {} | RSI {:.1f}".format(item["m4"]["trend"], item["m4"]["rsi"]),
+        "1H context: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]),
         "1H: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]),
         "15M: {} | RSI {:.1f} | حجم {:.2f}x".format(m15["trend"], m15["rsi"], m15["volume_ratio"]),
         "BOS 15m: {}".format("بله" if item["bos15"] else "خیر"),
@@ -1774,7 +1793,7 @@ def confirmed_message(item):
         lines.append("TP{}: {}".format(i, format_price(target)))
     lines += [
         "فاصله حد ضرر: {:.2f} ATR".format(plan["risk_atr"]),
-        "نسبت سود به زیان تا TP6: {:.2f}".format(plan["rr"]),
+        "نسبت سود به زیان تا TP3: {:.2f}".format(plan["rr"]),
         "امتیاز تحلیلی: {} امتیاز".format(item["score"]),
         "",
         "⚠️ این پیام تحلیل است، نه دستور معامله. سفارش خودکار ثبت نشده است.",
@@ -1918,7 +1937,7 @@ def print_result(item):
     log("{} | {} | SCORE {} POINTS".format(item["symbol"], item["direction"], item["score"]))
     log("STATUS: {}".format(item.get("status", "WATCH")))
     log("PRICE: {}".format(format_price(item["price"])))
-    log("4H: {} | RSI {:.1f}".format(item["m4"]["trend"], item["m4"]["rsi"]))
+    log("1H context: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]))
     log("1H: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]))
     log("15M: {} | RSI {:.1f} | VOL {:.2f}x | IMPULSE VOL: {}".format(
         item["m15"]["trend"], item["m15"]["rsi"], item["m15"]["volume_ratio"],
@@ -1971,7 +1990,7 @@ def main():
     log("START: " + now_text())
     log("MODE: V6.5.7 CONFIRMED-ONLY | strict quality filters | no orders")
     log("BASE URL: " + BASE_URL)
-    log("V6.5.7 QUALITY PATCH: confirmed-only Telegram; score>=10; volume>=1.0x; live gap<=0.20%; stop<=1.60 ATR")
+    log("V6.5.7 QUALITY PATCH: 5m first impulse + 15m direction; 1h context only; confirmed-only; no 4h gate")
 
     ping = api_get("/api/v1/contract/ping")
     if ping is None:
