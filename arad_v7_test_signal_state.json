@@ -161,9 +161,9 @@
     "trigger": "15M_SWING_HIGH_REJECTION"
   },
   "ETH_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794290570,
-    "trigger": "15M_SWING_HIGH_REJECTION"
+    "type": "WATCH",
+    "sent_at": 1794664469,
+    "trigger": ""
   },
   "NEAR_USDT|SHORT": {
     "type": "WATCH",
@@ -307,7 +307,7 @@
   },
   "APR_USDT|LONG": {
     "type": "EARLY",
-    "sent_at": 1794435398,
+    "sent_at": 1794664468,
     "trigger": "15M_SWING_LOW_RECLAIM"
   },
   "UNI_USDT|SHORT": {
@@ -392,7 +392,7 @@
   },
   "SAGA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794639204,
+    "sent_at": 1794664469,
     "trigger": ""
   },
   "HOT_USDT|SHORT": {
@@ -543,6 +543,21 @@
   "DOGE_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794639205,
+    "trigger": ""
+  },
+  "ERA_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794664468,
+    "trigger": "FIRST_BULLISH_15M_CANDLE"
+  },
+  "ZIL_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794664468,
+    "trigger": "FIRST_BULLISH_15M_CANDLE"
+  },
+  "COOKIE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794664469,
     "trigger": ""
   }
 }
