@@ -5037,6 +5037,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SHELL_USDT|LONG|EARLY|1794672241",
+      "symbol": "SHELL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.02755,
+      "sl": 0.026610870976379007,
+      "tp": [
+        0.028489129023620996,
+        0.02895869353543149,
+        0.02942825804724199,
+        0.02989782255905249,
+        0.030367387070862985,
+        0.03130651609448398
+      ],
+      "created_at": 1794672241,
+      "first_candle_time": 1794672300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
