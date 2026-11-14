@@ -5318,6 +5318,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "APEX_USDT|LONG|EARLY|1794679648",
+      "symbol": "APEX_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.1379,
+      "sl": 0.13545172282302073,
+      "tp": [
+        0.14034827717697926,
+        0.1415724157654689
+      ],
+      "created_at": 1794679648,
+      "first_candle_time": 1794679800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
