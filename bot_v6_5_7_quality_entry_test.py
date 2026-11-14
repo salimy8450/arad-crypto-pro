@@ -877,6 +877,13 @@ def analyze_stage3(candidate):
     live_diff = abs(candidate["price"] - m5["price"]) / m5["price"] * 100 if m5["price"] > 0 else 999
     live_ok = live_diff <= MAX_LIVE_DIFF
     momentum_ok = momentum_confirmed(candidate["m15"], m5, direction)
+    first_impulse5 = first_impulse_quality(candles, direction, min_volume_ratio=0.90)
+    first_impulse_path = bool(
+        first_impulse5
+        and candidate["m15"]["trend"] == direction
+        and ((direction == "LONG" and candidate["m15"]["rsi"] >= 48)
+             or (direction == "SHORT" and candidate["m15"]["rsi"] <= 52))
+    )
     directional_context_ok = confirmed_directional_context_ok(
         candidate["m15"], m5, candles, direction,
         bos15=bool(candidate.get("bos15")),
@@ -900,13 +907,6 @@ def analyze_stage3(candidate):
     # Two distinct entry paths; neither bypasses the common quality/risk gates.
     pullback_path = near_pullback and trigger5
     continuation_path = continuation5
-    first_impulse5 = first_impulse_quality(candles, direction, min_volume_ratio=0.90)
-    first_impulse_path = bool(
-        first_impulse5
-        and candidate["m15"]["trend"] == direction
-        and ((direction == "LONG" and candidate["m15"]["rsi"] >= 48)
-             or (direction == "SHORT" and candidate["m15"]["rsi"] <= 52))
-    )
     if first_impulse_path:
         score += min(2, first_impulse5["score"] // 3)
         candidate["score"] = score
@@ -914,6 +914,7 @@ def analyze_stage3(candidate):
     entry_path = (
         "PULLBACK" if pullback_path
         else "MOMENTUM_CONTINUATION" if continuation_path
+        else "FIRST_IMPULSE_5M" if first_impulse_path
         else "FIRST_CANDLE_15M" if first_candle_path
         else "NONE"
     )
