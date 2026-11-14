@@ -1283,22 +1283,49 @@ def detect_early_5m(candles5, candles15, live_price):
     volume_ok = m5["volume_ratio"] >= volume_floor or impulse_volume_ok(candles5, direction)
     if not volume_ok:
         return None
-    micro_bos = short_structure_break if direction == "SHORT" else long_structure_break
     structure_direction, _sweep, structure_bos = structure_signal(candles5)
+    actual_micro_bos = bool(
+        (micro_short_break if direction == "SHORT" else micro_long_break)
+        or (structure_direction == direction and structure_bos)
+    )
     predictive_sweep = bool(predictive and predictive.get("sweep_reclaim"))
-    fresh_bos = micro_bos or predictive_sweep or (structure_direction == direction and structure_bos) or trigger == "5M_EARLY_SWING_FAILURE"
+    fresh_bos = actual_micro_bos or predictive_sweep or trigger == "5M_EARLY_SWING_FAILURE"
     early_turn_trigger = trigger in ("5M_PRE_BREAKDOWN_ROLLOVER", "5M_PRE_BREAKOUT_TURN")
     if not fresh_bos and not early_turn_trigger and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE"):
         return None
 
     setup = classify_early_move(direction, m15)
     entry_confirmation = "5M_STRUCTURE_AND_VOLUME"
-    if setup["setup_type"] in ("CORRECTIVE_LONG", "CORRECTIVE_SHORT"):
-        if not fresh_bos and not early_turn_trigger:
+
+    # Counter-trend trades must pass the full first-impulse quality gate.
+    # A large candle body or a one-bar break alone must never authorize a
+    # corrective LONG/SHORT against the 15m context (HOME failure case).
+    corrective = setup["setup_type"] in ("CORRECTIVE_LONG", "CORRECTIVE_SHORT")
+    actual_structure_bos = bool(
+        (micro_long_break if direction == "LONG" else micro_short_break)
+        or (structure_direction == direction and structure_bos)
+    )
+    impulse_has_structure = bool(
+        predictive and (
+            predictive.get("micro_break") or predictive.get("sweep_reclaim")
+        )
+    )
+    if corrective:
+        if not predictive or predictive.get("score", 0) < 5:
             return None
-        entry_confirmation = "CORRECTIVE_MICRO_BOS_CONFIRMED"
+        if m5["volume_ratio"] < 1.00:
+            return None
+        if not (actual_structure_bos or impulse_has_structure):
+            return None
+        if direction == "LONG":
+            if m5["rsi"] < 48.0 or m5["macd_hist"] <= prev5_metrics["macd_hist"]:
+                return None
+        else:
+            if m5["rsi"] > 52.0 or m5["macd_hist"] >= prev5_metrics["macd_hist"]:
+                return None
+        entry_confirmation = "CORRECTIVE_FIRST_IMPULSE_QUALITY_CONFIRMED"
     elif setup["setup_type"].startswith("EARLY_REVERSAL_"):
-        if not fresh_bos and not early_turn_trigger and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE"):
+        if not actual_structure_bos and not early_turn_trigger and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE"):
             return None
         entry_confirmation = "EARLY_REVERSAL_STRUCTURE_CONFIRMED"
 
@@ -1358,7 +1385,8 @@ def detect_early_5m(candles5, candles15, live_price):
         "body_ratio": body_ratio, "trigger": trigger, "risk_atr": risk_atr,
         "setup_type": setup["setup_type"], "setup_label": setup["setup_label"],
         "context_note": setup["context_note"], "entry_confirmation": entry_confirmation,
-        "micro_bos": fresh_bos, "volume_confirmed": volume_ok,
+        "micro_bos": actual_micro_bos, "volume_confirmed": m5["volume_ratio"] >= 1.00,
+        "structure_confirmed": fresh_bos,
         "predictive_score": predictive["score"] if predictive else 0,
         "first_impulse_evidence": predictive or {},
         "nearest_5m_obstacle": obstacle,
@@ -1649,7 +1677,7 @@ def early_entry_message(item):
     lines += [
         "ریسک: {:.2f} ATR | تعداد تارگت‌ها: {}".format(item["risk_atr"], len(item["tp"])),
         "RSI 5m: {:.1f} | حجم: {:.2f}x".format(item["m5"]["rsi"], item["m5"]["volume_ratio"]),
-        "ساختار خرد: {} | تأیید حجم: {}".format("شکست تأیید شد" if item.get("micro_bos") else "رد شد", "بله" if item.get("volume_confirmed") else "خیر"),
+        "BOS واقعی 5m: {} | حجم حداقل 1.0x: {}".format("بله" if item.get("micro_bos") else "خیر", "بله" if item.get("volume_confirmed") else "خیر"),
         "قدرت پیش‌بینی کندل اول: {}/7".format(item.get("predictive_score", 0)),
         "نشانه‌ها: شکست خرد={} | جمع‌آوری نقدینگی={} | فشردگی={} | بهبود RSI={} | بهبود MACD={} | چرخش EMA9={}".format(
             "بله" if item.get("first_impulse_evidence", {}).get("micro_break") else "خیر",
@@ -1663,8 +1691,9 @@ def early_entry_message(item):
         "نوع حرکت: {}".format(item.get("setup_label", "نامشخص")),
         "تفسیر: {}".format(item.get("context_note", "زمینه حرکت نیازمند بررسی است.")),
         "تأیید ورود: {}".format(
-            "شکست ساختار خرد ۵ دقیقه تأیید شد" if item.get("entry_confirmation") == "CORRECTIVE_MICRO_BOS_CONFIRMED"
-            else ("محرک ۱۵ دقیقه با تأیید ۵ دقیقه" if item.get("source_tf") == "15M" else "محرک اولیه ۵ دقیقه؛ هنوز برگشت روند قطعی نیست")
+            "کیفیت حرکت اصلاحی + BOS واقعی ۵ دقیقه تأیید شد" if item.get("entry_confirmation") == "CORRECTIVE_FIRST_IMPULSE_QUALITY_CONFIRMED"
+            else ("ساختار برگشتی ۵ دقیقه تأیید شد" if item.get("entry_confirmation") == "EARLY_REVERSAL_STRUCTURE_CONFIRMED"
+            else ("محرک ۱۵ دقیقه با تأیید ۵ دقیقه" if item.get("source_tf") == "15M" else "محرک اولیه ۵ دقیقه؛ هنوز برگشت روند قطعی نیست"))
         ),
         "محرک: {} | قدرت بدنه: {:.0f}%".format(item["trigger"], item["body_ratio"] * 100),
         "امتیاز شروع حرکت: {}".format(item["score"]),
