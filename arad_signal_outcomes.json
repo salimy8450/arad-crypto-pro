@@ -5335,6 +5335,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SKHYNIX_USDT|LONG|EARLY|1794679649",
+      "symbol": "SKHYNIX_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 872.42,
+      "sl": 868.6272797181205,
+      "tp": [
+        876.2127202818795,
+        878.1090804228193,
+        880.005440563759,
+        881.9018007046986,
+        883.7981608456384,
+        887.590881127518
+      ],
+      "created_at": 1794679649,
+      "first_candle_time": 1794679800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
