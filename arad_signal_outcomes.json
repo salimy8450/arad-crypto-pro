@@ -5419,6 +5419,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "PIEVERSE_USDT|LONG|EARLY|1794679655",
+      "symbol": "PIEVERSE_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 1.8348,
+      "sl": 1.8125640333849837,
+      "tp": [
+        1.8570359666150162,
+        1.8681539499225244,
+        1.8792719332300325,
+        1.8903899165375406,
+        1.9015078998450488,
+        1.923743866460065
+      ],
+      "created_at": 1794679655,
+      "first_candle_time": 1794679800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
