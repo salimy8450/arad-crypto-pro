@@ -166,9 +166,9 @@
     "trigger": "15M_SWING_HIGH_REJECTION"
   },
   "NEAR_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794290571,
-    "trigger": "15M_SWING_HIGH_REJECTION"
+    "type": "WATCH",
+    "sent_at": 1794639205,
+    "trigger": ""
   },
   "MRNA_USDT|LONG": {
     "type": "WATCH",
@@ -392,7 +392,7 @@
   },
   "SAGA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794452678,
+    "sent_at": 1794639204,
     "trigger": ""
   },
   "HOT_USDT|SHORT": {
@@ -519,5 +519,30 @@
     "type": "EARLY",
     "sent_at": 1794616180,
     "trigger": "15M_SWING_HIGH_REJECTION"
+  },
+  "AIA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794639203,
+    "trigger": "FIRST_BEARISH_15M_CANDLE"
+  },
+  "INJ_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794639203,
+    "trigger": "FIRST_BEARISH_15M_CANDLE"
+  },
+  "PIXEL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794639203,
+    "trigger": "15M_RANGE_BREAK"
+  },
+  "LAB_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794639204,
+    "trigger": "FIRST_BEARISH_15M_CANDLE"
+  },
+  "DOGE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794639205,
+    "trigger": ""
   }
 }
