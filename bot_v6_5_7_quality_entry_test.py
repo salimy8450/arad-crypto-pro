@@ -10,7 +10,8 @@ from datetime import datetime, timezone
 
 # ==========================================================
 # ARAD CRYPTO PRO V6.5.7 EARLY 5M LONG/SHORT TEST OURBIT
-# EARLY WATCH + CONFIRMED TELEGRAM ALERTS
+# CONFIRMED-ONLY TELEGRAM ALERTS
+# Strict quality gates | MTF | BOS | SWEEP | PULLBACK | RISK FILTERS
 # MTF | BOS | SWEEP | PULLBACK | RISK FILTERS
 # ANALYSIS ONLY - NO ORDERS
 # ==========================================================
@@ -21,14 +22,14 @@ TELEGRAM_API = "https://api.telegram.org"
 MAX_STAGE1_SYMBOLS = 300  # liquid top-300 universe for reliable 5m test cadence
 MAX_STAGE2_SYMBOLS = 80
 MAX_STAGE3_SYMBOLS = 60
-MAX_TELEGRAM_WATCH_ALERTS = 5  # cap WATCH messages per test run to prevent Telegram flooding
-MAX_EARLY_ALERTS = 8  # cap early-entry messages per 5m test run
+MAX_TELEGRAM_WATCH_ALERTS = 0  # WATCH alerts are disabled
+MAX_EARLY_ALERTS = 0  # EARLY alerts are disabled
+TELEGRAM_CONFIRMED_ONLY = True
 
 TIMEFRAMES = {
     "5m": ("Min5", 300),
     "15m": ("Min15", 900),
     "1h": ("Min60", 3600),
-    "4h": ("Hour4", 14400),
 }
 
 CANDLE_LIMIT = 220
@@ -38,10 +39,10 @@ REQUEST_PAUSE = 0.12
 
 MIN_VOLUME_RATIO = 0.75
 MIN_SCORE_WATCH = 5
-MIN_SCORE_TRADE = 8
-MIN_RR = 1.30
-MAX_STOP_ATR = 2.00
-MAX_LIVE_DIFF = 0.35
+MIN_SCORE_TRADE = 10  # higher score threshold for fewer, stronger candidates
+MIN_RR = 2.00
+MAX_STOP_ATR = 1.60  # reject setups with an excessively wide stop
+MAX_LIVE_DIFF = 0.20  # do not chase a price that moved away from the closed 5m candle
 ATR_SL_MULTIPLIER = 1.20
 PIVOT_LOOKBACK = 12
 STRUCTURE_SCAN_BARS = 5
@@ -62,13 +63,13 @@ EXTREME_RSI_LONG_5M = 72.0
 # Higher-timeframe exhaustion guard for confirmed entries.
 EXTREME_RSI_LONG_1H = 75.0
 EXTREME_RSI_SHORT_1H = 25.0
-CONFIRM_MIN_VOLUME_RATIO = 0.90
+CONFIRM_MIN_VOLUME_RATIO = 1.00
 TRIGGER_MIN_BODY_RATIO = 0.45
 TRIGGER_CLOSE_EDGE = 0.25
 
 # Persistent anti-duplicate settings
 WATCH_COOLDOWN_MIN = 45
-CONFIRMED_COOLDOWN_MIN = 60
+CONFIRMED_COOLDOWN_MIN = 180
 STATE_FILE = "arad_v65_7_test_signal_state.json"
 OUTCOME_FILE = "arad_signal_outcomes.json"
 EARLY_COOLDOWN_MIN = 15
@@ -666,20 +667,22 @@ def room_to_structure(candidate, plan):
     return support >= entry or (entry - support) >= required_room
 
 
-def analyze_higher_timeframes(c4, c1):
-    m4, m1 = market_metrics(c4), market_metrics(c1)
-    long_score = 3 * (m4["trend"] == "LONG") + 3 * (m1["trend"] == "LONG")
-    short_score = 3 * (m4["trend"] == "SHORT") + 3 * (m1["trend"] == "SHORT")
-    long_score += int(m4["rsi"] > 50) + int(m1["rsi"] > 50)
-    short_score += int(m4["rsi"] < 50) + int(m1["rsi"] < 50)
-    direction = "LONG" if long_score > short_score else "SHORT" if short_score > long_score else "NONE"
-    return direction, long_score, short_score, m4, m1
+def analyze_higher_timeframes(c1):
+    # 1H is context only; it never decides or blocks the trade direction.
+    m1 = market_metrics(c1)
+    long_score = 3 * (m1["trend"] == "LONG") + int(m1["rsi"] > 50) + int(m1["macd_hist"] > 0)
+    short_score = 3 * (m1["trend"] == "SHORT") + int(m1["rsi"] < 50) + int(m1["macd_hist"] < 0)
+    direction = m1["trend"] if m1["trend"] in ("LONG", "SHORT") else "NEUTRAL"
+    return direction, long_score, short_score, m1
 
 
 def score_stage2(direction, long_score, short_score, candles):
     metrics = market_metrics(candles)
     structure, sweep, bos = structure_signal(candles)
-    score = long_score if direction == "LONG" else short_score
+    # Start from 15m evidence; 1H contributes at most one context point.
+    score = 3
+    context_aligned = (long_score > short_score) if direction == "LONG" else (short_score > long_score)
+    score += 1 if context_aligned else 0
     score += 2 if structure == direction else 0
     score += int(sweep) + int(metrics["trend"] == direction)
     if direction == "LONG" and metrics["rsi"] >= 48:
@@ -706,7 +709,8 @@ def make_trade_plan(direction, entry, current_atr, recent_candles):
     if risk <= 0:
         return None
     stop_atr = risk / current_atr
-    rr = abs(targets[-1] - entry) / risk
+    # Evaluate the minimum required RR at TP3 (2R), not the distant TP6 (4R).
+    rr = abs(targets[2] - entry) / risk
     if stop_atr > MAX_STOP_ATR or rr < MIN_RR:
         return None
     return {"entry": entry, "sl": stop, "tp": targets, "risk_atr": stop_atr, "rr": rr}
@@ -716,21 +720,16 @@ def analyze_symbol(symbol, ticker):
     price = ticker_price(ticker)
     if price <= 0:
         return None
-    c4 = get_candles(symbol, "4h")
-    time.sleep(REQUEST_PAUSE)
     c1 = get_candles(symbol, "1h")
     time.sleep(REQUEST_PAUSE)
-    if not c4 or not c1:
+    if not c1:
         return None
-    direction, ls, ss, m4, m1 = analyze_higher_timeframes(c4, c1)
-    if direction == "NONE":
-        return None
-    score = max(ls, ss)
-    if score < 4:
-        return None
+    direction, ls, ss, m1 = analyze_higher_timeframes(c1)
+    # Keep neutral 1H context candidates so 15m can establish the actual side.
+    score = max(ls, ss, 4)
     return {
         "symbol": symbol, "direction": direction, "price": price,
-        "long_score": ls, "short_score": ss, "score": score, "m4": m4, "m1": m1,
+        "long_score": ls, "short_score": ss, "score": score, "m1": m1,
     }
 
 
@@ -739,8 +738,14 @@ def analyze_stage2(candidate):
     time.sleep(REQUEST_PAUSE)
     if not candles:
         return None
+    metrics = market_metrics(candles)
+    # 15m is the directional authority; 1H remains context only.
+    direction = metrics["trend"] if metrics["trend"] in ("LONG", "SHORT") else candidate["direction"]
+    if direction not in ("LONG", "SHORT"):
+        return None
+    candidate["direction"] = direction
     score, metrics, structure, sweep, bos = score_stage2(
-        candidate["direction"], candidate["long_score"], candidate["short_score"], candles
+        direction, candidate["long_score"], candidate["short_score"], candles
     )
     if score < MIN_SCORE_WATCH:
         return None
@@ -789,8 +794,8 @@ def candidate_quality(item):
         score += 1
     elif direction == "LONG" and 35 <= rsi15 <= 70:
         score += 1
-    if item.get("m4", {}).get("trend") == direction and item.get("m1", {}).get("trend") == direction:
-        score += 2
+    if item.get("m1", {}).get("trend") == direction:
+        score += 1
     return score
 
 
@@ -859,7 +864,8 @@ def analyze_stage3(candidate):
         "micro5": micro5, "continuation5": continuation5,
     })
 
-    higher_aligned = candidate["m4"]["trend"] == direction and candidate["m1"]["trend"] == direction
+    # 1H is informational context only; it is deliberately not a hard entry gate.
+    higher_aligned = True
     volume_impulse_ok = (
         impulse_volume_ok(candidate["candles15"], direction)
         or impulse_volume_ok(candles, direction)
@@ -874,36 +880,52 @@ def analyze_stage3(candidate):
     live_diff = abs(candidate["price"] - m5["price"]) / m5["price"] * 100 if m5["price"] > 0 else 999
     live_ok = live_diff <= MAX_LIVE_DIFF
     momentum_ok = momentum_confirmed(candidate["m15"], m5, direction)
+    first_impulse5 = first_impulse_quality(candles, direction, min_volume_ratio=0.90)
+    first_impulse_path = bool(
+        first_impulse5
+        and candidate["m15"]["trend"] == direction
+        and ((direction == "LONG" and candidate["m15"]["rsi"] >= 48)
+             or (direction == "SHORT" and candidate["m15"]["rsi"] <= 52))
+    )
     directional_context_ok = confirmed_directional_context_ok(
         candidate["m15"], m5, candles, direction,
         bos15=bool(candidate.get("bos15")),
         sweep15=bool(candidate.get("sweep")),
-    )
+    ) or first_impulse_path
 
     # Keep the 15m structure gate strict and directional.
+    # The 15m directional trend confirms the first 5m impulse; waiting for 15m BOS
+    # alone can delay entry until much of the move has already happened.
     structure_ok = (
-        (
-            candidate["bos15"] or candidate["sweep"]
-            or candidate.get("micro15", False)
-        )
-        and candidate.get("structure") in ("NONE", direction)
+        candidate["m15"]["trend"] == direction
+        and ((direction == "LONG" and candidate["m15"]["price"] > candidate["m15"]["ema21"]
+              and candidate["m15"]["ema9"] > candidate["m15"]["ema21"])
+             or (direction == "SHORT" and candidate["m15"]["price"] < candidate["m15"]["ema21"]
+                 and candidate["m15"]["ema9"] < candidate["m15"]["ema21"]))
     )
     late_ok = late_entry_ok(candidate["m15"], m5, direction)
-    htf_rsi_ok = higher_timeframe_rsi_ok(candidate["m1"], direction)
+    # 1H RSI is included in scoring/context, not used as a hard veto.
+    htf_rsi_ok = True
 
     # Two distinct entry paths; neither bypasses the common quality/risk gates.
     pullback_path = near_pullback and trigger5
     continuation_path = continuation5
+    if first_impulse_path:
+        score += min(2, first_impulse5["score"] // 3)
+        candidate["score"] = score
     first_candle_path = first_candle15 == direction and (trigger5 or micro5)
     entry_path = (
         "PULLBACK" if pullback_path
         else "MOMENTUM_CONTINUATION" if continuation_path
+        else "FIRST_IMPULSE_5M" if first_impulse_path
         else "FIRST_CANDLE_15M" if first_candle_path
         else "NONE"
     )
-    trigger_ok = pullback_path or continuation_path or first_candle_path
+    trigger_ok = pullback_path or continuation_path or first_impulse_path or first_candle_path
     candidate["first_candle15"] = first_candle15
     candidate["first_candle_path"] = first_candle_path
+    candidate["first_impulse5"] = first_impulse5 or {}
+    candidate["first_impulse_path"] = first_impulse_path
     candidate["entry_path"] = entry_path
     candidate["pullback_path"] = pullback_path
     candidate["continuation_path"] = continuation_path
@@ -1069,6 +1091,50 @@ def first_impulse_quality(candles, direction, min_volume_ratio=0.90):
     }
 
 
+def first_target_room(candles, direction, entry, risk):
+    """
+    Measure clear space to the nearest recent 5m swing obstacle.
+    A first-impulse alert is blocked when nearby structure sits too close
+    to TP1; this avoids buying directly under resistance or selling above support.
+    """
+    if len(candles) < 8 or entry <= 0 or risk <= 0:
+        return None, None
+
+    history = candles[-25:-1]
+    pivots = []
+    for i in range(2, len(history) - 2):
+        if direction == "LONG":
+            level = history[i]["high"]
+            if (level > history[i-1]["high"] and level > history[i-2]["high"]
+                    and level >= history[i+1]["high"] and level >= history[i+2]["high"]
+                    and level > entry):
+                pivots.append(level)
+        else:
+            level = history[i]["low"]
+            if (level < history[i-1]["low"] and level < history[i-2]["low"]
+                    and level <= history[i+1]["low"] and level <= history[i+2]["low"]
+                    and level < entry):
+                pivots.append(level)
+
+    if not pivots:
+        return None, None
+
+    obstacle = min(pivots) if direction == "LONG" else max(pivots)
+    room_r = (obstacle - entry) / risk if direction == "LONG" else (entry - obstacle) / risk
+    return obstacle, room_r
+
+
+def countertrend_quality_gate(direction, predictive_score, volume_ratio, has_structure, rsi_value, macd_now, macd_prev):
+    """Strict, symmetric gate for corrective trades against the 15m context."""
+    if direction not in ("LONG", "SHORT"):
+        return False
+    if predictive_score < 5 or volume_ratio < 1.00 or not has_structure:
+        return False
+    if direction == "LONG":
+        return rsi_value >= 48.0 and macd_now > macd_prev
+    return rsi_value <= 52.0 and macd_now < macd_prev
+
+
 def detect_early_5m(candles5, candles15, live_price):
     """Detect a genuinely early 5m move with volume, micro-structure and exhaustion checks."""
     if len(candles5) < 35 or live_price <= 0:
@@ -1228,22 +1294,48 @@ def detect_early_5m(candles5, candles15, live_price):
     volume_ok = m5["volume_ratio"] >= volume_floor or impulse_volume_ok(candles5, direction)
     if not volume_ok:
         return None
-    micro_bos = short_structure_break if direction == "SHORT" else long_structure_break
     structure_direction, _sweep, structure_bos = structure_signal(candles5)
+    actual_micro_bos = bool(
+        (micro_short_break if direction == "SHORT" else micro_long_break)
+        or (structure_direction == direction and structure_bos)
+        or (predictive and predictive.get("micro_break"))
+    )
     predictive_sweep = bool(predictive and predictive.get("sweep_reclaim"))
-    fresh_bos = micro_bos or predictive_sweep or (structure_direction == direction and structure_bos) or trigger == "5M_EARLY_SWING_FAILURE"
+    fresh_bos = actual_micro_bos or predictive_sweep or trigger == "5M_EARLY_SWING_FAILURE"
     early_turn_trigger = trigger in ("5M_PRE_BREAKDOWN_ROLLOVER", "5M_PRE_BREAKOUT_TURN")
     if not fresh_bos and not early_turn_trigger and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE"):
         return None
 
     setup = classify_early_move(direction, m15)
     entry_confirmation = "5M_STRUCTURE_AND_VOLUME"
-    if setup["setup_type"] in ("CORRECTIVE_LONG", "CORRECTIVE_SHORT"):
-        if not fresh_bos and not early_turn_trigger:
+
+    # Counter-trend trades must pass the full first-impulse quality gate.
+    # A large candle body or a one-bar break alone must never authorize a
+    # corrective LONG/SHORT against the 15m context (HOME failure case).
+    corrective = setup["setup_type"] in ("CORRECTIVE_LONG", "CORRECTIVE_SHORT")
+    actual_structure_bos = bool(
+        (micro_long_break if direction == "LONG" else micro_short_break)
+        or (structure_direction == direction and structure_bos)
+    )
+    impulse_has_structure = bool(
+        predictive and (
+            predictive.get("micro_break") or predictive.get("sweep_reclaim")
+        )
+    )
+    if corrective:
+        if not countertrend_quality_gate(
+            direction,
+            predictive.get("score", 0) if predictive else 0,
+            m5["volume_ratio"],
+            actual_structure_bos or impulse_has_structure,
+            m5["rsi"],
+            m5["macd_hist"],
+            prev5_metrics["macd_hist"],
+        ):
             return None
-        entry_confirmation = "CORRECTIVE_MICRO_BOS_CONFIRMED"
+        entry_confirmation = "CORRECTIVE_FIRST_IMPULSE_QUALITY_CONFIRMED"
     elif setup["setup_type"].startswith("EARLY_REVERSAL_"):
-        if not fresh_bos and not early_turn_trigger and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE"):
+        if not actual_structure_bos and not early_turn_trigger and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE"):
             return None
         entry_confirmation = "EARLY_REVERSAL_STRUCTURE_CONFIRMED"
 
@@ -1282,6 +1374,13 @@ def detect_early_5m(candles5, candles15, live_price):
 
     r_multiples = (1.0, 1.5, 2.0, 2.5, 3.0, 4.0)
     targets = [entry - risk * r if direction == "SHORT" else entry + risk * r for r in r_multiples]
+
+    # Require at least 1.15R of clear room to the nearest recent 5m swing
+    # obstacle before advertising the first impulse as an entry candidate.
+    obstacle, room_r = first_target_room(candles5, direction, entry, risk)
+    if room_r is not None and room_r < 1.15:
+        return None
+
     score = 5
     if predictive:
         score = max(score, predictive["score"] + 3)
@@ -1296,9 +1395,12 @@ def detect_early_5m(candles5, candles15, live_price):
         "body_ratio": body_ratio, "trigger": trigger, "risk_atr": risk_atr,
         "setup_type": setup["setup_type"], "setup_label": setup["setup_label"],
         "context_note": setup["context_note"], "entry_confirmation": entry_confirmation,
-        "micro_bos": fresh_bos, "volume_confirmed": volume_ok,
+        "micro_bos": actual_micro_bos, "volume_confirmed": m5["volume_ratio"] >= 1.00,
+        "structure_confirmed": fresh_bos,
         "predictive_score": predictive["score"] if predictive else 0,
         "first_impulse_evidence": predictive or {},
+        "nearest_5m_obstacle": obstacle,
+        "room_to_obstacle_r": room_r,
     }
 
 def early_5m_turn_confirmation_ok(candles5, direction):
@@ -1585,7 +1687,7 @@ def early_entry_message(item):
     lines += [
         "ریسک: {:.2f} ATR | تعداد تارگت‌ها: {}".format(item["risk_atr"], len(item["tp"])),
         "RSI 5m: {:.1f} | حجم: {:.2f}x".format(item["m5"]["rsi"], item["m5"]["volume_ratio"]),
-        "ساختار خرد: {} | تأیید حجم: {}".format("شکست تأیید شد" if item.get("micro_bos") else "رد شد", "بله" if item.get("volume_confirmed") else "خیر"),
+        "BOS واقعی 5m: {} | حجم حداقل 1.0x: {}".format("بله" if item.get("micro_bos") else "خیر", "بله" if item.get("volume_confirmed") else "خیر"),
         "قدرت پیش‌بینی کندل اول: {}/7".format(item.get("predictive_score", 0)),
         "نشانه‌ها: شکست خرد={} | جمع‌آوری نقدینگی={} | فشردگی={} | بهبود RSI={} | بهبود MACD={} | چرخش EMA9={}".format(
             "بله" if item.get("first_impulse_evidence", {}).get("micro_break") else "خیر",
@@ -1599,8 +1701,9 @@ def early_entry_message(item):
         "نوع حرکت: {}".format(item.get("setup_label", "نامشخص")),
         "تفسیر: {}".format(item.get("context_note", "زمینه حرکت نیازمند بررسی است.")),
         "تأیید ورود: {}".format(
-            "شکست ساختار خرد ۵ دقیقه تأیید شد" if item.get("entry_confirmation") == "CORRECTIVE_MICRO_BOS_CONFIRMED"
-            else ("محرک ۱۵ دقیقه با تأیید ۵ دقیقه" if item.get("source_tf") == "15M" else "محرک اولیه ۵ دقیقه؛ هنوز برگشت روند قطعی نیست")
+            "کیفیت حرکت اصلاحی + BOS واقعی ۵ دقیقه تأیید شد" if item.get("entry_confirmation") == "CORRECTIVE_FIRST_IMPULSE_QUALITY_CONFIRMED"
+            else ("ساختار برگشتی ۵ دقیقه تأیید شد" if item.get("entry_confirmation") == "EARLY_REVERSAL_STRUCTURE_CONFIRMED"
+            else ("محرک ۱۵ دقیقه با تأیید ۵ دقیقه" if item.get("source_tf") == "15M" else "محرک اولیه ۵ دقیقه؛ هنوز برگشت روند قطعی نیست"))
         ),
         "محرک: {} | قدرت بدنه: {:.0f}%".format(item["trigger"], item["body_ratio"] * 100),
         "امتیاز شروع حرکت: {}".format(item["score"]),
@@ -1747,7 +1850,7 @@ def watch_message(item):
         "جهت احتمالی: {}".format("خرید LONG" if item["direction"] == "LONG" else "فروش SHORT"),
         "قیمت فعلی: {}".format(format_price(item["price"])),
         "امتیاز تحلیلی: {} امتیاز".format(item["score"]),
-        "4H: {} | RSI {:.1f}".format(item["m4"]["trend"], item["m4"]["rsi"]),
+        "1H context: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]),
         "1H: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]),
         "15M: {} | RSI {:.1f} | حجم {:.2f}x".format(m15["trend"], m15["rsi"], m15["volume_ratio"]),
         "BOS 15m: {}".format("بله" if item["bos15"] else "خیر"),
@@ -1775,7 +1878,7 @@ def confirmed_message(item):
         lines.append("TP{}: {}".format(i, format_price(target)))
     lines += [
         "فاصله حد ضرر: {:.2f} ATR".format(plan["risk_atr"]),
-        "نسبت سود به زیان تا TP6: {:.2f}".format(plan["rr"]),
+        "نسبت سود به زیان تا TP3: {:.2f}".format(plan["rr"]),
         "امتیاز تحلیلی: {} امتیاز".format(item["score"]),
         "",
         "⚠️ این پیام تحلیل است، نه دستور معامله. سفارش خودکار ثبت نشده است.",
@@ -1785,6 +1888,10 @@ def confirmed_message(item):
 
 
 def dispatch_alerts(early_items, watch_items, confirmed_items):
+    # Safety lock: this version sends actionable CONFIRMED plans only.
+    if TELEGRAM_CONFIRMED_ONLY:
+        early_items = []
+        watch_items = []
     state, sha, state_ok = load_signal_state()
     if not state_ok:
         # Fail closed: avoid flooding Telegram if deduplication cannot be checked.
@@ -1915,7 +2022,7 @@ def print_result(item):
     log("{} | {} | SCORE {} POINTS".format(item["symbol"], item["direction"], item["score"]))
     log("STATUS: {}".format(item.get("status", "WATCH")))
     log("PRICE: {}".format(format_price(item["price"])))
-    log("4H: {} | RSI {:.1f}".format(item["m4"]["trend"], item["m4"]["rsi"]))
+    log("1H context: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]))
     log("1H: {} | RSI {:.1f}".format(item["m1"]["trend"], item["m1"]["rsi"]))
     log("15M: {} | RSI {:.1f} | VOL {:.2f}x | IMPULSE VOL: {}".format(
         item["m15"]["trend"], item["m15"]["rsi"], item["m15"]["volume_ratio"],
@@ -1964,11 +2071,11 @@ def print_result(item):
 def main():
     started = time.time()
     log("")
-    log("ARAD CRYPTO PRO V6.5.7 EARLY 5M REVERSAL TEST OURBIT")
+    log("ARAD CRYPTO PRO V6.5.7 CONFIRMED-ONLY QUALITY TEST OURBIT")
     log("START: " + now_text())
-    log("MODE: V6.5.7 TEST ONLY | stricter entry filters | no orders")
+    log("MODE: V6.5.7 CONFIRMED-ONLY | strict quality filters | no orders")
     log("BASE URL: " + BASE_URL)
-    log("V6.5.7 PATCH: unified 5m + 15m early scan; 15m requires 5m confirmation; one early alert per symbol")
+    log("V6.5.7 QUALITY PATCH: 5m first impulse + 15m direction; 1h context only; confirmed-only; no 4h gate")
 
     ping = api_get("/api/v1/contract/ping")
     if ping is None:
@@ -2010,69 +2117,11 @@ def main():
     log("STAGE 1 SCAN COUNT: {}".format(len(selected)))
     log("METAL CONTRACTS PINNED: {}".format(len(pinned)))
 
-    # Unified early scan: 5m first impulse + independent 15m impulse confirmed by 5m.
-    # Both detectors run inside this single process; one early Telegram alert per symbol.
-    early_by_symbol = {}
-    for i, item in enumerate(selected, 1):
-        if PRINT_ALL_STAGES:
-            log("EARLY 5M+15M SCAN: {} / {} {}".format(i, len(selected), item["symbol"]))
-        live_price = ticker_price(item["ticker"])
-        candles5_early = get_candles(item["symbol"], "5m")
-        candles15_early = get_candles(item["symbol"], "15m")
-        candidate5 = None
-        candidate15 = None
+    # Predictive EARLY alerts are disabled in confirmed-only mode to save API calls.
+    early_alerts = []
+    log("EARLY 5M/15M TELEGRAM ALERTS: DISABLED (confirmed-only mode)")
 
-        if candles5_early:
-            candidate5 = detect_early_5m(candles5_early, candles15_early, live_price)
-            if candidate5:
-                candidate5["source_tf"] = "5M"
-                candidate5["symbol"] = item["symbol"]
 
-        if candles15_early and candles5_early:
-            preliminary15 = detect_early_15m(candles15_early, live_price)
-            if preliminary15:
-                candidate15 = detect_early_15m(
-                    candles15_early, live_price, candles5_early, require_5m=True
-                )
-                if candidate15:
-                    candidate15["source_tf"] = "15M"
-                    candidate15["symbol"] = item["symbol"]
-                    candidate15["m5"] = market_metrics(candles5_early)
-                    candidate15["micro_bos"] = bool(
-                        candidate15.get("first_impulse_evidence", {}).get("micro_break")
-                        or candidate15.get("first_impulse_evidence", {}).get("sweep_reclaim")
-                    )
-                    candidate15["volume_confirmed"] = True
-                    candidate15["entry_confirmation"] = "15M_IMPULSE_CONFIRMED_BY_5M"
-                    setup15 = classify_early_move(candidate15["direction"], candidate15["m15"])
-                    candidate15["setup_type"] = setup15["setup_type"]
-                    candidate15["setup_label"] = setup15["setup_label"]
-                    candidate15["context_note"] = setup15["context_note"]
-
-        # Resolve same-symbol overlap. Prefer the faster 5m entry when both
-        # agree; suppress the symbol for this run when the timeframes conflict.
-        if candidate5 and candidate15:
-            if candidate5["direction"] == candidate15["direction"]:
-                candidate5["also_15m_confirmed"] = True
-                candidate5["score"] = max(candidate5["score"], candidate15["score"])
-                early_by_symbol[item["symbol"]] = candidate5
-                log("EARLY MERGED: {} {} (5m entry + 15m confirmation)".format(
-                    item["symbol"], candidate5["direction"]
-                ))
-            else:
-                log("EARLY CONFLICT SKIPPED: {} 5m={} 15m={}".format(
-                    item["symbol"], candidate5["direction"], candidate15["direction"]
-                ))
-        elif candidate5:
-            early_by_symbol[item["symbol"]] = candidate5
-        elif candidate15:
-            early_by_symbol[item["symbol"]] = candidate15
-
-        time.sleep(REQUEST_PAUSE)
-
-    early_alerts = list(early_by_symbol.values())
-    early_alerts.sort(key=lambda x: (x["score"], x["m5"]["volume_ratio"]), reverse=True)
-    log("UNIFIED EARLY 5M/15M SIGNALS FOUND: {}".format(len(early_alerts)))
 
     stage1 = []
     for i, item in enumerate(selected, 1):
@@ -2101,9 +2150,8 @@ def main():
     stage2 = stage2[:MAX_STAGE3_SYMBOLS]
     log("STAGE 2 COMPLETE: {}".format(len(stage2)))
 
-    # TEST MODE: send a capped number of WATCH alerts plus every CONFIRMED alert.
-    # WATCH is informational only; CONFIRMED includes an entry/SL/TP plan.
-    log("TELEGRAM TEST MODE: unified EARLY 5m/15m + capped WATCH + CONFIRMED; outcomes tracked; no orders.")
+    # CONFIRMED-ONLY mode: no EARLY or WATCH messages are sent.
+    log("TELEGRAM MODE: CONFIRMED ONLY | strict quality gates | outcomes tracked | no orders.")
 
     final_results = []
     for i, candidate in enumerate(stage2, 1):
@@ -2116,15 +2164,9 @@ def main():
     confirmed = [x for x in final_results if x.get("status") == "CONFIRMED"]
     watch = [x for x in final_results if x.get("status") == "WATCH"]
 
-    # Send best WATCH candidates for visibility and all CONFIRMED setups.
-    watch.sort(key=candidate_quality, reverse=True)
-    watch_to_send = watch[:MAX_TELEGRAM_WATCH_ALERTS]
-    early_to_send = early_alerts[:MAX_EARLY_ALERTS]
-    log("TELEGRAM ALERT QUEUE: {} EARLY + {} WATCH + {} CONFIRMED = {} TOTAL BEFORE DEDUP".format(
-        len(early_to_send), len(watch_to_send), len(confirmed),
-        len(early_to_send) + len(watch_to_send) + len(confirmed)
-    ))
-    dispatch_alerts(early_to_send, watch_to_send, confirmed)
+    # Send only final CONFIRMED setups with entry, SL and TP plan.
+    log("TELEGRAM ALERT QUEUE: 0 EARLY + 0 WATCH + {} CONFIRMED".format(len(confirmed)))
+    dispatch_alerts([], [], confirmed)
 
     elapsed = time.time() - started
     log("")

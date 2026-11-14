@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '*/5 * * * *'
+  push:
+    branches:
+      - v6.5.7-confirmed-only-quality
 
 permissions:
   contents: write
@@ -13,7 +16,39 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validate:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile V6.5.7
+        run: python -m py_compile bot_v6_5_7_quality_entry_test.py
+      - name: Regression tests for countertrend gate
+        run: |
+          python - <<'PY'
+          import importlib.util
+          spec = importlib.util.spec_from_file_location("arad", "bot_v6_5_7_quality_entry_test.py")
+          arad = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(arad)
+          gate = arad.countertrend_quality_gate
+          assert not gate("LONG", 0, 0.78, False, 34.2, 0.001, 0.002)
+          assert not gate("LONG", 0, 0.78, True, 34.2, 0.001, 0.002)
+          assert gate("LONG", 6, 1.52, True, 52.5, 0.003, 0.002)
+          assert gate("SHORT", 6, 1.40, True, 47.0, -0.003, -0.002)
+          assert not gate("LONG", 6, 0.99, True, 52.5, 0.003, 0.002)
+          assert not gate("LONG", 6, 1.20, False, 52.5, 0.003, 0.002)
+          assert not gate("LONG", 4, 1.20, True, 52.5, 0.003, 0.002)
+          assert not gate("SHORT", 6, 1.20, True, 60.0, -0.003, -0.002)
+          print("PASS: 8 countertrend regression assertions")
+          PY
+
   scanner:
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -32,7 +67,7 @@ jobs:
         run: |
           test -n "$BOT_TOKEN" || (echo "Missing GitHub secret: BOT_TOKEN" && exit 1)
           test -n "$CHAT_ID" || (echo "Missing GitHub secret: CHAT_ID" && exit 1)
-      - name: Run V6.5.7 early 5m scanner
+      - name: Run V6.5.7 scanner
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
