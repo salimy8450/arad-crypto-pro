@@ -65,11 +65,11 @@
   },
   "OP_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794306987
+    "sent_at": 1794654433
   },
   "REZ_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794593753
+    "sent_at": 1794654433
   },
   "CYBER_USDT|SHORT": {
     "type": "WATCH",
@@ -253,7 +253,7 @@
   },
   "USELESS_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794627932
+    "sent_at": 1794654434
   },
   "TIA_USDT|SHORT": {
     "type": "WATCH",
@@ -358,5 +358,21 @@
   "ETHFI_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794627933
+  },
+  "FET_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794654432
+  },
+  "WLD_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794654433
+  },
+  "ID_USDT|SHORT": {
+    "type": "CONFIRMED",
+    "sent_at": 1794654434
+  },
+  "FOGO_USDT|SHORT": {
+    "type": "CONFIRMED",
+    "sent_at": 1794654434
   }
 }
