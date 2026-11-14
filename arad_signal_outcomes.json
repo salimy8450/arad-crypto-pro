@@ -5356,6 +5356,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CRCL_USDT|LONG|EARLY|1794679651",
+      "symbol": "CRCL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 59.22,
+      "sl": 58.81180821643424,
+      "tp": [
+        59.62819178356576,
+        59.83228767534864,
+        60.03638356713152,
+        60.24047945891441,
+        60.444575350697285,
+        60.85276713426305
+      ],
+      "created_at": 1794679651,
+      "first_candle_time": 1794679800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
