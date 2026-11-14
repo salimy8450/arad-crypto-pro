@@ -453,7 +453,7 @@
   },
   "SILVER_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794555397
+    "sent_at": 1794624545
   },
   "IMX_USDT|SHORT": {
     "type": "EARLY",
@@ -524,8 +524,8 @@
     "sent_at": 1794590943
   },
   "ZEC_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794590947
+    "type": "WATCH",
+    "sent_at": 1794624544
   },
   "ONDO_USDT|SHORT": {
     "type": "EARLY",
@@ -549,7 +549,7 @@
   },
   "ARM_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794610233
+    "sent_at": 1794624538
   },
   "TA_USDT|SHORT": {
     "type": "EARLY",
@@ -574,5 +574,29 @@
   "UNI_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794610248
+  },
+  "DOS_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794624540
+  },
+  "SPX500_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794624541
+  },
+  "GOLDCIR_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794624543
+  },
+  "XMR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794624544
+  },
+  "ZEREBRO_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794624544
+  },
+  "SKHY_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794624545
   }
 }
