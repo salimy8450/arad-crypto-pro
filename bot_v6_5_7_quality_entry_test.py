@@ -1124,6 +1124,17 @@ def first_target_room(candles, direction, entry, risk):
     return obstacle, room_r
 
 
+def countertrend_quality_gate(direction, predictive_score, volume_ratio, has_structure, rsi_value, macd_now, macd_prev):
+    """Strict, symmetric gate for corrective trades against the 15m context."""
+    if direction not in ("LONG", "SHORT"):
+        return False
+    if predictive_score < 5 or volume_ratio < 1.00 or not has_structure:
+        return False
+    if direction == "LONG":
+        return rsi_value >= 48.0 and macd_now > macd_prev
+    return rsi_value <= 52.0 and macd_now < macd_prev
+
+
 def detect_early_5m(candles5, candles15, live_price):
     """Detect a genuinely early 5m move with volume, micro-structure and exhaustion checks."""
     if len(candles5) < 35 or live_price <= 0:
@@ -1312,18 +1323,16 @@ def detect_early_5m(candles5, candles15, live_price):
         )
     )
     if corrective:
-        if not predictive or predictive.get("score", 0) < 5:
+        if not countertrend_quality_gate(
+            direction,
+            predictive.get("score", 0) if predictive else 0,
+            m5["volume_ratio"],
+            actual_structure_bos or impulse_has_structure,
+            m5["rsi"],
+            m5["macd_hist"],
+            prev5_metrics["macd_hist"],
+        ):
             return None
-        if m5["volume_ratio"] < 1.00:
-            return None
-        if not (actual_structure_bos or impulse_has_structure):
-            return None
-        if direction == "LONG":
-            if m5["rsi"] < 48.0 or m5["macd_hist"] <= prev5_metrics["macd_hist"]:
-                return None
-        else:
-            if m5["rsi"] > 52.0 or m5["macd_hist"] >= prev5_metrics["macd_hist"]:
-                return None
         entry_confirmation = "CORRECTIVE_FIRST_IMPULSE_QUALITY_CONFIRMED"
     elif setup["setup_type"].startswith("EARLY_REVERSAL_"):
         if not actual_structure_bos and not early_turn_trigger and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE"):
