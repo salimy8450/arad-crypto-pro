@@ -137,7 +137,7 @@
   },
   "XMR_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794278914
+    "sent_at": 1794627932
   },
   "PUMPFUN_USDT|SHORT": {
     "type": "WATCH",
@@ -145,7 +145,7 @@
   },
   "WOO_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794306986
+    "sent_at": 1794627933
   },
   "SXT_USDT|LONG": {
     "type": "WATCH",
@@ -253,7 +253,7 @@
   },
   "USELESS_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794593753
+    "sent_at": 1794627932
   },
   "TIA_USDT|SHORT": {
     "type": "WATCH",
@@ -350,5 +350,13 @@
   "HMSTR_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794613479
+  },
+  "COHR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794627932
+  },
+  "ETHFI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794627933
   }
 }
