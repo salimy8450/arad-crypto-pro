@@ -5297,6 +5297,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "AGT_USDT|LONG|EARLY|1794679646",
+      "symbol": "AGT_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.0345,
+      "sl": 0.033518925460464116,
+      "tp": [
+        0.03548107453953589,
+        0.03597161180930383,
+        0.036462149079071776,
+        0.03695268634883972,
+        0.03744322361860766,
+        0.03842429815814355
+      ],
+      "created_at": 1794679646,
+      "first_candle_time": 1794679800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
