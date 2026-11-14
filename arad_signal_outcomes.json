@@ -5234,6 +5234,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "VVV_USDT|LONG|EARLY|1794677459",
+      "symbol": "VVV_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 17.345,
+      "sl": 17.147523027781794,
+      "tp": [
+        17.542476972218203,
+        17.641215458327306,
+        17.739953944436408,
+        17.83869243054551,
+        17.937430916654613,
+        18.134907888872817
+      ],
+      "created_at": 1794677459,
+      "first_candle_time": 1794677700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
