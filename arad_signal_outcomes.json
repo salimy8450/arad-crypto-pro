@@ -4995,6 +4995,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "DOLO_USDT|SHORT|EARLY|1794672237",
+      "symbol": "DOLO_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.0199,
+      "sl": 0.020084319084521157,
+      "tp": [
+        0.019715680915478845,
+        0.019623521373218267,
+        0.01953136183095769,
+        0.01943920228869711,
+        0.019347042746436532,
+        0.019162723661915376
+      ],
+      "created_at": 1794672237,
+      "first_candle_time": 1794672300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
