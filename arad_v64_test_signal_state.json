@@ -1,8 +1,4 @@
 {
-  "DOT_USDT|SHORT": {
-    "type": "CONFIRMED",
-    "sent_at": 1794069261
-  },
   "ETH_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794334588
@@ -57,7 +53,7 @@
   },
   "ADA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794353515
+    "sent_at": 1794675902
   },
   "NEAR_USDT|SHORT": {
     "type": "WATCH",
@@ -197,7 +193,7 @@
   },
   "ZEC_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794366252
+    "sent_at": 1794675903
   },
   "IDOL_USDT|LONG": {
     "type": "WATCH",
@@ -305,7 +301,7 @@
   },
   "HOT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794567195
+    "sent_at": 1794675904
   },
   "CVC_USDT|SHORT": {
     "type": "WATCH",
@@ -345,7 +341,7 @@
   },
   "HBAR_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794613478
+    "sent_at": 1794675902
   },
   "HMSTR_USDT|LONG": {
     "type": "WATCH",
@@ -361,7 +357,7 @@
   },
   "FET_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794654432
+    "sent_at": 1794675904
   },
   "WLD_USDT|SHORT": {
     "type": "WATCH",
