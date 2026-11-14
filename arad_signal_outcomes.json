@@ -5016,6 +5016,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TRUST_USDT|LONG|EARLY|1794672239",
+      "symbol": "TRUST_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.0452,
+      "sl": 0.04471747582723253,
+      "tp": [
+        0.04568252417276746,
+        0.045923786259151195,
+        0.04616504834553493,
+        0.04640631043191866,
+        0.04664757251830239,
+        0.04713009669106986
+      ],
+      "created_at": 1794672239,
+      "first_candle_time": 1794672300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
