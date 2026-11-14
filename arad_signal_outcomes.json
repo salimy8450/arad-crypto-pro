@@ -5129,6 +5129,27 @@
       "result": "LOSS_SL",
       "max_tp": 0,
       "exit_candle": 1794672600
+    },
+    {
+      "id": "CRCL_USDT|LONG|EARLY|1794677451",
+      "symbol": "CRCL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 58.77,
+      "sl": 58.299774563072496,
+      "tp": [
+        59.24022543692751,
+        59.47533815539126,
+        59.71045087385502,
+        59.94556359231877,
+        60.18067631078252,
+        60.65090174771003
+      ],
+      "created_at": 1794677451,
+      "first_candle_time": 1794677700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
