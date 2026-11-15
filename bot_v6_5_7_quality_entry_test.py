@@ -1253,6 +1253,46 @@ def detect_early_5m(candles5, candles15, live_price):
         and m15.get("rsi", 50.0) < 67.0
     )
 
+    # FIRST PIVOT TURN: catch the first 5m reversal candle after a fresh
+    # local low/high. This route is intentionally earlier than a full BOS and
+    # accepts moderate participation, but still requires price + RSI + MACD
+    # to turn together. It is an early-entry setup, not a claim of trend reversal.
+    pivot_window = candles5[-7:-1]
+    pivot_low_idx = min(range(len(pivot_window)), key=lambda i: pivot_window[i]["low"])
+    pivot_high_idx = max(range(len(pivot_window)), key=lambda i: pivot_window[i]["high"])
+    pivot_low = pivot_window[pivot_low_idx]["low"]
+    pivot_high = pivot_window[pivot_high_idx]["high"]
+    bars_after_low = len(pivot_window) - 1 - pivot_low_idx
+    bars_after_high = len(pivot_window) - 1 - pivot_high_idx
+    fresh_low_turn = (
+        1 <= bars_after_low <= 4
+        and (last["close"] - pivot_low) / m5["atr"] <= 1.10
+        and last["close"] >= pivot_low
+        and last["close"] > last["open"]
+        and last["close"] > previous["close"]
+        and (last["close"] > previous["high"] or close_position >= 0.62)
+        and body_ratio >= 0.30 and close_position >= 0.58
+        and m5["rsi"] >= prev5_metrics["rsi"] + 0.50
+        and m5["macd_hist"] > prev5_metrics["macd_hist"]
+        and 34.0 <= m5["rsi"] <= 63.0
+        and (m5["volume_ratio"] >= 0.35 or impulse_volume_ok(candles5, "LONG"))
+        and (lower_wick_ratio >= 0.08 or close_position >= 0.68)
+    )
+    fresh_high_turn = (
+        1 <= bars_after_high <= 4
+        and (pivot_high - last["close"]) / m5["atr"] <= 1.10
+        and last["close"] <= pivot_high
+        and last["close"] < last["open"]
+        and last["close"] < previous["close"]
+        and (last["close"] < previous["low"] or close_position <= 0.38)
+        and body_ratio >= 0.30 and close_position <= 0.42
+        and m5["rsi"] <= prev5_metrics["rsi"] - 0.50
+        and m5["macd_hist"] < prev5_metrics["macd_hist"]
+        and 37.0 <= m5["rsi"] <= 66.0
+        and (m5["volume_ratio"] >= 0.35 or impulse_volume_ok(candles5, "SHORT"))
+        and (upper_wick_ratio >= 0.08 or close_position <= 0.32)
+    )
+
     # Predict the first directional impulse candle using 7 evidence points.
     # This is evaluated before legacy triggers so the alert can fire on the first
     # closed impulse candle, not after a multi-candle trend is already mature.
@@ -1265,7 +1305,11 @@ def detect_early_5m(candles5, candles15, live_price):
     elif early_long:
         direction, trigger, predictive = "LONG", "FIRST_IMPULSE_5M_PREDICTIVE", early_long
 
-    if not direction and short_pre_breakdown:
+    if not direction and fresh_high_turn:
+        direction, trigger = "SHORT", "5M_FIRST_PIVOT_TURN"
+    elif not direction and fresh_low_turn:
+        direction, trigger = "LONG", "5M_FIRST_PIVOT_TURN"
+    elif not direction and short_pre_breakdown:
         direction, trigger = "SHORT", "5M_PRE_BREAKDOWN_ROLLOVER"
     elif not direction and long_pre_breakout:
         direction, trigger = "LONG", "5M_PRE_BREAKOUT_TURN"
@@ -1291,7 +1335,7 @@ def detect_early_5m(candles5, candles15, live_price):
 
     # A single EMA9 cross or a candle closing near its extreme is not enough.
     # Require meaningful participation and an observable price/structure break.
-    volume_floor = 0.65 if trigger in ("5M_PRE_BREAKDOWN_ROLLOVER", "5M_PRE_BREAKOUT_TURN") else (0.90 if predictive else 1.05)
+    volume_floor = 0.35 if trigger == "5M_FIRST_PIVOT_TURN" else (0.65 if trigger in ("5M_PRE_BREAKDOWN_ROLLOVER", "5M_PRE_BREAKOUT_TURN") else (0.90 if predictive else 1.05))
     volume_ok = m5["volume_ratio"] >= volume_floor or impulse_volume_ok(candles5, direction)
     if not volume_ok:
         return None
@@ -1304,7 +1348,7 @@ def detect_early_5m(candles5, candles15, live_price):
     predictive_sweep = bool(predictive and predictive.get("sweep_reclaim"))
     fresh_bos = actual_micro_bos or predictive_sweep or trigger == "5M_EARLY_SWING_FAILURE"
     early_turn_trigger = trigger in ("5M_PRE_BREAKDOWN_ROLLOVER", "5M_PRE_BREAKOUT_TURN")
-    if not fresh_bos and not early_turn_trigger and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE"):
+    if not fresh_bos and not early_turn_trigger and trigger not in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM", "5M_EARLY_SWING_FAILURE", "5M_FIRST_PIVOT_TURN"):
         return None
 
     setup = classify_early_move(direction, m15)
@@ -1323,7 +1367,14 @@ def detect_early_5m(candles5, candles15, live_price):
             predictive.get("micro_break") or predictive.get("sweep_reclaim")
         )
     )
-    if corrective:
+    if corrective and trigger == "5M_FIRST_PIVOT_TURN":
+        # Explicitly label a counter-context first pivot as an early reversal
+        # attempt. Do not require a full trend-confirmation/BOS that would make
+        # the alert late; the pivot-turn gates above still apply symmetrically.
+        entry_confirmation = "EARLY_PIVOT_TURN_COUNTER_CONTEXT"
+        setup["setup_label"] = "ورود اولیه از چرخش کف/سقف ۵ دقیقه (خلاف زمینه؛ پرریسک‌تر)"
+        setup["context_note"] = "اولین چرخش قیمت و مومنتوم شناسایی شده؛ تغییر روند ۱۵ دقیقه هنوز تأیید نشده است."
+    elif corrective:
         if not countertrend_quality_gate(
             direction,
             predictive.get("score", 0) if predictive else 0,
@@ -1382,7 +1433,7 @@ def detect_early_5m(candles5, candles15, live_price):
     if room_r is not None and room_r < 1.15:
         return None
 
-    score = 5
+    score = 7 if trigger == "5M_FIRST_PIVOT_TURN" else 5
     if predictive:
         score = max(score, predictive["score"] + 3)
     score += 2 if trigger in ("5M_RESISTANCE_REJECTION", "5M_SUPPORT_RECLAIM") else 0
@@ -2075,11 +2126,11 @@ def print_result(item):
 def main():
     started = time.time()
     log("")
-    log("ARAD CRYPTO PRO V6.5.7 CONFIRMED-ONLY QUALITY TEST OURBIT")
+    log("ARAD CRYPTO PRO V6.5.7 EARLY FIRST-MOVE + QUALITY TEST OURBIT")
     log("START: " + now_text())
-    log("MODE: V6.5.7 CONFIRMED-ONLY | strict quality filters | no orders")
+    log("MODE: V6.5.7 EARLY + WATCH + CONFIRMED | first 5m pivot turn | no orders")
     log("BASE URL: " + BASE_URL)
-    log("V6.5.7 QUALITY PATCH: 5m first impulse + 15m direction; 1h context only; confirmed-only; no 4h gate")
+    log("V6.5.7 FINAL ENTRY PATCH: first 5m pivot turn + impulse; 15m context only; 1h context only; no 4h gate")
 
     ping = api_get("/api/v1/contract/ping")
     if ping is None:
