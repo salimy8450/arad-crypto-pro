@@ -32,8 +32,8 @@
     "sent_at": 1794465180
   },
   "HOT_USDT|SHORT": {
-    "type": "CONFIRMED",
-    "sent_at": 1794520799
+    "type": "WATCH",
+    "sent_at": 1794785780
   },
   "SXT_USDT|LONG": {
     "type": "WATCH",
@@ -786,5 +786,21 @@
   "LINK_USDT|LONG": {
     "type": "CONFIRMED",
     "sent_at": 1794772185
+  },
+  "PLUME_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794785779
+  },
+  "NES_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794785780
+  },
+  "DODO_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794785781
+  },
+  "BROCCOLI_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794785781
   }
 }
