@@ -717,7 +717,7 @@
   },
   "0G_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794721452
+    "sent_at": 1794752076
   },
   "WLD_USDT|LONG": {
     "type": "WATCH",
@@ -738,5 +738,29 @@
   "FF_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794724048
+  },
+  "DNA_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794752067
+  },
+  "AT_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794752069
+  },
+  "PARTI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794752070
+  },
+  "ESPORTS_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794752070
+  },
+  "TRUMPSOL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794752071
+  },
+  "HMSTR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794752076
   }
 }
