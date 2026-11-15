@@ -1367,13 +1367,13 @@ def detect_early_5m(candles5, candles15, live_price):
             predictive.get("micro_break") or predictive.get("sweep_reclaim")
         )
     )
-    if corrective and trigger == "5M_FIRST_PIVOT_TURN":
-        # Explicitly label a counter-context first pivot as an early reversal
-        # attempt. Do not require a full trend-confirmation/BOS that would make
-        # the alert late; the pivot-turn gates above still apply symmetrically.
-        entry_confirmation = "EARLY_PIVOT_TURN_COUNTER_CONTEXT"
-        setup["setup_label"] = "ورود اولیه از چرخش کف/سقف ۵ دقیقه (خلاف زمینه؛ پرریسک‌تر)"
-        setup["context_note"] = "اولین چرخش قیمت و مومنتوم شناسایی شده؛ تغییر روند ۱۵ دقیقه هنوز تأیید نشده است."
+    if trigger == "5M_FIRST_PIVOT_TURN":
+        # A pivot-turn alert is intentionally early; it does not wait for full
+        # BOS/HTF alignment, but its candle, RSI, MACD, volume and risk checks
+        # have already passed above. Clearly label it as an initial reversal.
+        entry_confirmation = "EARLY_PIVOT_TURN_COUNTER_CONTEXT" if corrective else "EARLY_PIVOT_TURN"
+        setup["setup_label"] = "ورود اولیه از چرخش کف/سقف ۵ دقیقه"
+        setup["context_note"] = "اولین چرخش قیمت و مومنتوم شناسایی شده؛ تغییر روند هنوز قطعی نیست."
     elif corrective:
         if not countertrend_quality_gate(
             direction,
