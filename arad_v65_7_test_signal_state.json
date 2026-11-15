@@ -389,7 +389,7 @@
   },
   "UAI_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794543326
+    "sent_at": 1794724048
   },
   "CTSI_USDT|SHORT": {
     "type": "EARLY",
@@ -726,5 +726,17 @@
   "HOT_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794721453
+  },
+  "PRL_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794724047
+  },
+  "MEGA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794724048
+  },
+  "FF_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794724048
   }
 }
