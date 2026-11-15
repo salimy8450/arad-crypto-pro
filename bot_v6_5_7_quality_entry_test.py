@@ -22,9 +22,9 @@ TELEGRAM_API = "https://api.telegram.org"
 MAX_STAGE1_SYMBOLS = 300  # liquid top-300 universe for reliable 5m test cadence
 MAX_STAGE2_SYMBOLS = 80
 MAX_STAGE3_SYMBOLS = 60
-MAX_TELEGRAM_WATCH_ALERTS = 0  # WATCH alerts are disabled
+MAX_TELEGRAM_WATCH_ALERTS = 5  # Send up to 5 WATCH alerts per scan
 MAX_EARLY_ALERTS = 0  # EARLY alerts are disabled
-TELEGRAM_CONFIRMED_ONLY = True
+TELEGRAM_CONFIRMED_ONLY = False  # Allow WATCH + CONFIRMED Telegram alerts
 
 TIMEFRAMES = {
     "5m": ("Min5", 300),
@@ -2150,8 +2150,8 @@ def main():
     stage2 = stage2[:MAX_STAGE3_SYMBOLS]
     log("STAGE 2 COMPLETE: {}".format(len(stage2)))
 
-    # CONFIRMED-ONLY mode: no EARLY or WATCH messages are sent.
-    log("TELEGRAM MODE: CONFIRMED ONLY | strict quality gates | outcomes tracked | no orders.")
+    # Telegram test mode: send WATCH candidates and CONFIRMED plans; EARLY pipeline remains disabled.
+    log("TELEGRAM MODE: WATCH + CONFIRMED | strict quality gates | outcomes tracked | no orders.")
 
     final_results = []
     for i, candidate in enumerate(stage2, 1):
@@ -2164,9 +2164,10 @@ def main():
     confirmed = [x for x in final_results if x.get("status") == "CONFIRMED"]
     watch = [x for x in final_results if x.get("status") == "WATCH"]
 
-    # Send only final CONFIRMED setups with entry, SL and TP plan.
-    log("TELEGRAM ALERT QUEUE: 0 EARLY + 0 WATCH + {} CONFIRMED".format(len(confirmed)))
-    dispatch_alerts([], [], confirmed)
+    # Send a capped set of WATCH candidates plus all final CONFIRMED setups.
+    watch_alerts = sorted(watch, key=candidate_quality, reverse=True)[:MAX_TELEGRAM_WATCH_ALERTS]
+    log("TELEGRAM ALERT QUEUE: 0 EARLY + {} WATCH + {} CONFIRMED".format(len(watch_alerts), len(confirmed)))
+    dispatch_alerts([], watch_alerts, confirmed)
 
     elapsed = time.time() - started
     log("")
