@@ -5498,6 +5498,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "DNA_USDT|LONG|EARLY|1794752067",
+      "symbol": "DNA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.1786,
+      "sl": 0.1766855646173294,
+      "tp": [
+        0.18051443538267062,
+        0.18147165307400592,
+        0.18242887076534123,
+        0.18338608845667653,
+        0.18434330614801184,
+        0.18625774153068245
+      ],
+      "created_at": 1794752067,
+      "first_candle_time": 1794752100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
