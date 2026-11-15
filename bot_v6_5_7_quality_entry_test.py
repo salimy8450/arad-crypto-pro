@@ -23,7 +23,7 @@ MAX_STAGE1_SYMBOLS = 300  # liquid top-300 universe for reliable 5m test cadence
 MAX_STAGE2_SYMBOLS = 80
 MAX_STAGE3_SYMBOLS = 60
 MAX_TELEGRAM_WATCH_ALERTS = 5  # Send up to 5 WATCH alerts per scan
-MAX_EARLY_ALERTS = 0  # EARLY alerts are disabled
+MAX_EARLY_ALERTS = 5  # Send up to 5 qualified first-move EARLY alerts per scan
 TELEGRAM_CONFIRMED_ONLY = False  # Allow WATCH + CONFIRMED Telegram alerts
 
 TIMEFRAMES = {
@@ -845,6 +845,28 @@ def analyze_stage3(candidate):
         return candidate
 
     m5 = market_metrics(candles)
+
+    # Activate the already-defined first-move detectors in the live V6.5.7 scan.
+    # 5m is primary; 15m is a secondary early setup and must have 5m proof.
+    early5 = detect_early_5m(candles, candidate.get("candles15", []), candidate["price"])
+    early15 = detect_early_15m(
+        candidate.get("candles15", []), candidate["price"],
+        candles5=candles, require_5m=True
+    )
+    early_options = []
+    if early5:
+        early5.update({"symbol": candidate["symbol"], "source_tf": "5M"})
+        early_options.append(early5)
+    if early15:
+        early15.update({"symbol": candidate["symbol"], "source_tf": "15M"})
+        early_options.append(early15)
+    candidate["early_alert"] = max(early_options, key=lambda x: x.get("score", 0)) if early_options else None
+    if candidate["early_alert"]:
+        log("EARLY DETECTED: {} {} {} SCORE {}".format(
+            candidate["symbol"], candidate["early_alert"]["direction"],
+            candidate["early_alert"]["source_tf"], candidate["early_alert"]["score"]
+        ))
+
     structure5, sweep5, bos5 = structure_signal(candles)
     near_pullback = pullback_ok(m5, direction, candles)
     trigger5 = five_minute_trigger(candles, m5, direction)
@@ -1820,8 +1842,11 @@ def should_send_alert(state, item, alert_type):
     cooldown = (EARLY_COOLDOWN_MIN if alert_type == "EARLY" else WATCH_COOLDOWN_MIN if alert_type == "WATCH" else CONFIRMED_COOLDOWN_MIN)
 
     # A confirmed alert is allowed immediately after a WATCH alert.
-    if alert_type == "CONFIRMED" and previous.get("type") == "WATCH":
+    if alert_type in ("EARLY", "CONFIRMED") and previous.get("type") == "WATCH":
         return True
+    if alert_type == "WATCH" and previous.get("type") == "EARLY":
+        if now - int(previous.get("sent_at", 0)) < WATCH_COOLDOWN_MIN * 60:
+            return False
     # Avoid repeating an early entry if another alert type for the same
     # symbol/direction was sent moments earlier.
     if alert_type == "EARLY" and previous.get("type") in ("EARLY", "WATCH", "CONFIRMED"):
@@ -2117,9 +2142,9 @@ def main():
     log("STAGE 1 SCAN COUNT: {}".format(len(selected)))
     log("METAL CONTRACTS PINNED: {}".format(len(pinned)))
 
-    # Predictive EARLY alerts are disabled in confirmed-only mode to save API calls.
+    # EARLY detection is evaluated for every Stage-2 candidate in Stage 3.
     early_alerts = []
-    log("EARLY 5M/15M TELEGRAM ALERTS: DISABLED (confirmed-only mode)")
+    log("EARLY 5M/15M TELEGRAM ALERTS: ENABLED | 5M primary + 15M with 5M proof")
 
 
 
@@ -2150,8 +2175,8 @@ def main():
     stage2 = stage2[:MAX_STAGE3_SYMBOLS]
     log("STAGE 2 COMPLETE: {}".format(len(stage2)))
 
-    # Telegram test mode: send WATCH candidates and CONFIRMED plans; EARLY pipeline remains disabled.
-    log("TELEGRAM MODE: WATCH + CONFIRMED | strict quality gates | outcomes tracked | no orders.")
+    # Telegram test mode: qualified EARLY + WATCH + CONFIRMED; no orders.
+    log("TELEGRAM MODE: EARLY + WATCH + CONFIRMED | strict quality gates | outcomes tracked | no orders.")
 
     final_results = []
     for i, candidate in enumerate(stage2, 1):
@@ -2163,11 +2188,18 @@ def main():
 
     confirmed = [x for x in final_results if x.get("status") == "CONFIRMED"]
     watch = [x for x in final_results if x.get("status") == "WATCH"]
+    early_alerts = [x["early_alert"] for x in final_results if x.get("early_alert")]
+    early_alerts.sort(key=lambda x: x.get("score", 0), reverse=True)
+    early_alerts = early_alerts[:MAX_EARLY_ALERTS]
+    early_keys = {(x["symbol"], x["direction"]) for x in early_alerts}
 
-    # Send a capped set of WATCH candidates plus all final CONFIRMED setups.
+    # Do not send a duplicate WATCH for a symbol/direction already promoted to EARLY.
+    watch = [x for x in watch if (x["symbol"], x["direction"]) not in early_keys]
     watch_alerts = sorted(watch, key=candidate_quality, reverse=True)[:MAX_TELEGRAM_WATCH_ALERTS]
-    log("TELEGRAM ALERT QUEUE: 0 EARLY + {} WATCH + {} CONFIRMED".format(len(watch_alerts), len(confirmed)))
-    dispatch_alerts([], watch_alerts, confirmed)
+    log("TELEGRAM ALERT QUEUE: {} EARLY + {} WATCH + {} CONFIRMED".format(
+        len(early_alerts), len(watch_alerts), len(confirmed)
+    ))
+    dispatch_alerts(early_alerts, watch_alerts, confirmed)
 
     elapsed = time.time() - started
     log("")
