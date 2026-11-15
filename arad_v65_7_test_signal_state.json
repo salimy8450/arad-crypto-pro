@@ -706,5 +706,25 @@
   "HOME_USDT|LONG": {
     "type": "EARLY",
     "sent_at": 1794679658
+  },
+  "ALLO_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794721451
+  },
+  "SXT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794721452
+  },
+  "0G_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794721452
+  },
+  "WLD_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794721453
+  },
+  "HOT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794721453
   }
 }
