@@ -5561,6 +5561,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "KAVA_USDT|LONG|EARLY|1794772182",
+      "symbol": "KAVA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.03051,
+      "sl": 0.02945886357086634,
+      "tp": [
+        0.03156113642913366,
+        0.03208670464370049
+      ],
+      "created_at": 1794772182,
+      "first_candle_time": 1794772200,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
