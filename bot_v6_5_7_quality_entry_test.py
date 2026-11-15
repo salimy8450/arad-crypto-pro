@@ -846,27 +846,6 @@ def analyze_stage3(candidate):
 
     m5 = market_metrics(candles)
 
-    # Activate the already-defined first-move detectors in the live V6.5.7 scan.
-    # 5m is primary; 15m is a secondary early setup and must have 5m proof.
-    early5 = detect_early_5m(candles, candidate.get("candles15", []), candidate["price"])
-    early15 = detect_early_15m(
-        candidate.get("candles15", []), candidate["price"],
-        candles5=candles, require_5m=True
-    )
-    early_options = []
-    if early5:
-        early5.update({"symbol": candidate["symbol"], "source_tf": "5M"})
-        early_options.append(early5)
-    if early15:
-        early15.update({"symbol": candidate["symbol"], "source_tf": "15M"})
-        early_options.append(early15)
-    candidate["early_alert"] = max(early_options, key=lambda x: x.get("score", 0)) if early_options else None
-    if candidate["early_alert"]:
-        log("EARLY DETECTED: {} {} {} SCORE {}".format(
-            candidate["symbol"], candidate["early_alert"]["direction"],
-            candidate["early_alert"]["source_tf"], candidate["early_alert"]["score"]
-        ))
-
     structure5, sweep5, bos5 = structure_signal(candles)
     near_pullback = pullback_ok(m5, direction, candles)
     trigger5 = five_minute_trigger(candles, m5, direction)
@@ -2161,6 +2140,37 @@ def main():
     stage1 = stage1[:MAX_STAGE2_SYMBOLS]
     log("STAGE 1 COMPLETE: {}".format(len(stage1)))
 
+    # Run first-move detection on the full Stage-1 shortlist BEFORE Stage-2
+    # trend/score filtering. This prevents a fresh reversal being discarded
+    # merely because 1H/15M context is still NEUTRAL or opposing.
+    early_scan_candidates = []
+    for i, candidate in enumerate(stage1, 1):
+        log("EARLY SCAN: {} / {} {}".format(i, len(stage1), candidate["symbol"]))
+        candles15 = get_candles(candidate["symbol"], "15m")
+        time.sleep(REQUEST_PAUSE)
+        candles5 = get_candles(candidate["symbol"], "5m")
+        time.sleep(REQUEST_PAUSE)
+        if not candles15 or not candles5:
+            continue
+        early5 = detect_early_5m(candles5, candles15, candidate["price"])
+        early15 = detect_early_15m(
+            candles15, candidate["price"], candles5=candles5, require_5m=True
+        )
+        options = []
+        if early5:
+            early5.update({"symbol": candidate["symbol"], "source_tf": "5M"})
+            options.append(early5)
+        if early15:
+            early15.update({"symbol": candidate["symbol"], "source_tf": "15M"})
+            options.append(early15)
+        if options:
+            selected_early = max(options, key=lambda x: x.get("score", 0))
+            early_scan_candidates.append(selected_early)
+            log("EARLY DETECTED: {} {} {} SCORE {}".format(
+                candidate["symbol"], selected_early["direction"],
+                selected_early["source_tf"], selected_early["score"]
+            ))
+
     stage2 = []
     for i, candidate in enumerate(stage1, 1):
         log("STAGE 2: {} / {} {}".format(i, len(stage1), candidate["symbol"]))
@@ -2188,9 +2198,7 @@ def main():
 
     confirmed = [x for x in final_results if x.get("status") == "CONFIRMED"]
     watch = [x for x in final_results if x.get("status") == "WATCH"]
-    early_alerts = [x["early_alert"] for x in final_results if x.get("early_alert")]
-    early_alerts.sort(key=lambda x: x.get("score", 0), reverse=True)
-    early_alerts = early_alerts[:MAX_EARLY_ALERTS]
+    early_alerts = sorted(early_scan_candidates, key=lambda x: x.get("score", 0), reverse=True)[:MAX_EARLY_ALERTS]
     early_keys = {(x["symbol"], x["direction"]) for x in early_alerts}
 
     # Do not send a duplicate WATCH for a symbol/direction already promoted to EARLY.
