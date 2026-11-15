@@ -1,7 +1,7 @@
 {
   "ETH_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794691548
+    "sent_at": 1794705669
   },
   "BERA_USDT|SHORT": {
     "type": "WATCH",
@@ -37,7 +37,7 @@
   },
   "UAI_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794691546
+    "sent_at": 1794705668
   },
   "MEGA_USDT|LONG": {
     "type": "WATCH",
@@ -373,10 +373,18 @@
   },
   "BTC_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794691547
+    "sent_at": 1794705668
   },
   "SOL_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794691548
+  },
+  "SXT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794705669
+  },
+  "LTC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794705670
   }
 }
