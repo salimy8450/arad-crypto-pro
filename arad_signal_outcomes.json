@@ -5578,6 +5578,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "LINK_USDT|LONG|CONFIRMED|1794772185",
+      "symbol": "LINK_USDT",
+      "direction": "LONG",
+      "alert_type": "CONFIRMED",
+      "entry": 9.239,
+      "sl": 9.206326342089453,
+      "tp": [
+        9.271673657910549,
+        9.288010486865822,
+        9.304347315821097,
+        9.320684144776372,
+        9.337020973731645,
+        9.369694631642194
+      ],
+      "created_at": 1794772185,
+      "first_candle_time": 1794772200,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
