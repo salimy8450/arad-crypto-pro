@@ -442,7 +442,7 @@
   },
   "ZEC_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794682572,
+    "sent_at": 1794708809,
     "trigger": ""
   },
   "IDOL_USDT|SHORT": {
@@ -477,7 +477,7 @@
   },
   "UAI_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794682573,
+    "sent_at": 1794708809,
     "trigger": ""
   },
   "BERA_USDT|SHORT": {
@@ -568,6 +568,11 @@
   "TIA_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794696684,
+    "trigger": ""
+  },
+  "SOPH_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794708809,
     "trigger": ""
   }
 }
