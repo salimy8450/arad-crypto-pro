@@ -5477,6 +5477,27 @@
       "result": "LOSS_SL",
       "max_tp": 0,
       "exit_candle": 1794679800
+    },
+    {
+      "id": "PRL_USDT|LONG|EARLY|1794724046",
+      "symbol": "PRL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 1.5205,
+      "sl": 1.51884385,
+      "tp": [
+        1.5221561499999998,
+        1.5229842249999996,
+        1.5238122999999997,
+        1.5246403749999997,
+        1.5254684499999995,
+        1.5271245999999994
+      ],
+      "created_at": 1794724046,
+      "first_candle_time": 1794724200,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
