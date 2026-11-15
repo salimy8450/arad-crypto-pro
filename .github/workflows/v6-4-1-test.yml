@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   scanner:
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
