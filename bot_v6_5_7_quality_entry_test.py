@@ -1725,6 +1725,11 @@ def detect_early_15m(candles, live_price, candles5=None, require_5m=False):
 
 def early_entry_message(item):
     direction_fa = "فروش SHORT" if item["direction"] == "SHORT" else "خرید LONG"
+    # 15m detector results carry m15 but may not carry the auxiliary m5
+    # metrics. Keep message formatting safe for both EARLY source timeframes.
+    m5_data = item.get("m5") or {}
+    rsi5_text = "{:.1f}".format(m5_data["rsi"]) if m5_data.get("rsi") is not None else "N/A"
+    volume5_text = "{:.2f}x".format(m5_data["volume_ratio"]) if m5_data.get("volume_ratio") is not None else "N/A"
     lines = [
         "🟠 ARAD CRYPTO PRO | EARLY {} ENTRY".format(item.get("source_tf", "5M")),
         "هشدار شروع حرکت بر اساس اولین نشانه قابل‌شناسایی در کندل بسته {}".format("۵ دقیقه" if item.get("source_tf") == "5M" else "۱۵ دقیقه با تأیید ۵ دقیقه"),
@@ -1738,7 +1743,7 @@ def early_entry_message(item):
         lines.append("TP{}: {}".format(i, format_price(target)))
     lines += [
         "ریسک: {:.2f} ATR | تعداد تارگت‌ها: {}".format(item["risk_atr"], len(item["tp"])),
-        "RSI 5m: {:.1f} | حجم: {:.2f}x".format(item["m5"]["rsi"], item["m5"]["volume_ratio"]),
+        "RSI 5m: {} | حجم 5m: {}".format(rsi5_text, volume5_text),
         "BOS واقعی 5m: {} | حجم حداقل 1.0x: {}".format("بله" if item.get("micro_bos") else "خیر", "بله" if item.get("volume_confirmed") else "خیر"),
         "قدرت پیش‌بینی کندل اول: {}/7".format(item.get("predictive_score", 0)),
         "نشانه‌ها: شکست خرد={} | جمع‌آوری نقدینگی={} | فشردگی={} | بهبود RSI={} | بهبود MACD={} | چرخش EMA9={}".format(
