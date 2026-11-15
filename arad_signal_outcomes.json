@@ -5519,6 +5519,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "AT_USDT|LONG|EARLY|1794752068",
+      "symbol": "AT_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.0912,
+      "sl": 0.09082718341542524,
+      "tp": [
+        0.09157281658457476,
+        0.09175922487686214,
+        0.09194563316914953,
+        0.09213204146143691,
+        0.09231844975372429,
+        0.09269126633829905
+      ],
+      "created_at": 1794752068,
+      "first_candle_time": 1794752100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
