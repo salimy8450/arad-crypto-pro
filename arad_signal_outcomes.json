@@ -5835,6 +5835,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TLM_USDT|LONG|CONFIRMED|1794862618",
+      "symbol": "TLM_USDT",
+      "direction": "LONG",
+      "alert_type": "CONFIRMED",
+      "entry": 0.000936,
+      "sl": 0.000930640810448979,
+      "tp": [
+        0.0009413591895510209,
+        0.0009440387843265314,
+        0.0009467183791020419,
+        0.0009493979738775524,
+        0.0009520775686530629,
+        0.0009574367582040838
+      ],
+      "created_at": 1794862618,
+      "first_candle_time": 1794862800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
