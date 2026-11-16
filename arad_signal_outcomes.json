@@ -5793,6 +5793,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MRNA_USDT|SHORT|EARLY|1794862612",
+      "symbol": "MRNA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 214.78,
+      "sl": 216.37564044795698,
+      "tp": [
+        213.18435955204302,
+        212.38653932806454,
+        211.58871910408604,
+        210.79089888010753,
+        209.99307865612906,
+        208.39743820817208
+      ],
+      "created_at": 1794862612,
+      "first_candle_time": 1794862800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
