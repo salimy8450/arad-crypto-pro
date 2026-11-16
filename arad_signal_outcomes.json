@@ -5772,6 +5772,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "HEI_USDT|SHORT|EARLY|1794862610",
+      "symbol": "HEI_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.08014,
+      "sl": 0.08158929389635776,
+      "tp": [
+        0.07869070610364225,
+        0.07796605915546337,
+        0.07724141220728449,
+        0.07651676525910561,
+        0.07579211831092673,
+        0.07434282441456898
+      ],
+      "created_at": 1794862610,
+      "first_candle_time": 1794862800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
