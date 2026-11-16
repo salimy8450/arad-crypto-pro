@@ -5814,6 +5814,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "DODO_USDT|LONG|EARLY|1794862614",
+      "symbol": "DODO_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.033343,
+      "sl": 0.033264309376319946,
+      "tp": [
+        0.03342169062368005,
+        0.03346103593552008,
+        0.0335003812473601,
+        0.03353972655920012,
+        0.03357907187104015,
+        0.0336577624947202
+      ],
+      "created_at": 1794862614,
+      "first_candle_time": 1794862800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
