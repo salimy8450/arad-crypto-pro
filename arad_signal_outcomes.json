@@ -5599,6 +5599,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TA_USDT|LONG|EARLY|1794798289",
+      "symbol": "TA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.11462,
+      "sl": 0.11403762387684535,
+      "tp": [
+        0.11520237612315465,
+        0.11549356418473197,
+        0.1157847522463093,
+        0.11607594030788662,
+        0.11636712836946395,
+        0.1169495044926186
+      ],
+      "created_at": 1794798289,
+      "first_candle_time": 1794798300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
