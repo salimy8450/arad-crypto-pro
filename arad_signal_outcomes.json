@@ -5679,6 +5679,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TIA_USDT|LONG|EARLY|1794826920",
+      "symbol": "TIA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.3491,
+      "sl": 0.34657201812013166,
+      "tp": [
+        0.3516279818798684,
+        0.35289197281980256
+      ],
+      "created_at": 1794826920,
+      "first_candle_time": 1794827100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
