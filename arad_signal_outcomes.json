@@ -5730,6 +5730,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CBRS_USDT|LONG|EARLY|1794862606",
+      "symbol": "CBRS_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 101.46,
+      "sl": 100.33225743731649,
+      "tp": [
+        102.5877425626835,
+        103.15161384402526,
+        103.71548512536701,
+        104.27935640670876,
+        104.84322768805052,
+        105.97097025073403
+      ],
+      "created_at": 1794862606,
+      "first_candle_time": 1794862800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
