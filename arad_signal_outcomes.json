@@ -5696,6 +5696,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ZHIPU_USDT|LONG|EARLY|1794826922",
+      "symbol": "ZHIPU_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 44.76,
+      "sl": 44.43547539190037,
+      "tp": [
+        45.08452460809963,
+        45.246786912149446
+      ],
+      "created_at": 1794826922,
+      "first_candle_time": 1794827100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
