@@ -5911,6 +5911,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "EIDO_USDT|LONG|EARLY|1794917393",
+      "symbol": "EIDO_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 10.55,
+      "sl": 10.536835,
+      "tp": [
+        10.563165000000001,
+        10.569747500000002,
+        10.576330000000002,
+        10.582912500000003,
+        10.589495000000003,
+        10.602660000000004
+      ],
+      "created_at": 1794917393,
+      "first_candle_time": 1794917400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
