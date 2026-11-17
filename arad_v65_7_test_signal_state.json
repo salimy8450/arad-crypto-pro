@@ -120,8 +120,8 @@
     "sent_at": 1794477429
   },
   "NIL_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794477431
+    "type": "WATCH",
+    "sent_at": 1794917400
   },
   "ZETA_USDT|LONG": {
     "type": "EARLY",
@@ -452,8 +452,8 @@
     "sent_at": 1794548087
   },
   "SILVER_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794624545
+    "type": "EARLY",
+    "sent_at": 1794917397
   },
   "IMX_USDT|SHORT": {
     "type": "EARLY",
@@ -728,8 +728,8 @@
     "sent_at": 1794721453
   },
   "PRL_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794724047
+    "type": "WATCH",
+    "sent_at": 1794917399
   },
   "MEGA_USDT|LONG": {
     "type": "WATCH",
@@ -748,8 +748,8 @@
     "sent_at": 1794752069
   },
   "PARTI_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794752070
+    "type": "EARLY",
+    "sent_at": 1794917399
   },
   "ESPORTS_USDT|LONG": {
     "type": "WATCH",
@@ -777,15 +777,15 @@
   },
   "SENT_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794772184
+    "sent_at": 1794917400
   },
   "1000XEC_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794772184
   },
   "LINK_USDT|LONG": {
-    "type": "CONFIRMED",
-    "sent_at": 1794772185
+    "type": "WATCH",
+    "sent_at": 1794917401
   },
   "PLUME_USDT|SHORT": {
     "type": "WATCH",
@@ -902,5 +902,17 @@
   "MAV_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794885757
+  },
+  "EIDO_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794917394
+  },
+  "SOL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794917396
+  },
+  "TRUMPSOL_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794917400
   }
 }
