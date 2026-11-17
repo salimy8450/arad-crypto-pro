@@ -5873,6 +5873,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "REZ_USDT|LONG|EARLY|1794885753",
+      "symbol": "REZ_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.00279,
+      "sl": 0.0027604041684804845,
+      "tp": [
+        0.0028195958315195154,
+        0.0028343937472792733
+      ],
+      "created_at": 1794885753,
+      "first_candle_time": 1794885900,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
