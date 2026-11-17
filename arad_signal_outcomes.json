@@ -5932,6 +5932,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SOL_USDT|SHORT|EARLY|1794917395",
+      "symbol": "SOL_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 73.28,
+      "sl": 73.53447019442481,
+      "tp": [
+        73.02552980557519,
+        72.89829470836278,
+        72.77105961115038,
+        72.64382451393797,
+        72.51658941672557,
+        72.26211922230075
+      ],
+      "created_at": 1794917395,
+      "first_candle_time": 1794917400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
