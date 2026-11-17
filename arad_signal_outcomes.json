@@ -5974,6 +5974,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "PARTI_USDT|SHORT|EARLY|1794917398",
+      "symbol": "PARTI_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.0346,
+      "sl": 0.034897740925697356,
+      "tp": [
+        0.03430225907430264,
+        0.034153388611453964
+      ],
+      "created_at": 1794917398,
+      "first_candle_time": 1794917400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
