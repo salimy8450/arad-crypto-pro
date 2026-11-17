@@ -5856,6 +5856,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "HEI_USDT|LONG|EARLY|1794885750",
+      "symbol": "HEI_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.08136,
+      "sl": 0.08001099111532073,
+      "tp": [
+        0.08270900888467927,
+        0.0833835133270189
+      ],
+      "created_at": 1794885750,
+      "first_candle_time": 1794885900,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
