@@ -5991,6 +5991,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "CORE_USDT|SHORT|EARLY|1794948775",
+      "symbol": "CORE_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.00985,
+      "sl": 0.009947871737236746,
+      "tp": [
+        0.009752128262763253,
+        0.00970319239414488,
+        0.009654256525526506,
+        0.009605320656908133,
+        0.00955638478828976,
+        0.009458513051053013
+      ],
+      "created_at": 1794948775,
+      "first_candle_time": 1794948900,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
