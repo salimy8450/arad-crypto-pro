@@ -252,8 +252,8 @@
     "sent_at": 1794610235
   },
   "TOWNS_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794513143
+    "type": "WATCH",
+    "sent_at": 1794998796
   },
   "ONDO_USDT|LONG": {
     "type": "EARLY",
@@ -900,8 +900,8 @@
     "sent_at": 1794885757
   },
   "MAV_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794885757
+    "type": "EARLY",
+    "sent_at": 1794998793
   },
   "EIDO_USDT|LONG": {
     "type": "EARLY",
@@ -950,5 +950,33 @@
   "COOKIE_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794969676
+  },
+  "ZKC_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1794998789
+  },
+  "ID_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794998791
+  },
+  "NVDA_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794998796
+  },
+  "QQQ_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794998797
+  },
+  "TRX_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794998797
+  },
+  "FOGO_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794998797
+  },
+  "SQQQ_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794998798
   }
 }
