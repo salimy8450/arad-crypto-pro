@@ -6134,6 +6134,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MAV_USDT|LONG|EARLY|1794998792",
+      "symbol": "MAV_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.006948,
+      "sl": 0.006889000239960896,
+      "tp": [
+        0.0070069997600391044,
+        0.007036499640058657
+      ],
+      "created_at": 1794998792,
+      "first_candle_time": 1794999000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
