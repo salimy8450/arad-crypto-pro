@@ -845,7 +845,7 @@
   },
   "SOL_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794826926
+    "sent_at": 1794969676
   },
   "UAI_USDT|LONG": {
     "type": "WATCH",
@@ -864,8 +864,8 @@
     "sent_at": 1794862612
   },
   "DODO_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794862615
+    "type": "WATCH",
+    "sent_at": 1794969675
   },
   "HYPE_USDT|LONG": {
     "type": "WATCH",
@@ -934,5 +934,21 @@
   "AXIS_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794948786
+  },
+  "BREV_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1794969675
+  },
+  "NIGHT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794969675
+  },
+  "ETC_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1794969675
+  },
+  "COOKIE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1794969676
   }
 }
