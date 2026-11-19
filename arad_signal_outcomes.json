@@ -6341,6 +6341,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "NBIS_USDT|SHORT|EARLY|1795078125",
+      "symbol": "NBIS_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 111.28,
+      "sl": 111.84889350881798,
+      "tp": [
+        110.71110649118202,
+        110.42665973677303
+      ],
+      "created_at": 1795078125,
+      "first_candle_time": 1795078200,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
