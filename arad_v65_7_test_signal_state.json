@@ -8,8 +8,8 @@
     "sent_at": 1794465170
   },
   "ZBT_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794563468
+    "type": "WATCH",
+    "sent_at": 1795050746
   },
   "HAJIMI_USDT|LONG": {
     "type": "EARLY",
@@ -540,8 +540,8 @@
     "sent_at": 1794590954
   },
   "ID_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794590954
+    "type": "EARLY",
+    "sent_at": 1795050740
   },
   "MON_USDT|SHORT": {
     "type": "WATCH",
@@ -994,5 +994,37 @@
   "INTC_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795029015
+  },
+  "ZK_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795050736
+  },
+  "APE_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795050738
+  },
+  "ZETA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795050743
+  },
+  "ALLO_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795050745
+  },
+  "US_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795050745
+  },
+  "DASH_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795050746
+  },
+  "ZORA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795050746
+  },
+  "BASED_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795050747
   }
 }
