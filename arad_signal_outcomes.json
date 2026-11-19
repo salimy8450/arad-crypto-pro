@@ -6324,6 +6324,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "PRL_USDT|SHORT|EARLY|1795078123",
+      "symbol": "PRL_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 2.3346,
+      "sl": 2.35942577331302,
+      "tp": [
+        2.30977422668698,
+        2.29736134003047
+      ],
+      "created_at": 1795078123,
+      "first_candle_time": 1795078200,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
