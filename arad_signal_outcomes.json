@@ -6273,6 +6273,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ZETA_USDT|SHORT|EARLY|1795050741",
+      "symbol": "ZETA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.02948,
+      "sl": 0.029803143867835776,
+      "tp": [
+        0.029156856132164222,
+        0.028995284198246332
+      ],
+      "created_at": 1795050741,
+      "first_candle_time": 1795050900,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
