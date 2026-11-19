@@ -6375,6 +6375,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "UNI_USDT|SHORT|EARLY|1795110353",
+      "symbol": "UNI_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 4.965,
+      "sl": 5.003554009225605,
+      "tp": [
+        4.926445990774395,
+        4.907168986161593
+      ],
+      "created_at": 1795110353,
+      "first_candle_time": 1795110600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
