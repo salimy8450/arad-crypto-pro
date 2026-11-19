@@ -6392,6 +6392,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "APE_USDT|SHORT|EARLY|1795110356",
+      "symbol": "APE_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.0799,
+      "sl": 0.08027553725092593,
+      "tp": [
+        0.07952446274907407,
+        0.0793366941236111,
+        0.07914892549814814,
+        0.07896115687268518,
+        0.07877338824722221,
+        0.07839785099629629
+      ],
+      "created_at": 1795110356,
+      "first_candle_time": 1795110600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
