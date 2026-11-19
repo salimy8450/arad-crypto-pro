@@ -6307,6 +6307,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ZKC_USDT|LONG|EARLY|1795078121",
+      "symbol": "ZKC_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.02548,
+      "sl": 0.02513763425121734,
+      "tp": [
+        0.025822365748782657,
+        0.025993548623173986
+      ],
+      "created_at": 1795078121,
+      "first_candle_time": 1795078200,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
