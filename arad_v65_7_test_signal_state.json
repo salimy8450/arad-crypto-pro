@@ -61,7 +61,7 @@
   },
   "ERA_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794885758
+    "sent_at": 1795150286
   },
   "HMSTR_USDT|LONG": {
     "type": "WATCH",
@@ -85,7 +85,7 @@
   },
   "ETH_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794536725
+    "sent_at": 1795150284
   },
   "DOT_USDT|SHORT": {
     "type": "EARLY",
@@ -103,10 +103,6 @@
     "type": "EARLY",
     "sent_at": 1794590940
   },
-  "HOME_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794543315
-  },
   "OPG_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794590956
@@ -119,77 +115,25 @@
     "type": "EARLY",
     "sent_at": 1794563474
   },
-  "NIGHT_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794536715
-  },
   "TLM_USDT|LONG": {
     "type": "CONFIRMED",
     "sent_at": 1794862619
-  },
-  "CELO_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794536719
-  },
-  "AAVE_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794536721
-  },
-  "STBL_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794536723
-  },
-  "USELESS_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794536724
-  },
-  "BCH_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794536725
-  },
-  "WAL_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794536726
   },
   "CORE_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1794948776
   },
-  "SENT_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794543311
-  },
-  "CT_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794543313
-  },
-  "COPPER_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794543317
-  },
   "UAI_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794724048
+    "sent_at": 1795150286
   },
   "CTSI_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1794555382
   },
-  "BEAT_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794543326
-  },
   "XAUT_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1794563471
-  },
-  "FOGO_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794543325
-  },
-  "BERA_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794543327
   },
   "MRVL_USDT|SHORT": {
     "type": "EARLY",
@@ -837,7 +781,7 @@
   },
   "LINK_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795110359
+    "sent_at": 1795150285
   },
   "FET_USDT|SHORT": {
     "type": "WATCH",
@@ -858,5 +802,9 @@
   "PUMPFUN_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795132515
+  },
+  "RVN_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795150285
   }
 }
