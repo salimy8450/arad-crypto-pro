@@ -6413,6 +6413,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ARB_USDT|LONG|EARLY|1795210441",
+      "symbol": "ARB_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.11205,
+      "sl": 0.1104777494066761,
+      "tp": [
+        0.1136222505933239,
+        0.11440837588998584
+      ],
+      "created_at": 1795210441,
+      "first_candle_time": 1795210500,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
