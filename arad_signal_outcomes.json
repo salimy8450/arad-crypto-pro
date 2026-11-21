@@ -6515,6 +6515,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "STEEM_USDT|SHORT|EARLY|1795229273",
+      "symbol": "STEEM_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.04141,
+      "sl": 0.04194760623342611,
+      "tp": [
+        0.040872393766573895,
+        0.04060359064986084
+      ],
+      "created_at": 1795229273,
+      "first_candle_time": 1795229400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
