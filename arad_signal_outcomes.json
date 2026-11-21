@@ -6680,6 +6680,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TRX_USDT|SHORT|EARLY|1795282830",
+      "symbol": "TRX_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.30513,
+      "sl": 0.305441539,
+      "tp": [
+        0.30481846100000004,
+        0.3046626915,
+        0.30450692200000007,
+        0.3043511525000001,
+        0.3041953830000001,
+        0.3038838440000001
+      ],
+      "created_at": 1795282830,
+      "first_candle_time": 1795283100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
