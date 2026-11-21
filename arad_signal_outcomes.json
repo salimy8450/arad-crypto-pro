@@ -6532,6 +6532,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "IDOL_USDT|LONG|EARLY|1795229275",
+      "symbol": "IDOL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.024109,
+      "sl": 0.02392063167816925,
+      "tp": [
+        0.024297368321830746,
+        0.024391552482746118,
+        0.024485736643661493,
+        0.02457992080457687,
+        0.02467410496549224,
+        0.024862473287322988
+      ],
+      "created_at": 1795229275,
+      "first_candle_time": 1795229400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
