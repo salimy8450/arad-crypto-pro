@@ -25,7 +25,7 @@
   },
   "MRNA_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794862614
+    "sent_at": 1795256370
   },
   "TRIA_USDT|LONG": {
     "type": "EARLY",
@@ -40,8 +40,8 @@
     "sent_at": 1794862617
   },
   "HBAR_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795132513
+    "type": "EARLY",
+    "sent_at": 1795256365
   },
   "ERA_USDT|LONG": {
     "type": "EARLY",
@@ -95,10 +95,6 @@
     "type": "WATCH",
     "sent_at": 1794862616
   },
-  "ZEC_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794624544
-  },
   "ID_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1795050740
@@ -107,10 +103,6 @@
     "type": "WATCH",
     "sent_at": 1795078129
   },
-  "ARM_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794624538
-  },
   "NVDA_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795210454
@@ -118,30 +110,6 @@
   "UNI_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1795110355
-  },
-  "DOS_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794624540
-  },
-  "SPX500_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794624541
-  },
-  "GOLDCIR_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794624543
-  },
-  "XMR_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794624544
-  },
-  "ZEREBRO_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794624544
-  },
-  "SKHY_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794624545
   },
   "SOPH_USDT|SHORT": {
     "type": "WATCH",
@@ -682,5 +650,37 @@
   "BROCCOLI_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795229283
+  },
+  "WCT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795256367
+  },
+  "MELANIA_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795256368
+  },
+  "ALT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795256371
+  },
+  "CYBER_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795256372
+  },
+  "ACE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795256372
+  },
+  "RESOLV_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795256372
+  },
+  "HUMA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795256372
+  },
+  "LTC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795256373
   }
 }
