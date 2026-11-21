@@ -6570,6 +6570,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ERA_USDT|LONG|EARLY|1795229279",
+      "symbol": "ERA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.07294,
+      "sl": 0.07224374309546085,
+      "tp": [
+        0.07363625690453916,
+        0.07398438535680874
+      ],
+      "created_at": 1795229279,
+      "first_candle_time": 1795229400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
