@@ -6604,6 +6604,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "WCT_USDT|SHORT|EARLY|1795256366",
+      "symbol": "WCT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.02833,
+      "sl": 0.028569943470867068,
+      "tp": [
+        0.028090056529132934,
+        0.0279700847936994,
+        0.027850113058265867,
+        0.027730141322832334,
+        0.0276101695873988,
+        0.027370226116531733
+      ],
+      "created_at": 1795256366,
+      "first_candle_time": 1795256400,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
