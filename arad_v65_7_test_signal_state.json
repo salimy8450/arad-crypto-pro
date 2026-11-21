@@ -11,10 +11,6 @@
     "type": "WATCH",
     "sent_at": 1794677466
   },
-  "CVC_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794610249
-  },
   "WLFI_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794948786
@@ -48,24 +44,16 @@
     "sent_at": 1795132513
   },
   "ERA_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1795150286
+    "type": "EARLY",
+    "sent_at": 1795229281
   },
   "HMSTR_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794885758
   },
-  "XRP_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794610248
-  },
   "ZKC_USDT|LONG": {
     "type": "EARLY",
     "sent_at": 1795078123
-  },
-  "ROSE_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794610235
   },
   "TOWNS_USDT|LONG": {
     "type": "WATCH",
@@ -74,10 +62,6 @@
   "ETH_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795150284
-  },
-  "MAGMA_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794610239
   },
   "TLM_USDT|LONG": {
     "type": "CONFIRMED",
@@ -126,22 +110,6 @@
   "ARM_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1794624538
-  },
-  "TA_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794610237
-  },
-  "AIA_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794610243
-  },
-  "RECALL_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794610245
-  },
-  "1INCH_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794610247
   },
   "NVDA_USDT|SHORT": {
     "type": "WATCH",
@@ -493,7 +461,7 @@
   },
   "BMNR_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1794948780
+    "sent_at": 1795229272
   },
   "ADA_USDT|SHORT": {
     "type": "EARLY",
@@ -604,8 +572,8 @@
     "sent_at": 1795050747
   },
   "PRL_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795078125
+    "type": "WATCH",
+    "sent_at": 1795229283
   },
   "NBIS_USDT|SHORT": {
     "type": "EARLY",
@@ -686,5 +654,33 @@
   "BERA_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795210454
+  },
+  "STEEM_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795229274
+  },
+  "IDOL_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795229276
+  },
+  "CHZ_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795229279
+  },
+  "CC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795229281
+  },
+  "BMT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795229282
+  },
+  "XRP_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795229282
+  },
+  "BROCCOLI_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795229283
   }
 }
