@@ -6722,6 +6722,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "STONK_USDT|SHORT|EARLY|1795282834",
+      "symbol": "STONK_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.03548,
+      "sl": 0.03566639433341557,
+      "tp": [
+        0.035293605666584425,
+        0.03520040849987664,
+        0.03510721133316885,
+        0.03501401416646106,
+        0.03492081699975328,
+        0.03473442266633771
+      ],
+      "created_at": 1795282834,
+      "first_candle_time": 1795283100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
