@@ -6823,6 +6823,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "EVAA_USDT|LONG|EARLY|1795341931",
+      "symbol": "EVAA_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 3.1821,
+      "sl": 2.876247417867549,
+      "tp": [
+        3.4879525821324515,
+        3.640878873198677
+      ],
+      "created_at": 1795341931,
+      "first_candle_time": 1795342200,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
