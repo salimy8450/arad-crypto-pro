@@ -119,37 +119,17 @@
     "type": "EARLY",
     "sent_at": 1794798292
   },
-  "0G_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794752076
-  },
   "WLD_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794772184
+    "sent_at": 1795369737
   },
   "PRL_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795341939
   },
-  "DNA_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794752067
-  },
-  "AT_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794752069
-  },
   "PARTI_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1794917399
-  },
-  "ESPORTS_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794752070
-  },
-  "TRUMPSOL_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794752071
   },
   "HMSTR_USDT|SHORT": {
     "type": "EARLY",
@@ -232,8 +212,8 @@
     "sent_at": 1794826925
   },
   "ARB_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1795210443
+    "type": "WATCH",
+    "sent_at": 1795369737
   },
   "SOL_USDT|LONG": {
     "type": "WATCH",
@@ -261,7 +241,7 @@
   },
   "HYPE_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794862616
+    "sent_at": 1795369738
   },
   "CROSS_USDT|LONG": {
     "type": "WATCH",
@@ -477,7 +457,7 @@
   },
   "YB_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795182136
+    "sent_at": 1795369736
   },
   "MAV_USDT|SHORT": {
     "type": "WATCH",
@@ -642,5 +622,9 @@
   "CARV_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795341938
+  },
+  "APR_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795369737
   }
 }
