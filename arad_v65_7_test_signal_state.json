@@ -119,14 +119,6 @@
     "type": "EARLY",
     "sent_at": 1794798292
   },
-  "ALLO_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794721451
-  },
-  "SXT_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794721452
-  },
   "0G_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794752076
@@ -135,21 +127,9 @@
     "type": "WATCH",
     "sent_at": 1794772184
   },
-  "HOT_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794721453
-  },
   "PRL_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1794917399
-  },
-  "MEGA_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794724048
-  },
-  "FF_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794724048
+    "sent_at": 1795341939
   },
   "DNA_USDT|LONG": {
     "type": "EARLY",
@@ -513,7 +493,7 @@
   },
   "MELANIA_USDT|LONG": {
     "type": "EARLY",
-    "sent_at": 1795210450
+    "sent_at": 1795341936
   },
   "WOO_USDT|LONG": {
     "type": "EARLY",
@@ -637,6 +617,30 @@
   },
   "ENSO_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1795314447
+    "sent_at": 1795341938
+  },
+  "US_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795341930
+  },
+  "EVAA_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795341932
+  },
+  "SAPIEN_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795341934
+  },
+  "HYPER_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795341937
+  },
+  "ETHFI_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795341937
+  },
+  "CARV_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795341938
   }
 }
