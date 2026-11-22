@@ -6840,6 +6840,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SAPIEN_USDT|LONG|EARLY|1795341933",
+      "symbol": "SAPIEN_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.04065,
+      "sl": 0.04010011238146769,
+      "tp": [
+        0.041199887618532306,
+        0.04147483142779846
+      ],
+      "created_at": 1795341933,
+      "first_candle_time": 1795342200,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
