@@ -6874,6 +6874,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "POL_USDT|LONG|EARLY|1795387992",
+      "symbol": "POL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.07556,
+      "sl": 0.075437332,
+      "tp": [
+        0.07568266800000001,
+        0.075744002,
+        0.07580533600000001,
+        0.07586667000000002,
+        0.07592800400000002,
+        0.07605067200000003
+      ],
+      "created_at": 1795387992,
+      "first_candle_time": 1795388100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
