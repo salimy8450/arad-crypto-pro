@@ -6764,6 +6764,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "KORU_USDT|LONG|EARLY|1795314441",
+      "symbol": "KORU_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 5.074,
+      "sl": 5.0566973760830205,
+      "tp": [
+        5.091302623916979,
+        5.099953935875469,
+        5.1086052478339585,
+        5.117256559792448,
+        5.125907871750938,
+        5.143210495667917
+      ],
+      "created_at": 1795314441,
+      "first_candle_time": 1795314600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
