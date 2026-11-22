@@ -6785,6 +6785,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "DASH_USDT|LONG|EARLY|1795314443",
+      "symbol": "DASH_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 34.59,
+      "sl": 34.51341215315633,
+      "tp": [
+        34.666587846843676,
+        34.704881770265516,
+        34.74317569368735,
+        34.78146961710918,
+        34.81976354053102,
+        34.89635138737469
+      ],
+      "created_at": 1795314443,
+      "first_candle_time": 1795314600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
