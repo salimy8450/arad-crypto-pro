@@ -6743,6 +6743,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ETH_USDT|LONG|EARLY|1795314439",
+      "symbol": "ETH_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 1679.73,
+      "sl": 1676.696081,
+      "tp": [
+        1682.763919,
+        1684.2808785,
+        1685.797838,
+        1687.3147975,
+        1688.831757,
+        1691.865676
+      ],
+      "created_at": 1795314439,
+      "first_candle_time": 1795314600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
