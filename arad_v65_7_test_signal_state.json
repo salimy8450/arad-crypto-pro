@@ -109,11 +109,7 @@
   },
   "BLESS_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1795210453
-  },
-  "VVV_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794772183
+    "sent_at": 1795387996
   },
   "SOPH_USDT|LONG": {
     "type": "EARLY",
@@ -139,21 +135,9 @@
     "type": "EARLY",
     "sent_at": 1795282833
   },
-  "KAVA_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794772183
-  },
-  "TAC_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794772183
-  },
   "SENT_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1794917400
-  },
-  "1000XEC_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794772184
   },
   "LINK_USDT|LONG": {
     "type": "EARLY",
@@ -185,7 +169,7 @@
   },
   "INIT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794798293
+    "sent_at": 1795387995
   },
   "SAGA_USDT|LONG": {
     "type": "WATCH",
@@ -385,7 +369,7 @@
   },
   "US_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795050745
+    "sent_at": 1795387994
   },
   "DASH_USDT|SHORT": {
     "type": "WATCH",
@@ -626,5 +610,17 @@
   "APR_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795369737
+  },
+  "POL_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795387993
+  },
+  "IRYS_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795387994
+  },
+  "USELESS_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795387995
   }
 }
