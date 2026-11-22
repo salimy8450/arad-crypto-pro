@@ -60,8 +60,8 @@
     "sent_at": 1794862619
   },
   "CORE_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794948776
+    "type": "WATCH",
+    "sent_at": 1795314446
   },
   "UAI_USDT|SHORT": {
     "type": "WATCH",
@@ -337,7 +337,7 @@
   },
   "TAC_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1794948785
+    "sent_at": 1795314446
   },
   "SPCX_USDT|LONG": {
     "type": "WATCH",
@@ -614,5 +614,29 @@
   "MIRA_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795299929
+  },
+  "ETH_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795314440
+  },
+  "KORU_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795314443
+  },
+  "DASH_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795314445
+  },
+  "SENT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795314445
+  },
+  "RENDER_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795314447
+  },
+  "ENSO_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795314447
   }
 }
