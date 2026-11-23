@@ -15,10 +15,6 @@
     "type": "EARLY",
     "sent_at": 1795256370
   },
-  "TRIA_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794826919
-  },
   "OP_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1794948784
@@ -65,7 +61,7 @@
   },
   "SHELL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795029016
+    "sent_at": 1795439690
   },
   "SILVER_USDT|SHORT": {
     "type": "EARLY",
@@ -135,10 +131,6 @@
     "type": "WATCH",
     "sent_at": 1795387995
   },
-  "SKHY_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794826918
-  },
   "TIA_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795282836
@@ -150,10 +142,6 @@
   "CBRS_USDT|LONG": {
     "type": "EARLY",
     "sent_at": 1794862608
-  },
-  "COOKIE_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794826925
   },
   "ARB_USDT|LONG": {
     "type": "WATCH",
@@ -357,11 +345,11 @@
   },
   "CORE_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1795078129
+    "sent_at": 1795439690
   },
   "CVC_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1795078130
+    "sent_at": 1795439692
   },
   "ENA_USDT|SHORT": {
     "type": "WATCH",
@@ -606,5 +594,17 @@
   "TWST_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795404016
+  },
+  "PROM_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795439689
+  },
+  "GOOGL_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795439691
+  },
+  "PAXG_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795439691
   }
 }
