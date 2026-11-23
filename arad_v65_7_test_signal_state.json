@@ -3,10 +3,6 @@
     "type": "WATCH",
     "sent_at": 1795050746
   },
-  "HOT_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794785780
-  },
   "WLFI_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794948786
@@ -40,8 +36,8 @@
     "sent_at": 1795299928
   },
   "HMSTR_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794885758
+    "type": "EARLY",
+    "sent_at": 1795404011
   },
   "ZKC_USDT|LONG": {
     "type": "EARLY",
@@ -103,17 +99,9 @@
     "type": "WATCH",
     "sent_at": 1795299929
   },
-  "SHELL_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794798293
-  },
   "BLESS_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795387996
-  },
-  "SOPH_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794798292
   },
   "WLD_USDT|LONG": {
     "type": "WATCH",
@@ -143,37 +131,9 @@
     "type": "EARLY",
     "sent_at": 1795210445
   },
-  "PLUME_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794785779
-  },
-  "NES_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794785780
-  },
-  "DODO_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794785781
-  },
-  "BROCCOLI_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794798293
-  },
-  "TA_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794798290
-  },
-  "IREN_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794798292
-  },
   "INIT_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795387995
-  },
-  "SAGA_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794798294
   },
   "SKHY_USDT|LONG": {
     "type": "EARLY",
@@ -184,8 +144,8 @@
     "sent_at": 1795282836
   },
   "ZHIPU_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794826923
+    "type": "WATCH",
+    "sent_at": 1795404015
   },
   "CBRS_USDT|LONG": {
     "type": "EARLY",
@@ -622,5 +582,29 @@
   "USELESS_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795387995
+  },
+  "XAU_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795404013
+  },
+  "MON_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795404015
+  },
+  "KERNEL_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795404015
+  },
+  "MINIMAX_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795404016
+  },
+  "RARE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795404016
+  },
+  "TWST_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795404016
   }
 }
