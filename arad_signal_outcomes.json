@@ -6912,6 +6912,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "XAU_USDT|LONG|EARLY|1795404012",
+      "symbol": "XAU_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 3608.52,
+      "sl": 3593.5822060079026,
+      "tp": [
+        3623.4577939920973,
+        3630.926690988146,
+        3638.3955879841947,
+        3645.864484980243,
+        3653.333381976292,
+        3668.2711759683893
+      ],
+      "created_at": 1795404012,
+      "first_candle_time": 1795404300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
