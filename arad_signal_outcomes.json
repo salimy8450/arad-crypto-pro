@@ -6950,6 +6950,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "PROM_USDT|SHORT|EARLY|1795439688",
+      "symbol": "PROM_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 5.855,
+      "sl": 6.08039107244611,
+      "tp": [
+        5.629608927553891,
+        5.516913391330836,
+        5.404217855107781,
+        5.291522318884726,
+        5.178826782661671,
+        4.953435710215562
+      ],
+      "created_at": 1795439688,
+      "first_candle_time": 1795439700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
