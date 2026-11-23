@@ -6895,6 +6895,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "HMSTR_USDT|LONG|EARLY|1795404010",
+      "symbol": "HMSTR_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.0001459,
+      "sl": 0.00014491283170679938,
+      "tp": [
+        0.00014688716829320062,
+        0.0001473807524398009
+      ],
+      "created_at": 1795404010,
+      "first_candle_time": 1795404300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
