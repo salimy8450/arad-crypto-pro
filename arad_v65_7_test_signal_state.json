@@ -19,10 +19,6 @@
     "type": "EARLY",
     "sent_at": 1794948784
   },
-  "MU_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794862617
-  },
   "HBAR_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1795256365
@@ -47,10 +43,6 @@
     "type": "WATCH",
     "sent_at": 1795150284
   },
-  "TLM_USDT|LONG": {
-    "type": "CONFIRMED",
-    "sent_at": 1794862619
-  },
   "CORE_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795314446
@@ -70,10 +62,6 @@
   "XAU_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1794948786
-  },
-  "ARB_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794862616
   },
   "ID_USDT|SHORT": {
     "type": "EARLY",
@@ -139,10 +127,6 @@
     "type": "WATCH",
     "sent_at": 1795404015
   },
-  "CBRS_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794862608
-  },
   "ARB_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795369737
@@ -159,10 +143,6 @@
     "type": "WATCH",
     "sent_at": 1795282836
   },
-  "CC_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794862610
-  },
   "HEI_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795078130
@@ -174,14 +154,6 @@
   "HYPE_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795369738
-  },
-  "CROSS_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794862616
-  },
-  "SOXL_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794862617
   },
   "HEI_USDT|LONG": {
     "type": "EARLY",
@@ -317,7 +289,7 @@
   },
   "US_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795387994
+    "sent_at": 1795481750
   },
   "DASH_USDT|SHORT": {
     "type": "WATCH",
@@ -565,7 +537,7 @@
   },
   "IRYS_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795387994
+    "sent_at": 1795481752
   },
   "USELESS_USDT|SHORT": {
     "type": "WATCH",
@@ -606,5 +578,17 @@
   "PAXG_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795439691
+  },
+  "LINEA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795481751
+  },
+  "MOVE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795481751
+  },
+  "ZKP_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795481752
   }
 }
