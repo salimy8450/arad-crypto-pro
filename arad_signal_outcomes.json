@@ -7060,6 +7060,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SKHY_USDT|LONG|EARLY|1795553629",
+      "symbol": "SKHY_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 112.53,
+      "sl": 111.33104732157155,
+      "tp": [
+        113.72895267842846,
+        114.32842901764269
+      ],
+      "created_at": 1795553629,
+      "first_candle_time": 1795553700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
