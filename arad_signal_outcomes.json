@@ -7043,6 +7043,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "2Z_USDT|LONG|EARLY|1795553627",
+      "symbol": "2Z_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.01623,
+      "sl": 0.01604533738005594,
+      "tp": [
+        0.01641466261994406,
+        0.016506993929916093
+      ],
+      "created_at": 1795553627,
+      "first_candle_time": 1795553700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
