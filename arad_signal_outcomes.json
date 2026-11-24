@@ -6971,6 +6971,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SILVER_USDT|LONG|EARLY|1795516563",
+      "symbol": "SILVER_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 42.16,
+      "sl": 41.89637362876316,
+      "tp": [
+        42.423626371236836,
+        42.555439556855255
+      ],
+      "created_at": 1795516563,
+      "first_candle_time": 1795516800,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
