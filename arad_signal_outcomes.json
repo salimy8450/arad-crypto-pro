@@ -7026,6 +7026,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "XPL_USDT|LONG|EARLY|1795553625",
+      "symbol": "XPL_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 0.04455,
+      "sl": 0.04430983002536073,
+      "tp": [
+        0.04479016997463927,
+        0.044910254961958905
+      ],
+      "created_at": 1795553625,
+      "first_candle_time": 1795553700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
