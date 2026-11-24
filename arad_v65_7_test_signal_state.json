@@ -20,8 +20,8 @@
     "sent_at": 1794948784
   },
   "HBAR_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795256365
+    "type": "WATCH",
+    "sent_at": 1795516568
   },
   "ERA_USDT|LONG": {
     "type": "WATCH",
@@ -154,26 +154,6 @@
   "HYPE_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795369738
-  },
-  "HEI_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794885752
-  },
-  "REZ_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794885754
-  },
-  "HUMA_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794885756
-  },
-  "SLP_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794885756
-  },
-  "ZEC_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794885757
   },
   "MAV_USDT|LONG": {
     "type": "EARLY",
@@ -590,5 +570,29 @@
   "ZKP_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795481752
+  },
+  "SILVER_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795516564
+  },
+  "SHELL_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795516566
+  },
+  "BNB_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795516566
+  },
+  "EVAA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795516567
+  },
+  "RENDER_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795516567
+  },
+  "GMT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795516567
   }
 }
