@@ -7,6 +7,7 @@ import urllib.request
 import urllib.parse
 import urllib.error
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 
 # ==========================================================
 # ARAD CRYPTO PRO V6.5.7 EARLY 5M LONG/SHORT TEST OURBIT
