@@ -21,7 +21,7 @@
   },
   "ZKC_USDT|LONG": {
     "type": "EARLY",
-    "sent_at": 1795078123
+    "sent_at": 1795646898
   },
   "ETH_USDT|SHORT": {
     "type": "WATCH",
@@ -53,7 +53,7 @@
   },
   "UNI_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1795110355
+    "sent_at": 1795646896
   },
   "SOPH_USDT|SHORT": {
     "type": "EARLY",
@@ -70,10 +70,6 @@
   "PRL_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795341939
-  },
-  "HMSTR_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795029014
   },
   "BERA_USDT|LONG": {
     "type": "WATCH",
@@ -122,18 +118,6 @@
   "TAC_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795553632
-  },
-  "TRUST_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795029012
-  },
-  "SNDK_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795029014
-  },
-  "SOXSX_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1795029015
   },
   "INTC_USDT|SHORT": {
     "type": "WATCH",
@@ -200,8 +184,8 @@
     "sent_at": 1795110358
   },
   "LINK_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795182137
+    "type": "EARLY",
+    "sent_at": 1795646894
   },
   "FET_USDT|SHORT": {
     "type": "WATCH",
@@ -348,8 +332,8 @@
     "sent_at": 1795299929
   },
   "ETH_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1795314440
+    "type": "WATCH",
+    "sent_at": 1795646901
   },
   "KORU_USDT|LONG": {
     "type": "EARLY",
@@ -530,5 +514,21 @@
   "SOL_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795614081
+  },
+  "ONG_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795646899
+  },
+  "LAYER_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795646900
+  },
+  "BTC_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795646900
+  },
+  "GT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795646901
   }
 }
