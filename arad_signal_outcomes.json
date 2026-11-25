@@ -7094,6 +7094,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "LINK_USDT|SHORT|EARLY|1795646893",
+      "symbol": "LINK_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 9.02,
+      "sl": 9.06044424171878,
+      "tp": [
+        8.979555758281219,
+        8.959333637421828,
+        8.939111516562438,
+        8.918889395703047,
+        8.898667274843657,
+        8.858223033124876
+      ],
+      "created_at": 1795646893,
+      "first_candle_time": 1795647000,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
