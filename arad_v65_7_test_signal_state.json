@@ -23,10 +23,6 @@
     "type": "EARLY",
     "sent_at": 1795078123
   },
-  "TOWNS_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794998796
-  },
   "ETH_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795150284
@@ -60,8 +56,8 @@
     "sent_at": 1795110355
   },
   "SOPH_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795299929
+    "type": "EARLY",
+    "sent_at": 1795614079
   },
   "BLESS_USDT|LONG": {
     "type": "WATCH",
@@ -119,10 +115,6 @@
     "type": "WATCH",
     "sent_at": 1795369738
   },
-  "MAV_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794998793
-  },
   "BMNR_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1795229272
@@ -130,34 +122,6 @@
   "TAC_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795553632
-  },
-  "ZKC_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1794998789
-  },
-  "ID_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794998791
-  },
-  "NVDA_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1794998796
-  },
-  "QQQ_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794998797
-  },
-  "TRX_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794998797
-  },
-  "FOGO_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1794998797
-  },
-  "SQQQ_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1794998798
   },
   "TRUST_USDT|SHORT": {
     "type": "EARLY",
@@ -313,7 +277,7 @@
   },
   "XRP_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795229282
+    "sent_at": 1795614082
   },
   "BROCCOLI_USDT|SHORT": {
     "type": "WATCH",
@@ -325,7 +289,7 @@
   },
   "MELANIA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795553631
+    "sent_at": 1795614080
   },
   "ALT_USDT|SHORT": {
     "type": "EARLY",
@@ -541,7 +505,7 @@
   },
   "SPCX_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795578789
+    "sent_at": 1795614081
   },
   "RPL_USDT|SHORT": {
     "type": "WATCH",
@@ -558,5 +522,13 @@
   "PAXG_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795578791
+  },
+  "NEAR_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795614080
+  },
+  "SOL_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795614081
   }
 }
