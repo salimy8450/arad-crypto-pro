@@ -7077,6 +7077,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SOPH_USDT|SHORT|EARLY|1795614078",
+      "symbol": "SOPH_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.000845,
+      "sl": 0.0008561834616895436,
+      "tp": [
+        0.0008338165383104565,
+        0.0008282248074656846
+      ],
+      "created_at": 1795614078,
+      "first_candle_time": 1795614300,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
