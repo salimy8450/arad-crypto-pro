@@ -6,6 +6,7 @@ on:
     - cron: '*/5 * * * *'
   push:
     branches:
+      - main
       - v6.5.7-confirmed-only-quality
 
 permissions:
