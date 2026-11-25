@@ -2129,8 +2129,97 @@ def print_result(item):
     log("=" * 58)
 
 
+# -------- OURBIT OFFICIAL LISTING MONITOR (same bot file) --------
+OURBIT_MONITOR_STATE = "arad_ourbit_listing_seen.json"
+OURBIT_RSS = "https://www.ourbit.com/?feed=rss2"
+
+def _listing_state_read():
+    token=os.getenv("GITHUB_TOKEN","").strip(); repo=os.getenv("GITHUB_REPOSITORY","").strip()
+    branch=os.getenv("GITHUB_REF_NAME","main").strip()
+    if not token or not repo: return None
+    url="https://api.github.com/repos/{}/contents/{}".format(repo,OURBIT_MONITOR_STATE)
+    headers={"Authorization":"Bearer "+token,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}
+    try:
+        d=http_json(url+"?ref="+urllib.parse.quote(branch),headers=headers,timeout=20)
+        return {"state":json.loads(base64.b64decode(d.get("content","")).decode()),"sha":d.get("sha"),"url":url,"headers":headers,"branch":branch}
+    except urllib.error.HTTPError as e:
+        if e.code==404: return {"state":{"initialized":False,"seen":[]},"sha":None,"url":url,"headers":headers,"branch":branch}
+        log("OURBIT MONITOR STATE READ ERROR HTTP "+str(e.code)); return None
+    except Exception as e: log("OURBIT MONITOR STATE ERROR "+str(e)[:140]); return None
+
+def _listing_state_write(info,state):
+    body={"message":"Update ARAD Ourbit listing alert history","content":base64.b64encode(json.dumps(state,ensure_ascii=False,indent=2).encode()).decode(),"branch":info["branch"]}
+    if info.get("sha"): body["sha"]=info["sha"]
+    try: return bool(http_json(info["url"],method="PUT",payload=body,headers=info["headers"],timeout=25).get("content"))
+    except Exception as e: log("OURBIT MONITOR STATE SAVE ERROR "+str(e)[:140]); return False
+
+def _official_listing_feed():
+    import xml.etree.ElementTree as ET
+    req=urllib.request.Request(OURBIT_RSS,headers={"User-Agent":"ARAD listing monitor/1.0"})
+    with urllib.request.urlopen(req,timeout=20) as r: root=ET.fromstring(r.read())
+    found=[]
+    for node in root.findall(".//item"):
+        title=(node.findtext("title") or "").strip(); link=(node.findtext("link") or "").strip(); pub=(node.findtext("pubDate") or "").strip()
+        if link.startswith("https://www.ourbit.com/") and any(x in title.lower() for x in ("will list","to be listed","listed on ourbit","new listing")) and not any(x in title.lower() for x in ("delist","rename","will support")):
+            found.append({"title":title,"link":link,"pub":pub})
+    return found
+
+def _listing_details(link):
+    try:
+        req=urllib.request.Request(link,headers={"User-Agent":"ARAD listing monitor/1.0"})
+        with urllib.request.urlopen(req,timeout=20) as r: page=r.read().decode("utf-8","replace")
+        from html.parser import HTMLParser
+        class TextParser(HTMLParser):
+            def __init__(self): super().__init__(); self.text=[]; self.skip=0
+            def handle_starttag(self,t,a):
+                if t in ("script","style"): self.skip+=1
+            def handle_endtag(self,t):
+                if t in ("script","style") and self.skip: self.skip-=1
+            def handle_data(self,d):
+                if not self.skip and d.strip(): self.text.append(d.strip())
+        p=TextParser(); p.feed(page); text=" ".join(p.text)
+        import re
+        contract=re.search(r"0x[a-fA-F0-9]{40}",text)
+        net=re.search(r"(?:Network|Chain)\s*[:：]\s*([^|,;]{2,40})",text,re.I)
+        timeinfo=re.search(r"(?:Trading|Launch|Listing)\s*(?:Time)?\s*[:：]?\s*([^|]{5,120}?UTC)",text,re.I)
+        return (net.group(1).strip() if net else "",timeinfo.group(1).strip() if timeinfo else "",contract.group(0) if contract else "")
+    except Exception as e: log("OURBIT ARTICLE READ ERROR "+str(e)[:120]); return ("","","")
+
+def run_ourbit_listing_monitor():
+    log("OURBIT OFFICIAL LISTING MONITOR: checking")
+    try: items=_official_listing_feed()
+    except Exception as e: log("OURBIT RSS ERROR "+str(e)[:150]); return
+    info=_listing_state_read()
+    if not info: log("OURBIT MONITOR FAIL-CLOSED: dedup state unavailable"); return
+    state=info["state"] or {}; seen=set(state.get("seen",[]))
+    links=[x["link"] for x in items]
+    if not state.get("initialized"):
+        baseline={"initialized":True,"seen":links[-500:],"checked_utc":now_text()}
+        if _listing_state_write(info,baseline):
+            telegram_send("🟢 ARAD | Ourbit Listing Monitor activated.\nOfficial Ourbit RSS baseline saved: {} existing listing notices. Historical notices will not be repeated; new official listing notices will alert automatically.\nSource: {}".format(len(links),OURBIT_RSS))
+        else: log("OURBIT MONITOR BASELINE SAVE FAILED")
+        return
+    new=[x for x in items if x["link"] not in seen]
+    if not new: log("OURBIT MONITOR: no new official listing announcements"); return
+    delivered=[]
+    for item in reversed(new):
+        network,listing_time,contract=_listing_details(item["link"])
+        msg=["🚨 ARAD | OURBIT OFFICIAL LISTING","",item["title"]]
+        if item["pub"]: msg.append("Published: "+item["pub"])
+        msg.append("Network: "+(network or "not specified in notice"))
+        msg.append("Trading time: "+(listing_time or "not specified/detected"))
+        msg.append("Contract: "+(contract or "not included/detected in notice"))
+        msg += ["","Official notice: "+item["link"]]
+        if telegram_send("\n".join(msg)): delivered.append(item["link"]); seen.add(item["link"])
+    if delivered:
+        newstate={"initialized":True,"seen":list(seen)[-500:],"checked_utc":now_text()}
+        log("OURBIT MONITOR SENT {} alerts; state saved {}".format(len(delivered),_listing_state_write(info,newstate)))
+    else: log("OURBIT MONITOR: delivery failed; will retry next scheduled run")
+
+
 def main():
     started = time.time()
+    run_ourbit_listing_monitor()
     log("")
     log("ARAD CRYPTO PRO V6.5.7 EARLY FIRST-MOVE + QUALITY TEST OURBIT")
     log("START: " + now_text())
