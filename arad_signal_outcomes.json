@@ -7174,6 +7174,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ZEC_USDT|LONG|EARLY|1795667578",
+      "symbol": "ZEC_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 771.87,
+      "sl": 765.2111512603982,
+      "tp": [
+        778.5288487396018,
+        781.8582731094027
+      ],
+      "created_at": 1795667578,
+      "first_candle_time": 1795667700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
