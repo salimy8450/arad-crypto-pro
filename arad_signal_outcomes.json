@@ -7191,6 +7191,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SQQQ_USDT|LONG|EARLY|1795667580",
+      "symbol": "SQQQ_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 48.24,
+      "sl": 48.11851509604993,
+      "tp": [
+        48.36148490395007,
+        48.4222273559251,
+        48.48296980790014,
+        48.54371225987518,
+        48.60445471185021,
+        48.72593961580028
+      ],
+      "created_at": 1795667580,
+      "first_candle_time": 1795667700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
