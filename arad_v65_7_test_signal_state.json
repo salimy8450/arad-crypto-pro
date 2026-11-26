@@ -1,8 +1,4 @@
 {
-  "ZBT_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795050746
-  },
   "MRNA_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1795256370
@@ -38,10 +34,6 @@
   "SHELL_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795439690
-  },
-  "ID_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795050740
   },
   "MON_USDT|SHORT": {
     "type": "WATCH",
@@ -123,37 +115,13 @@
     "type": "WATCH",
     "sent_at": 1795210454
   },
-  "ZK_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795050736
-  },
   "APE_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1795110357
   },
-  "ZETA_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795050743
-  },
-  "ALLO_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795050745
-  },
   "US_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795481750
-  },
-  "DASH_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795050746
-  },
-  "ZORA_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795050746
-  },
-  "BASED_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1795050747
   },
   "PRL_USDT|SHORT": {
     "type": "WATCH",
@@ -396,8 +364,8 @@
     "sent_at": 1795387995
   },
   "XAU_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1795404013
+    "type": "WATCH",
+    "sent_at": 1795667582
   },
   "MON_USDT|LONG": {
     "type": "EARLY",
@@ -428,8 +396,8 @@
     "sent_at": 1795439691
   },
   "PAXG_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1795439691
+    "type": "EARLY",
+    "sent_at": 1795667578
   },
   "LINEA_USDT|SHORT": {
     "type": "WATCH",
@@ -521,7 +489,7 @@
   },
   "LAYER_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1795646900
+    "sent_at": 1795667582
   },
   "BTC_USDT|LONG": {
     "type": "WATCH",
@@ -530,5 +498,25 @@
   "GT_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795646901
+  },
+  "ZEC_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795667579
+  },
+  "SQQQ_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795667581
+  },
+  "ANT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795667581
+  },
+  "XAUT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795667581
+  },
+  "SQD_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795667582
   }
 }
