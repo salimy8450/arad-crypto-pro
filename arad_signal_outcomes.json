@@ -7292,6 +7292,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "SOXSX_USDT|LONG|EARLY|1795702870",
+      "symbol": "SOXSX_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 59.6,
+      "sl": 59.124010884460866,
+      "tp": [
+        60.07598911553914,
+        60.313983673308705,
+        60.55197823107827,
+        60.78997278884784,
+        61.02796734661741,
+        61.503956462156545
+      ],
+      "created_at": 1795702870,
+      "first_candle_time": 1795703100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
