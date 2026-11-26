@@ -35,13 +35,9 @@
     "type": "WATCH",
     "sent_at": 1795439690
   },
-  "MON_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795078129
-  },
   "NVDA_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795210454
+    "type": "EARLY",
+    "sent_at": 1795702869
   },
   "UNI_USDT|SHORT": {
     "type": "EARLY",
@@ -53,7 +49,7 @@
   },
   "BLESS_USDT|LONG": {
     "type": "WATCH",
-    "sent_at": 1795387996
+    "sent_at": 1795702873
   },
   "WLD_USDT|LONG": {
     "type": "WATCH",
@@ -68,8 +64,8 @@
     "sent_at": 1795553632
   },
   "LINK_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1795210445
+    "type": "WATCH",
+    "sent_at": 1795702873
   },
   "INIT_USDT|SHORT": {
     "type": "WATCH",
@@ -87,17 +83,9 @@
     "type": "WATCH",
     "sent_at": 1795369737
   },
-  "UAI_USDT|LONG": {
-    "type": "WATCH",
-    "sent_at": 1795078130
-  },
   "DOT_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795282836
-  },
-  "HEI_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795078130
   },
   "HYPE_USDT|LONG": {
     "type": "WATCH",
@@ -112,8 +100,8 @@
     "sent_at": 1795553632
   },
   "INTC_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795210454
+    "type": "EARLY",
+    "sent_at": 1795702864
   },
   "APE_USDT|SHORT": {
     "type": "EARLY",
@@ -126,14 +114,6 @@
   "PRL_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795229283
-  },
-  "NBIS_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795078127
-  },
-  "IRYS_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1795078128
   },
   "CORE_USDT|LONG": {
     "type": "WATCH",
@@ -416,8 +396,8 @@
     "sent_at": 1795516564
   },
   "SHELL_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1795516566
+    "type": "WATCH",
+    "sent_at": 1795702872
   },
   "BNB_USDT|SHORT": {
     "type": "WATCH",
@@ -428,8 +408,8 @@
     "sent_at": 1795516567
   },
   "RENDER_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795516567
+    "type": "EARLY",
+    "sent_at": 1795702867
   },
   "GMT_USDT|SHORT": {
     "type": "WATCH",
@@ -518,5 +498,21 @@
   "SQD_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795667582
+  },
+  "COHR_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795702865
+  },
+  "SOXSX_USDT|LONG": {
+    "type": "EARLY",
+    "sent_at": 1795702871
+  },
+  "TRIA_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795702872
+  },
+  "MON_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795702872
   }
 }
