@@ -7157,6 +7157,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "PAXG_USDT|LONG|EARLY|1795667577",
+      "symbol": "PAXG_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 3584.01,
+      "sl": 3567.0265180008423,
+      "tp": [
+        3600.993481999158,
+        3609.4852229987373
+      ],
+      "created_at": 1795667577,
+      "first_candle_time": 1795667700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
