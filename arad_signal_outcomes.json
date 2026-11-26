@@ -7233,6 +7233,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "COHR_USDT|SHORT|EARLY|1795702864",
+      "symbol": "COHR_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 201.63,
+      "sl": 202.220489,
+      "tp": [
+        201.039511,
+        200.7442665,
+        200.449022,
+        200.15377750000002,
+        199.85853300000002,
+        199.26804400000003
+      ],
+      "created_at": 1795702864,
+      "first_candle_time": 1795703100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
