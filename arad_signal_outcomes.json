@@ -7275,6 +7275,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "NVDA_USDT|SHORT|EARLY|1795702868",
+      "symbol": "NVDA_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 151.05,
+      "sl": 151.63797014027827,
+      "tp": [
+        150.46202985972175,
+        150.1680447895826
+      ],
+      "created_at": 1795702868,
+      "first_candle_time": 1795703100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
