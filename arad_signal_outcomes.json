@@ -7313,6 +7313,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ME_USDT|SHORT|EARLY|1795734499",
+      "symbol": "ME_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.04161,
+      "sl": 0.04235299696228909,
+      "tp": [
+        0.04086700303771091,
+        0.040495504556566364
+      ],
+      "created_at": 1795734499,
+      "first_candle_time": 1795734600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
