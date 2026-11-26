@@ -7330,6 +7330,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "ZRO_USDT|LONG|EARLY|1795734502",
+      "symbol": "ZRO_USDT",
+      "direction": "LONG",
+      "alert_type": "EARLY",
+      "entry": 1.1247,
+      "sl": 1.117394716231328,
+      "tp": [
+        1.132005283768672,
+        1.1356579256530082,
+        1.139310567537344,
+        1.14296320942168,
+        1.146615851306016,
+        1.153921135074688
+      ],
+      "created_at": 1795734502,
+      "first_candle_time": 1795734600,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
