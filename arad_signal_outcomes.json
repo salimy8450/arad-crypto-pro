@@ -7254,6 +7254,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "RENDER_USDT|SHORT|EARLY|1795702866",
+      "symbol": "RENDER_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 1.325,
+      "sl": 1.3305243400544755,
+      "tp": [
+        1.3194756599455244,
+        1.3167134899182866,
+        1.3139513198910489,
+        1.311189149863811,
+        1.3084269798365733,
+        1.3029026397820977
+      ],
+      "created_at": 1795702866,
+      "first_candle_time": 1795703100,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
