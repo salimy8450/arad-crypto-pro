@@ -19,17 +19,9 @@
     "type": "EARLY",
     "sent_at": 1795646898
   },
-  "ETH_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795150284
-  },
   "CORE_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795314446
-  },
-  "UAI_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795150286
+    "sent_at": 1795755609
   },
   "SHELL_USDT|SHORT": {
     "type": "WATCH",
@@ -122,26 +114,6 @@
   "LINK_USDT|SHORT": {
     "type": "EARLY",
     "sent_at": 1795646894
-  },
-  "FET_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795132515
-  },
-  "HYPE_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795132514
-  },
-  "ZHIPU_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795132514
-  },
-  "PUMPFUN_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795132515
-  },
-  "RVN_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795150285
   },
   "YB_USDT|SHORT": {
     "type": "WATCH",
@@ -389,7 +361,7 @@
   },
   "EVAA_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795516567
+    "sent_at": 1795755607
   },
   "RENDER_USDT|SHORT": {
     "type": "EARLY",
@@ -513,10 +485,30 @@
   },
   "AT_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795734504
+    "sent_at": 1795755609
   },
   "HYPER_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795734505
+  },
+  "BIGTIME_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795755602
+  },
+  "INJ_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795755605
+  },
+  "MMT_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795755607
+  },
+  "OP_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795755608
+  },
+  "SQD_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795755608
   }
 }
