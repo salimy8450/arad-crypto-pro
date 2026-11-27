@@ -85,7 +85,7 @@
   },
   "BMNR_USDT|SHORT": {
     "type": "EARLY",
-    "sent_at": 1795229272
+    "sent_at": 1795820576
   },
   "TAC_USDT|SHORT": {
     "type": "WATCH",
@@ -126,14 +126,6 @@
   "MELANIA_USDT|LONG": {
     "type": "EARLY",
     "sent_at": 1795341936
-  },
-  "WOO_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1795210452
-  },
-  "BERA_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795210454
   },
   "STEEM_USDT|SHORT": {
     "type": "EARLY",
@@ -348,8 +340,8 @@
     "sent_at": 1795702872
   },
   "BNB_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795516566
+    "type": "EARLY",
+    "sent_at": 1795820582
   },
   "EVAA_USDT|SHORT": {
     "type": "WATCH",
@@ -405,7 +397,7 @@
   },
   "NEAR_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795614080
+    "sent_at": 1795820584
   },
   "SOL_USDT|SHORT": {
     "type": "WATCH",
@@ -514,5 +506,33 @@
   "CVC_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795791054
+  },
+  "LAYER_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795820578
+  },
+  "MSTU_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795820580
+  },
+  "OPG_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795820584
+  },
+  "BTC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795820584
+  },
+  "SAGA_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795820585
+  },
+  "AT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795820585
+  },
+  "WCT_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795820586
   }
 }
