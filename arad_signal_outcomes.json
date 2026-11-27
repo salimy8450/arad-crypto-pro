@@ -7406,6 +7406,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BMNR_USDT|SHORT|EARLY|1795820575",
+      "symbol": "BMNR_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 13.82,
+      "sl": 13.879880576072837,
+      "tp": [
+        13.760119423927163,
+        13.730179135890744
+      ],
+      "created_at": 1795820575,
+      "first_candle_time": 1795820700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
