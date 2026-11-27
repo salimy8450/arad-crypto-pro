@@ -7440,6 +7440,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MSTU_USDT|SHORT|EARLY|1795820579",
+      "symbol": "MSTU_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 9.68,
+      "sl": 9.707179217286665,
+      "tp": [
+        9.652820782713334,
+        9.639231174070002,
+        9.625641565426669,
+        9.612051956783336,
+        9.598462348140004,
+        9.571283130853338
+      ],
+      "created_at": 1795820579,
+      "first_candle_time": 1795820700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
