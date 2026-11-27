@@ -7368,6 +7368,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "INJ_USDT|SHORT|EARLY|1795755603",
+      "symbol": "INJ_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 6.365,
+      "sl": 6.378064528899278,
+      "tp": [
+        6.351935471100722,
+        6.345403206651083,
+        6.338870942201444,
+        6.332338677751805,
+        6.325806413302166,
+        6.312741884402888
+      ],
+      "created_at": 1795755603,
+      "first_candle_time": 1795755900,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
