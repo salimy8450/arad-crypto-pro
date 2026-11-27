@@ -7423,6 +7423,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "LAYER_USDT|SHORT|EARLY|1795820577",
+      "symbol": "LAYER_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.04884,
+      "sl": 0.04926001047145602,
+      "tp": [
+        0.04841998952854398,
+        0.04820998429281598
+      ],
+      "created_at": 1795820577,
+      "first_candle_time": 1795820700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
