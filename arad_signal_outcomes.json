@@ -7482,6 +7482,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "OPG_USDT|SHORT|EARLY|1795820582",
+      "symbol": "OPG_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.1758,
+      "sl": 0.17828574231478087,
+      "tp": [
+        0.17331425768521916,
+        0.17207138652782872
+      ],
+      "created_at": 1795820582,
+      "first_candle_time": 1795820700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
