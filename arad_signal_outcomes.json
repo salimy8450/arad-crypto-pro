@@ -7461,6 +7461,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BNB_USDT|SHORT|EARLY|1795820581",
+      "symbol": "BNB_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 553.27,
+      "sl": 553.915981,
+      "tp": [
+        552.624019,
+        552.3010285,
+        551.978038,
+        551.6550474999999,
+        551.332057,
+        550.686076
+      ],
+      "created_at": 1795820581,
+      "first_candle_time": 1795820700,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
