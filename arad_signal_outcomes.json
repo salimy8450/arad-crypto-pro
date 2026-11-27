@@ -7389,6 +7389,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "MMT_USDT|SHORT|EARLY|1795755606",
+      "symbol": "MMT_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.1847,
+      "sl": 0.19311144560143242,
+      "tp": [
+        0.17628855439856758,
+        0.17208283159785137
+      ],
+      "created_at": 1795755606,
+      "first_candle_time": 1795755900,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
