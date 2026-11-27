@@ -101,7 +101,7 @@
   },
   "PRL_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795229283
+    "sent_at": 1795791055
   },
   "CORE_USDT|LONG": {
     "type": "WATCH",
@@ -118,14 +118,6 @@
   "YB_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795369736
-  },
-  "MAV_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795182137
-  },
-  "USUAL_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795182137
   },
   "XPL_USDT|LONG": {
     "type": "EARLY",
@@ -189,7 +181,7 @@
   },
   "ACE_USDT|SHORT": {
     "type": "WATCH",
-    "sent_at": 1795256372
+    "sent_at": 1795791052
   },
   "RESOLV_USDT|SHORT": {
     "type": "WATCH",
@@ -510,5 +502,17 @@
   "SQD_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795755608
+  },
+  "PIEVERSE_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795791053
+  },
+  "KORU_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795791053
+  },
+  "CVC_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795791054
   }
 }
