@@ -7351,6 +7351,23 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "BIGTIME_USDT|SHORT|EARLY|1795755601",
+      "symbol": "BIGTIME_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.006681,
+      "sl": 0.00705719644980441,
+      "tp": [
+        0.006304803550195591,
+        0.006116705325293386
+      ],
+      "created_at": 1795755601,
+      "first_candle_time": 1795755900,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
