@@ -1,8 +1,4 @@
 {
-  "MRNA_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795256370
-  },
   "HBAR_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795516568
@@ -32,8 +28,8 @@
     "sent_at": 1795702869
   },
   "UNI_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795646896
+    "type": "WATCH",
+    "sent_at": 1795873226
   },
   "SOPH_USDT|SHORT": {
     "type": "EARLY",
@@ -131,37 +127,17 @@
     "type": "WATCH",
     "sent_at": 1795614082
   },
-  "WCT_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795256367
-  },
   "MELANIA_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795614080
-  },
-  "ALT_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795256371
-  },
-  "CYBER_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795256372
   },
   "ACE_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795791052
   },
-  "RESOLV_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795256372
-  },
   "HUMA_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795734505
-  },
-  "LTC_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795256373
   },
   "TRX_USDT|SHORT": {
     "type": "EARLY",
@@ -530,5 +506,25 @@
   "GUN_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795840984
+  },
+  "TRUMPSOL_USDT|SHORT": {
+    "type": "EARLY",
+    "sent_at": 1795873225
+  },
+  "SSV_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795873225
+  },
+  "REZ_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795873226
+  },
+  "HOT_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795873226
+  },
+  "ICP_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795873226
   }
 }
