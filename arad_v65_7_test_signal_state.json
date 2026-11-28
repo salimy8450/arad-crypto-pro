@@ -127,33 +127,9 @@
     "type": "EARLY",
     "sent_at": 1795341936
   },
-  "STEEM_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795229274
-  },
-  "IDOL_USDT|LONG": {
-    "type": "EARLY",
-    "sent_at": 1795229276
-  },
-  "CHZ_USDT|SHORT": {
-    "type": "EARLY",
-    "sent_at": 1795229279
-  },
-  "CC_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795229281
-  },
-  "BMT_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795229282
-  },
   "XRP_USDT|SHORT": {
     "type": "WATCH",
     "sent_at": 1795614082
-  },
-  "BROCCOLI_USDT|SHORT": {
-    "type": "WATCH",
-    "sent_at": 1795229283
   },
   "WCT_USDT|SHORT": {
     "type": "EARLY",
@@ -534,5 +510,25 @@
   "WCT_USDT|LONG": {
     "type": "WATCH",
     "sent_at": 1795820586
+  },
+  "USUAL_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795840983
+  },
+  "ARB_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795840984
+  },
+  "OPG_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795840984
+  },
+  "ETH_USDT|SHORT": {
+    "type": "WATCH",
+    "sent_at": 1795840984
+  },
+  "GUN_USDT|LONG": {
+    "type": "WATCH",
+    "sent_at": 1795840984
   }
 }
