@@ -7499,6 +7499,27 @@
       "status": "OPEN",
       "result": null,
       "max_tp": 0
+    },
+    {
+      "id": "TRUMPSOL_USDT|SHORT|EARLY|1795873224",
+      "symbol": "TRUMPSOL_USDT",
+      "direction": "SHORT",
+      "alert_type": "EARLY",
+      "entry": 0.748,
+      "sl": 0.7578366742654669,
+      "tp": [
+        0.7381633257345331,
+        0.7332449886017998,
+        0.7283266514690663,
+        0.7234083143363328,
+        0.7184899772035994,
+        0.7086533029381326
+      ],
+      "created_at": 1795873224,
+      "first_candle_time": 1795873500,
+      "status": "OPEN",
+      "result": null,
+      "max_tp": 0
     }
   ]
 }
